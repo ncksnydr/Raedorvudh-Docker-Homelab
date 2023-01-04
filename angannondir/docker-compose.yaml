@@ -1,0 +1,119 @@
+# TODO Add documentation flag.
+version: "3.9"
+services:
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:latest
+    container_name: angannondir-cloudflare
+    cap_drop:
+      - all
+    environment:
+      CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN}
+      DOMAINS: ${DOMAINS}
+      PGID: ${PGID}
+      PROXIED: true
+      PUID: ${PUID}
+      TZ: ${TZ}
+    network_mode: host
+    read_only: true
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    
+  guacd:
+    image: lscr.io/linuxserver/guacd:latest
+    container_name: angannondir-guacamole
+    ports:
+      - ${ANGANNONDIR_GUAC_PORT}:4822
+    restart: unless-stopped
+
+  app:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: angannondir-npm-app
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: ${ANGANNONDIR_NPM_PORT_DB}
+      DB_MYSQL_USER: ${ANGANNONDIR_NPM_USERNAME}
+      DB_MYSQL_PASSWORD: ${ANGANNONDIR_NPM_PASSWORD}
+      DB_MYSQL_NAME: ${ANGANNONDIR_NPM_DATABASE}
+      DISABLE_IPV6: 'true'
+    ports:
+      - ${ANGANNONDIR_NPM_PORT_HTTP}:80
+      - ${ANGANNONDIR_NPM_PORT_HTTPS}:443
+      - ${ANGANNONDIR_NPM_PORT_ADMIN}:81
+    restart: unless-stopped
+    volumes:
+      - nginx-proxy-manager-app:/data
+      - nginx-proxy-manager-letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
+
+  db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: angannondir-npm-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE}
+      MYSQL_USER: ${ANGANNONDIR_NPM_USERNAME}
+      MYSQL_PASSWORD: ${ANGANNONDIR_NPM_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - nginx-proxy-manager-db:/var/lib/mysql
+
+  # pihole:
+  #   image: pihole/pihole:latest
+  #   container_name: angannondir-pihole
+  #   cap_add:
+  #     - NET_ADMIN
+  #   environment:
+  #     FTLCONF_LOCAL_IPV4: ${RAEDORVUDH_IP}
+  #     IPv6: false
+  #     PGID: ${PGID}
+  #     PROXY_LOCATION: pihole
+  #     PUID: ${PUID}
+  #     TEMPERATUREUNIT: f
+  #     TZ: ${TZ}
+  #     VIRTUAL_HOST: pihole.${DOMAINS}
+  #     VIRTUAL_PORT: ${ANGANNONDIR_NPM_PORT_HTTP}
+  #     WEBPASSWORD: ${ANGANNONDIR_PIHOLE_PASSWORD}
+  #     WEBTHEME: default-light
+  #   ports:
+  #     - 53:53/tcp
+  #     - 53:53/udp
+  #     - 67:67/udp
+  #     - ${ANGANNONDIR_PIHOLE_PORT}:80/tcp
+  #   restart: unless-stopped
+  #   volumes:
+  #     - pihole-app:/etc/pihole
+  #     - pihole-dns:/etc/dnsmasq.d
+
+volumes:
+  nginx-proxy-manager-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${ENEDOS_PATH}/angannondir/nginx-proxy-manager"
+  nginx-proxy-manager-letsencrypt:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${ENEDOS_PATH}/angannondir/nginx-proxy-manager/letsencrypt"
+  nginx-proxy-manager-db:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${ENEDOS_PATH}/angannondir/nginx-proxy-manager/database"
+  # pihole-app:
+  #   driver: local
+  #   driver_opts:
+  #     type: nfs
+  #     o: addr=${NFS_IP},${NFS_OPTIONS}
+  #     device: ":${ENEDOS_PATH}/angannondir/pihole/"
+  # pihole-dns:
+  #   driver: local
+  #   driver_opts:
+  #     type: nfs
+  #     o: addr=${NFS_IP},${NFS_OPTIONS}
+  #     device: ":${ENEDOS_PATH}/angannondir/pihole/dns"
