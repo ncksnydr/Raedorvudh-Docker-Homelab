@@ -1,0 +1,69 @@
+version: '3.3'
+services:
+  app:
+    image: fireflyiii/core:latest
+    container_name: celebwain-firefly3-app
+    ports:
+      - ${FF3_PORT}:8080
+    volumes:
+      - ${FF3_PATH}:/var/www/html/storage/upload
+    # TODO: Convert .env file to environment variables in this file.
+    # env_file: ${FF3_PATH}/.env
+    restart: always
+    depends_on:
+      - db
+  db:
+    image: mariadb
+    container_name: celebwain-firefly3-db
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_USER: ${FF3_DB_USER}
+      MYSQL_PASSWORD: ${FF3_DB_PASSWORD}
+      MYSQL_DATABASE: ${FF3_DB_DATABASE}
+    hostname: fireflyiiidb
+    volumes:
+      - ${FF3_PATH}/database:/var/lib/mysql
+    restart: always
+
+  paperless-ng:
+    image: lscr.io/linuxserver/paperless-ng:latest
+    container_name: celebwain-paperless
+    ports:
+      - ${PAPERLESS_PORT}:8000
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - ${PAPERLESS_PATH}/config:/config
+      - ${PAPERLESS_PATH}/data:/data
+    restart: unless-stopped
+
+  nano-wallet:
+    image: lscr.io/linuxserver/nano-wallet:latest
+    container_name: nano-wallet
+    ports:
+      - 80:80
+    restart: unless-stopped
+
+  papermerge:
+    image: lscr.io/linuxserver/papermerge:latest
+    container_name: papermerge
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - REDIS_URL= #optional
+    volumes:
+      - </path/to/appdata/config>:/config
+      - </path/to/appdata/data>:/data
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+
+volumes:
+  firefly_iii_upload:
+  firefly_iii_db:
