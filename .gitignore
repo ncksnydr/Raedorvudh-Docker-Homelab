@@ -1,6 +1,7 @@
 # TODO Organize .gitignore file.
 
 .env
+barenfastad
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,linux,images,audio,video,archives
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,linux,images,audio,video,archives
