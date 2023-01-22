@@ -1,0 +1,151 @@
+version: "3.9"
+services:
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: perfadaben-lazylibrarian
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DOCKER_MODS: linuxserver/calibre-web:calibre|linuxserver/mods:lazylibrarian-ffmpeg
+    ports:
+      - ${PERFADABEN_LAZYLIBRARIAN_PORT}:5299
+    restart: unless-stopped
+    volumes:
+      - lazylibrarian-app:/config
+      - cofbilion-books:/downloads
+      - thinmbahad-books:/books
+
+  booksonic-air:
+    image: lscr.io/linuxserver/booksonic-air:latest
+    container_name: perfadaben-booksonic
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      CONTEXT_PATH: ${PERFADABEN_BOOKSONIC_URL}
+    ports:
+      - ${PERFADABEN_BOOKSONIC_PORT}:4040
+    restart: unless-stopped
+    volumes:
+      - booksonic-app:/config
+      - thinmbahad-audiobooks:/audiobooks
+      - thinmbahad-podcasts:/podcasts
+
+  ubooquity:
+    image: lscr.io/linuxserver/ubooquity:latest
+    container_name: perfadaben-ubooquity
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PERFADABEN_UBOOQUITY_PORT}:2202
+      - ${PERFADABEN_UBOOQUITY_PORT_ADMIN}:2203
+    restart: unless-stopped
+    volumes:
+      - ubooquity-app:/config
+      - thinmbahad-books:/books
+      - thinmbahad-comics:/comics
+      - ubooquity-app-raw:/files
+
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: perfadaben-calibre
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      PASSWORD: ${PERFADABEN_CALIBRE_PASSWORD}
+    ports:
+      - ${PERFADABEN_CALIBRE_PORT}:8080
+      - ${PERFADABEN_CALIBRE_PORT_ADMIN}:8081
+    restart: unless-stopped
+    volumes:
+      - calibre-app:/config
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: perfadaben-calibre-web
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DOCKER_MODS: linuxserver/mods:universal-calibre
+      OAUTHLIB_RELAX_TOKEN_SCOPE: 1
+    ports:
+      - ${PERFADABEN_CALIBRE_WEB_PORT}:8083
+    restart: unless-stopped
+    volumes:
+      - calibre-web-app:/config
+      - thinmbahad-books:/books
+
+
+volumes:
+  lazylibrarian-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/perfadaben/lazylibrarian"
+  cofbilion-books:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor/public/books"
+  thinmbahad-books:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/books/ebooks"
+  booksonic-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/perfadaben/booksonic"
+  thinmbahad-audiobooks:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/books/audiobooks"
+  thinmbahad-podcasts:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/podcasts"
+  ubooquity-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/perfadaben/ubooquity"
+  ubooquity-app-raw:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/perfadaben/ubooquity/raw"
+  thinmbahad-comics:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/books/comics"
+  calibre-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/perfadaben/calibre"
+  calibre-web-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/perfadaben/calibre-web"
+
