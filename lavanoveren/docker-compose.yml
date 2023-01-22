@@ -1,0 +1,63 @@
+version: "3.9"
+services:
+  bds:
+    image: itzg/minecraft-server
+    container_name: lavanoveren-minecraft
+    environment:
+      UID: ${PUID}
+      GID: ${PGID}
+      ALLOW_CHEATS: "TRUE"
+      DIFFICULTY: normal
+      EULA: "TRUE"
+      GAMEMODE: survival
+      SERVER_NAME: Nickopia
+    ports:
+      - ${LAVANOVEREN_MINECRAFT_PORT}:19132/udp
+    stdin_open: true
+    tty: true
+    volumes:
+      - minecraft-app:/data
+
+  # https://hub.docker.com/r/felddy/foundryvtt
+  # foundry:
+  #   image: felddy/foundryvtt:release
+  #   hostname: my_foundry_host
+  #   init: true
+  #   volumes:
+  #     - type: bind
+  #       source: <your_data_dir>
+  #       target: /data
+  #   environment:
+  #     - FOUNDRY_PASSWORD=<your_password>
+  #     - FOUNDRY_USERNAME=<your_username>
+  #     - FOUNDRY_ADMIN_KEY=atropos
+  #   ports:
+  #     - target: 30000
+  #       published: 30000
+  #       protocol: tcp
+
+  # emulatorjs:
+  #   image: lscr.io/linuxserver/emulatorjs:latest
+  #   container_name: emulatorjs
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Europe/London
+  #     - SUBFOLDER=/ #optional
+  #   volumes:
+  #     - /path/to/config:/config
+  #     - /path/to/data:/data
+  #   ports:
+  #     - 3000:3000
+  #     - 80:80
+  #     - 4001:4001 #optional
+  #   restart: unless-stopped
+
+
+volumes:
+  minecraft-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${ENEDOS_PATH}/lavanoveren/minecraft"
