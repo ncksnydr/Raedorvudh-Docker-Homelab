@@ -38,7 +38,7 @@ services:
       placement:
         constraints: [node.labels.nethiadil == true]
 
-   ombi:
+  ombi:
     image: lscr.io/linuxserver/ombi:latest
     container_name: nethiadil-requests
     environment:
