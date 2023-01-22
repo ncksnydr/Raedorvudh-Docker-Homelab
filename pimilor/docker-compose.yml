@@ -1,0 +1,78 @@
+version: "3.9"
+services:
+
+  transmission-openvpn:
+    image: haugene/transmission-openvpn
+    container_name: pimilor-transmission
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      OPENVPN_PROVIDER: ${VPN_PROVIDER}
+      OPENVPN_CONFIG: ${VPN_REGION}
+      OPENVPN_USERNAME: ${VPN_USERNAME}
+      OPENVPN_PASSWORD: ${VPN_PASSWORD}
+      LOCAL_NETWORK: ${NETWORK_RANGE}
+      WEBPROXY_ENABLED: "TRUE"
+      WEBPROXY_PORT: 8118
+      TRANSMISSION_WEB_UI: transmission-web-control
+      PUID: ${PUID}
+      PGID: ${PGID}
+      DEBUG: "TRUE"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - 9091:9091
+      - 3000:3000
+    volumes:
+      - cofbilion:/data
+      - transmission-app:/config
+  firefox:
+    image: lscr.io/linuxserver/firefox:latest
+    container_name: pimilor-firefox
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    volumes:
+      - firefox-app:/config
+    # ports:
+    #   - 3000:3000
+    network_mode: "service:transmission-openvpn"
+    depends_on:
+      - transmission-openvpn
+    healthcheck: # Here you will check if transmission is reachable from the Jackett container via localhost
+        test: curl -f http://localhost:9091 || exit 1
+        # Use this test if you protect your transmission with user and password
+        # comment test above and un-comment line below.
+        #test: curl -f http://${TRANSMISSION_RPC_USERNAME}:${TRANSMISSION_RPC_PASSWORD}@localhost:9091 || exit 1
+        interval: 5m00s
+        timeout: 10s
+        retries: 2
+    shm_size: "1gb"
+    restart: unless-stopped
+
+volumes:
+  transmission-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${ENEDOS_PATH}/pimilor/transmission
+  firefox-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${ENEDOS_PATH}/pimilor/firefox
+  cofbilion:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}
