@@ -1,0 +1,187 @@
+version: "3.9"
+services:
+  transmission-openvpn:
+    image: haugene/transmission-openvpn
+    container_name: pimilor-bt
+    cap_add:
+      - NET_ADMIN
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      OPENVPN_PROVIDER: ${PIMILOR_BT_PROVIDER}
+      OPENVPN_CONFIG: ${PIMILOR_BT_CONFIG}
+      OPENVPN_USERNAME: ${PIMILOR_BT_USERNAME}
+      OPENVPN_PASSWORD: ${PIMILOR_BT_PASSWORD}
+      LOCAL_NETWORK: ${NETWORK_RANGE}
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_BT_PORT}:9091
+    volumes:
+      - transmission-app:/config
+      - transmission-dl:/data
+
+  ytdl_material:
+    image: tzahi12345/youtubedl-material:latest
+    container_name: pimilor-ytdl-app
+    environment:
+      ALLOW_CONFIG_MUTATIONS: 'true'
+      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
+      ytdl_use_local_db: 'false'
+      write_ytdl_config: 'true'
+    ports:
+      - ${PIMILOR_YTDL_PORT}:17442
+    restart: always
+    volumes:
+      - ytdl-app:/app/appdata
+      - cofbilion-video:/app/video
+
+  ytdl-mongo-db:
+    image: mongo:4.4.6
+    container_name: mongo-db
+    logging:
+      driver: "none"
+    ports:
+      - ${PIMILOR_YTDL_PORT_DB}:27017
+    restart: always
+    volumes:
+      - ytdl-db:/data/db
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: pimilor-lidarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_LIDARR_PORT}:8686
+    restart: unless-stopped
+    volumes:
+      - lidarr-app:/config
+      - cofbilion-music:/downloads
+
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: pimilor-mylar
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_MYLAR_PORT}:8090
+    restart: unless-stopped
+    volumes:
+      - mylar-app:/config
+      - cofbilion-comics:/downloads
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: pimilor-radarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_RADARR_PORT}:7878
+    restart: unless-stopped
+    volumes:
+      - radarr-app:/config
+      - cofbilion-movies:/downloads
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: pimilor-sonarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_SONARR_PORT}:8989
+    restart: unless-stopped
+    volumes:
+      - sonarr-app:/config
+      - cofbilion-tv:/downloads
+
+volumes:
+  tranmission-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/tranmission"
+  tranmission-dl:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor"
+  ytdl-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/ytdl"
+  ytdl-db:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/ytdl/database"
+  cofbilion-video:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor/public/video"
+  lidarr-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/lidarr"
+  cofbilion-music:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor/public/music"
+  mylar-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/mylar"
+  cofbilion-comics:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor/public/comics"
+  radarr-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/radarr"
+  cofbilion-movies:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor/public/movies"
+  sonarr-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${ENEDOS_PATH}/pimilor/sonar"
+  cofbilion-tv:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${DROBO_IP},${DROBO_OPTIONS}
+      device: ":${COFBILION_PATH}/pimilor/public/tv"
