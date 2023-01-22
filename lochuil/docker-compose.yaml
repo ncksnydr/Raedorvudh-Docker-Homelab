@@ -1,0 +1,58 @@
+version: "3.9"
+services:
+  homer:
+    image: b4bz/homer
+    container_name: lochuil-homer
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      INIT_ASSETS: 1
+    ports:
+      - ${LOCHUIL_HOMER_PORT}:8080
+    volumes:
+      - homer-app:/www/assets
+    user: ${PUID}:${PGID}
+
+  homer-admin:
+    image: b4bz/homer
+    container_name: lochuil-homer-admin
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      INIT_ASSETS: 1
+    ports:
+      - ${LOCHUIL_HOMER_PORT_ADMIN}:8080
+    volumes:
+      - homer-admin-app:/www/assets
+    user: ${PUID}:${PGID}
+
+  homer-editor:
+    image: linuxserver/code-server
+    container_name: lochuil-editor
+    environment:
+      PUID: ${PUID}
+      GUID: ${PGID}
+      TZ: ${TZ}
+      PROXY_DOMAIN: ${LOCHUIL_VSCODE_URL}.${DOMAINS}
+      DEFAULT_WORKSPACE: ${LOCHUIL_VSCODE_WORKSPACE}
+    ports:
+      - ${LOCHUIL_VSCODE_PORT}:8443
+    restart: unless-stopped
+    volumes:
+       - homer-app:/www/assets
+    depends_on:
+      - homer
+
+volumes:
+  homer-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${ENEDOS_PATH}/lochuil/homer
+  homer-admin-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${ENEDOS_PATH}/lochuil/homer/admin
