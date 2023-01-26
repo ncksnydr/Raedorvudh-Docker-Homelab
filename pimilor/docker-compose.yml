@@ -1,9 +1,8 @@
 version: "3.9"
 services:
-
   transmission-openvpn:
     image: haugene/transmission-openvpn
-    container_name: pimilor-transmission
+    container_name: transmission-openvpn
     cap_add:
       - NET_ADMIN
     devices:
@@ -25,37 +24,62 @@ services:
       options:
         max-size: 10m
     ports:
-      - 9091:9091
-      - 3000:3000
+      - ${PIMILOR_TRANSMISSION_PORT}:9091
     volumes:
       - cofbilion:/data
       - transmission-app:/config
-  firefox:
-    image: lscr.io/linuxserver/firefox:latest
-    container_name: pimilor-firefox
-    security_opt:
-      - seccomp:unconfined
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    volumes:
-      - firefox-app:/config
-    # ports:
-    #   - 3000:3000
-    network_mode: "service:transmission-openvpn"
+    deploy:
+      replicas: 6
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  ytdl_material:
+    image: tzahi12345/youtubedl-material:latest
+    container_name: pimilor-ytdl-app
     depends_on:
-      - transmission-openvpn
-    healthcheck: # Here you will check if transmission is reachable from the Jackett container via localhost
-        test: curl -f http://localhost:9091 || exit 1
-        # Use this test if you protect your transmission with user and password
-        # comment test above and un-comment line below.
-        #test: curl -f http://${TRANSMISSION_RPC_USERNAME}:${TRANSMISSION_RPC_PASSWORD}@localhost:9091 || exit 1
-        interval: 5m00s
-        timeout: 10s
-        retries: 2
-    shm_size: "1gb"
-    restart: unless-stopped
+      - ytdl-mongo-db
+    environment:
+      ALLOW_CONFIG_MUTATIONS: "TRUE"
+      write_ytdl_config: "TRUE"
+      ytdl_allow_advanced_download: "TRUE"
+      ytdl_allow_subscriptions: "TRUE"
+      ytdl_allow_theme_change: "TRUE"
+      ytdl_default_theme: "default"
+      ytdl_download_only_mode: "TRUE"
+      ytdl_include_metadata: "TRUE"
+      ytdl_include_thumbnail: "TRUE"
+      ytdl_max_concurrent_downloads: 3
+      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
+      ytdl_multi_user_mode: "TRUE"
+      ytdl_use_local_db: "TRUE"
+      ytdl_use_youtubedl_archive: "TRUE"
+    ports:
+      - ${PIMILOR_YTDL_PORT}:17442
+    restart: always
+    volumes:
+      - ytdl-app:/app/appdata
+      - cofbilion-audio:/app/audio
+      - cofbilion-video:/app/video
+      - cofbilion-video:/app/subscriptions
+      - cofbilion-video:/app/users
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  ytdl-mongo-db:
+    image: mongo:4.4.6
+    container_name: pimilor-ytdl-db
+    ports:
+      - ${PIMILOR_YTDL_DB_PORT}:27017
+    logging:
+      driver: "none"
+    restart: always
+    volumes:
+      - ${PIMILOR_YTDL_DB_PATH}:/data/db
+    deploy:
+      placement:
+        constraints: [node.labels.database == true]
 
 volumes:
   transmission-app:
@@ -64,15 +88,31 @@ volumes:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${ENEDOS_PATH}/pimilor/transmission
-  firefox-app:
+
+  ytdl-app:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/pimilor/firefox
+      device: :${ENEDOS_PATH}/pimilor/youtube-dl
+
   cofbilion:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${COFBILION_PATH}
+
+  cofbilion-audio:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/audio
+
+  cofbilion-video:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/video
