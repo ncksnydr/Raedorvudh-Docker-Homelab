@@ -1,0 +1,118 @@
+version: "3.9"
+services:
+  transmission-openvpn:
+    image: haugene/transmission-openvpn
+    container_name: transmission-openvpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      OPENVPN_PROVIDER: ${VPN_PROVIDER}
+      OPENVPN_CONFIG: ${VPN_REGION}
+      OPENVPN_USERNAME: ${VPN_USERNAME}
+      OPENVPN_PASSWORD: ${VPN_PASSWORD}
+      LOCAL_NETWORK: ${NETWORK_RANGE}
+      WEBPROXY_ENABLED: "TRUE"
+      WEBPROXY_PORT: 8118
+      TRANSMISSION_WEB_UI: transmission-web-control
+      PUID: ${PUID}
+      PGID: ${PGID}
+      DEBUG: "TRUE"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_TRANSMISSION_PORT}:9091
+    volumes:
+      - cofbilion:/data
+      - transmission-app:/config
+    deploy:
+      replicas: 6
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  ytdl_material:
+    image: tzahi12345/youtubedl-material:latest
+    container_name: pimilor-ytdl-app
+    depends_on:
+      - ytdl-mongo-db
+    environment:
+      ALLOW_CONFIG_MUTATIONS: "TRUE"
+      write_ytdl_config: "TRUE"
+      ytdl_allow_advanced_download: "TRUE"
+      ytdl_allow_subscriptions: "TRUE"
+      ytdl_allow_theme_change: "TRUE"
+      ytdl_default_theme: "default"
+      ytdl_download_only_mode: "TRUE"
+      ytdl_include_metadata: "TRUE"
+      ytdl_include_thumbnail: "TRUE"
+      ytdl_max_concurrent_downloads: 3
+      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
+      ytdl_multi_user_mode: "TRUE"
+      ytdl_use_local_db: "TRUE"
+      ytdl_use_youtubedl_archive: "TRUE"
+    ports:
+      - ${PIMILOR_YTDL_PORT}:17442
+    restart: always
+    volumes:
+      - ytdl-app:/app/appdata
+      - cofbilion-audio:/app/audio
+      - cofbilion-video:/app/video
+      - cofbilion-video:/app/subscriptions
+      - cofbilion-video:/app/users
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  ytdl-mongo-db:
+    image: mongo:4.4.6
+    container_name: pimilor-ytdl-db
+    ports:
+      - ${PIMILOR_YTDL_DB_PORT}:27017
+    logging:
+      driver: "none"
+    restart: always
+    volumes:
+      - ${PIMILOR_YTDL_DB_PATH}:/data/db
+    deploy:
+      placement:
+        constraints: [node.labels.database == true]
+
+volumes:
+  transmission-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${ENEDOS_PATH}/pimilor/transmission
+
+  ytdl-app:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${ENEDOS_PATH}/pimilor/youtube-dl
+
+  cofbilion:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}
+
+  cofbilion-audio:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/audio
+
+  cofbilion-video:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/video
