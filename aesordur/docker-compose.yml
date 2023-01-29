@@ -18,15 +18,8 @@ services:
       - ${AESORDUR_MEALIE_PORT}:80
     restart: always
     volumes:
-      - mealie-app:/app/data
+      - ${AESORDUR_MEALIE_PATH}:/app/data
     deploy:
       replicas: 2
       placement:
         constraints: [node.labels.aesordur == true]
-volumes:
-  mealie-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/aesordur/mealie

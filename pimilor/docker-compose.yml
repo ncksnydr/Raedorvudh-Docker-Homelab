@@ -27,7 +27,7 @@ services:
       - ${PIMILOR_TRANSMISSION_PORT}:9091
     volumes:
       - cofbilion:/data
-      - transmission-app:/config
+      - ${PIMILOR_TRANSMISSION_PATH}:/config
     deploy:
       replicas: 6
       placement:
@@ -36,8 +36,6 @@ services:
   ytdl_material:
     image: tzahi12345/youtubedl-material:latest
     container_name: pimilor-ytdl-app
-    depends_on:
-      - ytdl-mongo-db
     environment:
       ALLOW_CONFIG_MUTATIONS: "TRUE"
       write_ytdl_config: "TRUE"
@@ -57,11 +55,13 @@ services:
       - ${PIMILOR_YTDL_PORT}:17442
     restart: always
     volumes:
-      - ytdl-app:/app/appdata
+      - ${PIMILOR_YTDL_PATH}:/app/appdata
       - cofbilion-audio:/app/audio
       - cofbilion-video:/app/video
       - cofbilion-video:/app/subscriptions
       - cofbilion-video:/app/users
+    depends_on:
+      - ytdl-mongo-db
     deploy:
       replicas: 2
       placement:
@@ -76,26 +76,12 @@ services:
       driver: "none"
     restart: always
     volumes:
-      - ${PIMILOR_YTDL_DB_PATH}:/data/db
+      - ${PIMILOR_YTDL_PATH}/database:/data/db
     deploy:
       placement:
         constraints: [node.labels.database == true]
 
 volumes:
-  transmission-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/pimilor/transmission
-
-  ytdl-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/pimilor/youtube-dl
-
   cofbilion:
     driver: local
     driver_opts:
