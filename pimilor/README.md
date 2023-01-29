@@ -37,7 +37,6 @@ _pee-MEH-lore_
 
 | Root word | Definition |
 |-----------|:----------:|
-| [Sindarin word with link to ElfDict.com](#) | Test |
 | [pîn](https://www.elfdict.com/wt/15660) | little |
 | [pil](https://www.elfdict.com/wt/519443) | thief, robber |
 | [-or](https://www.elfdict.com/wt/518972) | agental suffix |
