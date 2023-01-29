@@ -13,7 +13,7 @@ services:
       - ${NETHIADIL_PLEX_PORT}:32400/tcp
     restart: unless-stopped
     volumes:
-      - plex-app:/config
+      - ${NETHIADIL_PLEX_PATH}:/config
       - plex-media:/media
       - /etc/localtime:/etc/localtime:ro
     deploy:
@@ -32,24 +32,25 @@ services:
       - ${NETHIADIL_TAUTULLI_PORT}:8181
     restart: unless-stopped
     volumes:
-      - tautulli-app:/config
+      - ${NETHIADIL_TAUTULLI_PATH}:/config
     deploy:
       replicas: 1
       placement:
         constraints: [node.labels.nethiadil == true]
 
-  ombi:
-    image: lscr.io/linuxserver/ombi:latest
-    container_name: nethiadil-requests
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: nethiadil-overseerr
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
+      LOG_LEVEL: debug
     ports:
-      - ${NETHIADIL_OMBI_PORT}:3579
-    restart: unless-stopped
+      - ${NETHIADIL_OVERSEERR_PORT}:5055
     volumes:
-      - ombi-app:/config
+      - ${NETHIADIL_OVERSEERR_PATH}:/app/config
+    restart: unless-stopped
     deploy:
       replicas: 1
       placement:
@@ -64,40 +65,33 @@ services:
       TZ: ${TZ}
     restart: unless-stopped
     volumes:
-      - plex-meta-manager-app:/config
+      - ${NETHIADIL_PMM_PATH}:/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.nethiadil == true]
+
+  ersatztv:
+    image: jasongdove/ersatztv:latest
+    container_name: nethiadil-ersatztv
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${NETHIADIL_ERSATZTV_PORT}:8409
+    volumes:
+      - ${NETHIADIL_ERSATZTV_PATH}:/root/.local/share/ersatztv
+      - plex-media:/media/shared:ro
     deploy:
       replicas: 1
       placement:
         constraints: [node.labels.nethiadil == true]
 
 volumes:
-  plex-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/plex
   plex-media:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${THINMBAHAD_PATH}/media
-  plex-meta-manager-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/metadata
-  ombi-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/requests
-  tautulli-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/stats
