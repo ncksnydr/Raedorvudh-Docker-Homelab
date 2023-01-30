@@ -2,13 +2,13 @@ version: "3.9"
 services:
   plex:
     image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    network_mode: host
+    container_name: nethiadil-plex
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
       VERSION: docker
       PLEX_CLAIM: ${NETHIADIL_PLEX_CLAIM}
+    network_mode: host
     ports:
       - ${NETHIADIL_PLEX_PORT}:32400/tcp
     restart: unless-stopped
@@ -17,7 +17,7 @@ services:
       - plex-media:/media
       - /etc/localtime:/etc/localtime:ro
     deploy:
-      replicas: 1
+      replicas: 3
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -66,23 +66,6 @@ services:
     restart: unless-stopped
     volumes:
       - ${NETHIADIL_PMM_PATH}:/config
-    deploy:
-      replicas: 1
-      placement:
-        constraints: [node.labels.nethiadil == true]
-
-  ersatztv:
-    image: jasongdove/ersatztv:latest
-    container_name: nethiadil-ersatztv
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    ports:
-      - ${NETHIADIL_ERSATZTV_PORT}:8409
-    volumes:
-      - ${NETHIADIL_ERSATZTV_PATH}:/root/.local/share/ersatztv
-      - plex-media:/media/shared:ro
     deploy:
       replicas: 1
       placement:
