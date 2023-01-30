@@ -2,7 +2,7 @@ version: "3.9"
 services:
   transmission-openvpn:
     image: haugene/transmission-openvpn
-    container_name: transmission-openvpn
+    container_name: pimilor-transmission
     cap_add:
       - NET_ADMIN
     devices:
@@ -29,9 +29,49 @@ services:
       - cofbilion:/data
       - ${PIMILOR_TRANSMISSION_PATH}:/config
     deploy:
-      replicas: 6
+      replicas: 3
       placement:
         constraints: [node.labels.pimilor == true]
+
+  transmission-openvpn-pt:
+    image: haugene/transmission-openvpn
+    container_name: pimilor-transmission-pt
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      OPENVPN_PROVIDER: ${VPN_PROVIDER}
+      OPENVPN_CONFIG: ${VPN_REGION}
+      OPENVPN_USERNAME: ${VPN_USERNAME}
+      OPENVPN_PASSWORD: ${VPN_PASSWORD}
+      LOCAL_NETWORK: ${NETWORK_RANGE}
+      WEBPROXY_ENABLED: "TRUE"
+      WEBPROXY_PORT: 8118
+      TRANSMISSION_WEB_UI: transmission-web-control
+      PUID: ${PUID}
+      PGID: ${PGID}
+      DEBUG: "TRUE"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_TRANSMISSION_PT_PORT}:9091
+    volumes:
+      - cofbilion:/data
+      - ${PIMILOR_TRANSMISSION_PT_PATH}:/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.hostname == amonvedui]
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1900M
+        reservations:
+          cpus: "1"
+          memory: 1000M
 
   ytdl_material:
     image: tzahi12345/youtubedl-material:latest
