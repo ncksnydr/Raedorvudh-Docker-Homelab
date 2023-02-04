@@ -2,7 +2,7 @@
 <img src="../resources/images/lochuil.svg" alt="Lochuil written in Tengwar" style="max-width:100%;">
 
 # Lochuil
-_Warm Winds_
+_Warm Winds (Innkeeper)_
 </div>
 
 ## Applications in the stack

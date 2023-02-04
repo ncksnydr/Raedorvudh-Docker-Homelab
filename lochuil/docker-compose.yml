@@ -10,8 +10,11 @@ services:
     ports:
       - ${LOCHUIL_HOMER_PORT}:8080
     volumes:
-      - homer-app:/www/assets
+      - ${LOCHUIL_HOMER_PATH}:/www/assets
     user: ${PUID}:${PGID}
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]
 
   homer-admin:
     image: b4bz/homer
@@ -23,8 +26,11 @@ services:
     ports:
       - ${LOCHUIL_HOMER_PORT_ADMIN}:8080
     volumes:
-      - homer-admin-app:/www/assets
+      - ${LOCHUIL_HOMER_ADMIN_PATH}:/www/assets
     user: ${PUID}:${PGID}
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]
 
   homer-editor:
     image: linuxserver/code-server
@@ -39,20 +45,10 @@ services:
       - ${LOCHUIL_VSCODE_PORT}:8443
     restart: unless-stopped
     volumes:
-       - homer-app:/www/assets
+       - ${LOCHUIL_HOMER_PATH}:/www
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]
     depends_on:
       - homer
-
-volumes:
-  homer-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/lochuil/homer
-  homer-admin-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/lochuil/homer/admin
+      - homer-admin
