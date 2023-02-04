@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   transmission-openvpn:
-    image: haugene/transmission-openvpn
+    image: haugene/transmission-openvpn:3.7.1
     container_name: pimilor-transmission
     cap_add:
       - NET_ADMIN
@@ -19,19 +19,28 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       DEBUG: "TRUE"
+      OVERRIDE_DNS_1: 8.8.8.8
+      OVERRIDE_DNS_2: 8.8.4.4
     logging:
       driver: json-file
       options:
         max-size: 10m
     ports:
       - ${PIMILOR_TRANSMISSION_PORT}:9091
+      - 8118:8118
+    security_opt:
+      - seccomp:unconfined
     volumes:
       - cofbilion:/data
       - ${PIMILOR_TRANSMISSION_PATH}:/config
     deploy:
-      replicas: 3
+      replicas: 1
       placement:
-        constraints: [node.labels.pimilor == true]
+        constraints: [node.hostname == gadathli]
+      resources:
+        limits:
+          cpus: "4"
+          memory: 3600M
 
   transmission-openvpn-pt:
     image: haugene/transmission-openvpn
@@ -62,16 +71,10 @@ services:
       - cofbilion:/data
       - ${PIMILOR_TRANSMISSION_PT_PATH}:/config
     deploy:
-      replicas: 1
+      replicas: 0
       placement:
-        constraints: [node.hostname == amonvedui]
-      resources:
-        limits:
-          cpus: "2"
-          memory: 1900M
-        reservations:
-          cpus: "1"
-          memory: 1000M
+        constraints: [node.labels.pimilor-pt == true]
+
 
   ytdl_material:
     image: tzahi12345/youtubedl-material:latest
@@ -103,7 +106,7 @@ services:
     depends_on:
       - ytdl-mongo-db
     deploy:
-      replicas: 2
+      replicas: 0
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -118,6 +121,7 @@ services:
     volumes:
       - ${PIMILOR_YTDL_PATH}/database:/data/db
     deploy:
+      replicas: 0
       placement:
         constraints: [node.labels.database == true]
 

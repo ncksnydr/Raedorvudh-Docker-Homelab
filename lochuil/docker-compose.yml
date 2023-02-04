@@ -45,7 +45,7 @@ services:
       - ${LOCHUIL_VSCODE_PORT}:8443
     restart: unless-stopped
     volumes:
-       - ${LOCHUIL_HOMER_PATH}:/www/assets
+       - ${LOCHUIL_HOMER_PATH}:/www
     deploy:
       placement:
         constraints: [node.labels.lochuil == true]
