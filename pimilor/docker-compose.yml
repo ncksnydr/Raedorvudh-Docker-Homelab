@@ -1,0 +1,151 @@
+version: "3.9"
+services:
+  transmission-openvpn:
+    image: haugene/transmission-openvpn:4.2
+    container_name: pimilor-transmission
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DEBUG: "TRUE"
+      LOCAL_NETWORK: ${NETWORK_RANGE}
+      OPENVPN_PROVIDER: ${VPN_PROVIDER}
+      OPENVPN_CONFIG: ${VPN_REGION}
+      OPENVPN_USERNAME: ${VPN_USERNAME}
+      OPENVPN_PASSWORD: ${VPN_PASSWORD}
+      OPENVPN_OPTS: ${VPN_OPTIONS}
+      WEBPROXY_ENABLED: "TRUE"
+      WEBPROXY_PORT: 8118
+      TRANSMISSION_WEB_UI: transmission-web-control
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_TRANSMISSION_PORT}:9091
+      - 8118:8118
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - cofbilion:/data
+      - ${PIMILOR_TRANSMISSION_PATH}:/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.hostname == gadathli]
+
+  transmission-openvpn-pt:
+    image: haugene/transmission-openvpn:4.0
+    container_name: pimilor-transmission-pt
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DEBUG: "TRUE"
+      LOCAL_NETWORK: ${NETWORK_RANGE}
+      OPENVPN_PROVIDER: ${VPN_PROVIDER}
+      OPENVPN_CONFIG: ${VPN_REGION}
+      OPENVPN_USERNAME: ${VPN_USERNAME}
+      OPENVPN_PASSWORD: ${VPN_PASSWORD}
+      OPENVPN_OPTS: ${VPN_OPTIONS}
+      WEBPROXY_ENABLED: "TRUE"
+      WEBPROXY_PORT: 8120
+      TRANSMISSION_WEB_UI: transmission-web-control
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_TRANSMISSION_PT_PORT}:9091
+      - 8120:8120
+    volumes:
+      - cofbilion:/data
+      - ${PIMILOR_TRANSMISSION_PT_PATH}:/config
+    deploy:
+      replicas: 0
+      placement:
+        constraints: [node.labels.pimilor-pt == true]
+
+  ytdl_material:
+    image: tzahi12345/youtubedl-material:latest
+    container_name: pimilor-ytdl-app
+    environment:
+      ALLOW_CONFIG_MUTATIONS: "TRUE"
+      write_ytdl_config: "TRUE"
+      ytdl_allow_advanced_download: "TRUE"
+      ytdl_allow_subscriptions: "TRUE"
+      ytdl_allow_theme_change: "TRUE"
+      ytdl_default_theme: "default"
+      ytdl_download_only_mode: "TRUE"
+      ytdl_include_metadata: "TRUE"
+      ytdl_include_thumbnail: "TRUE"
+      ytdl_max_concurrent_downloads: 3
+      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
+      ytdl_multi_user_mode: "TRUE"
+      ytdl_use_local_db: "TRUE"
+      ytdl_use_youtubedl_archive: "TRUE"
+    ports:
+      - ${PIMILOR_YTDL_PORT}:17442
+    restart: always
+    volumes:
+      - ${PIMILOR_YTDL_PATH}:/app/appdata
+      - cofbilion-audio:/app/audio
+      - cofbilion-video:/app/video
+      - cofbilion-video:/app/subscriptions
+      - cofbilion-video:/app/users
+    depends_on:
+      - ytdl-mongo-db
+    deploy:
+      replicas: 0
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  ytdl-mongo-db:
+    image: mongo:4.4.6
+    container_name: pimilor-ytdl-db
+    ports:
+      - ${PIMILOR_YTDL_DB_PORT}:27017
+    logging:
+      driver: "none"
+    restart: always
+    volumes:
+      - ${PIMILOR_YTDL_PATH}/database:/data/db
+    deploy:
+      replicas: 0
+      placement:
+        constraints: [node.labels.database == true]
+
+volumes:
+  cofbilion:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}
+  cofbilion-audio:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/audio
+  cofbilion-video:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/video

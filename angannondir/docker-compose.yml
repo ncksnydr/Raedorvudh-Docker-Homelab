@@ -35,8 +35,8 @@ services:
       - ${ANGANNONDIR_NPM_PORT_ADMIN}:81
     restart: unless-stopped
     volumes:
-      - nginx-proxy-manager-app:/data
-      - nginx-proxy-manager-letsencrypt:/etc/letsencrypt
+      - ${ANGANNONDIR_NPM_PATH}:/data
+      - ${ANGANNONDIR_NPM_PATH}/letsencrypt:/etc/letsencrypt
     depends_on:
       - db
     deploy:
@@ -50,23 +50,10 @@ services:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE}
       MYSQL_USER: ${ANGANNONDIR_NPM_USERNAME}
-      MYSQL_PASSWORD: ${ANGANNONDIR_NPM_PASSWORD}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD}
     restart: unless-stopped
     volumes:
       - ${ANGANNONDIR_DB_PATH}:/var/lib/mysql
     deploy:
       placement:
         constraints: [node.labels.database == true]
-volumes:
-  nginx-proxy-manager-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/angannondir/nginx-proxy-manager
-  nginx-proxy-manager-letsencrypt:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/angannondir/nginx-proxy-manager/letsencrypt

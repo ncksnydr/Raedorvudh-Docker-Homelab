@@ -2,6 +2,9 @@
 
 .env
 barenfastad
+faenil
+
+lochuil/homer/tools/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,linux,images,audio,video,archives
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,linux,images,audio,video,archives
@@ -98,9 +101,6 @@ barenfastad
 *.tiff
 *.tif
 
-# Scalable Vector Graphics
-*.svg
-*.svgz
 
 # Portable Document Format
 *.pdf
