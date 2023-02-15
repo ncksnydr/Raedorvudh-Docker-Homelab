@@ -1,26 +1,29 @@
 version: "3.9"
 services:
   transmission-openvpn:
-    image: haugene/transmission-openvpn:3.7.1
+    image: haugene/transmission-openvpn:4.2
     container_name: pimilor-transmission
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DEBUG: "TRUE"
+      LOCAL_NETWORK: ${NETWORK_RANGE}
       OPENVPN_PROVIDER: ${VPN_PROVIDER}
       OPENVPN_CONFIG: ${VPN_REGION}
       OPENVPN_USERNAME: ${VPN_USERNAME}
       OPENVPN_PASSWORD: ${VPN_PASSWORD}
-      LOCAL_NETWORK: ${NETWORK_RANGE}
+      OPENVPN_OPTS: ${VPN_OPTIONS}
       WEBPROXY_ENABLED: "TRUE"
       WEBPROXY_PORT: 8118
       TRANSMISSION_WEB_UI: transmission-web-control
-      PUID: ${PUID}
-      PGID: ${PGID}
-      DEBUG: "TRUE"
-      OVERRIDE_DNS_1: 8.8.8.8
-      OVERRIDE_DNS_2: 8.8.4.4
     logging:
       driver: json-file
       options:
@@ -28,6 +31,7 @@ services:
     ports:
       - ${PIMILOR_TRANSMISSION_PORT}:9091
       - 8118:8118
+    restart: unless-stopped
     security_opt:
       - seccomp:unconfined
     volumes:
@@ -37,36 +41,38 @@ services:
       replicas: 1
       placement:
         constraints: [node.hostname == gadathli]
-      resources:
-        limits:
-          cpus: "4"
-          memory: 3600M
 
   transmission-openvpn-pt:
-    image: haugene/transmission-openvpn
+    image: haugene/transmission-openvpn:4.0
     container_name: pimilor-transmission-pt
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DEBUG: "TRUE"
+      LOCAL_NETWORK: ${NETWORK_RANGE}
       OPENVPN_PROVIDER: ${VPN_PROVIDER}
       OPENVPN_CONFIG: ${VPN_REGION}
       OPENVPN_USERNAME: ${VPN_USERNAME}
       OPENVPN_PASSWORD: ${VPN_PASSWORD}
-      LOCAL_NETWORK: ${NETWORK_RANGE}
+      OPENVPN_OPTS: ${VPN_OPTIONS}
       WEBPROXY_ENABLED: "TRUE"
-      WEBPROXY_PORT: 8118
+      WEBPROXY_PORT: 8120
       TRANSMISSION_WEB_UI: transmission-web-control
-      PUID: ${PUID}
-      PGID: ${PGID}
-      DEBUG: "TRUE"
     logging:
       driver: json-file
       options:
         max-size: 10m
     ports:
       - ${PIMILOR_TRANSMISSION_PT_PORT}:9091
+      - 8120:8120
     volumes:
       - cofbilion:/data
       - ${PIMILOR_TRANSMISSION_PT_PATH}:/config
@@ -74,7 +80,6 @@ services:
       replicas: 0
       placement:
         constraints: [node.labels.pimilor-pt == true]
-
 
   ytdl_material:
     image: tzahi12345/youtubedl-material:latest
@@ -132,14 +137,12 @@ volumes:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${COFBILION_PATH}
-
   cofbilion-audio:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${COFBILION_PATH}/public/audio
-
   cofbilion-video:
     driver: local
     driver_opts:
