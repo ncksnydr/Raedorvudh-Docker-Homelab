@@ -1,5 +1,6 @@
 version: "3.9"
 services:
+
   lazylibrarian:
     image: lscr.io/linuxserver/lazylibrarian:latest
     container_name: perfadaben-lazylibrarian
@@ -12,9 +13,13 @@ services:
       - ${PERFADABEN_LAZYLIBRARIAN_PORT}:5299
     restart: unless-stopped
     volumes:
-      - lazylibrarian-app:/config
+      - ${PERFADABEN_LAZYLIBRARIAN_PATH}:/config
       - cofbilion-books:/downloads
       - thinmbahad-books:/books
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
 
   booksonic-air:
     image: lscr.io/linuxserver/booksonic-air:latest
@@ -28,9 +33,13 @@ services:
       - ${PERFADABEN_BOOKSONIC_PORT}:4040
     restart: unless-stopped
     volumes:
-      - booksonic-app:/config
+      - ${PERFADABEN_BOOKSONIC_PATH}:/config
       - thinmbahad-audiobooks:/audiobooks
       - thinmbahad-podcasts:/podcasts
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.labels.perfadaben == true]
 
   ubooquity:
     image: lscr.io/linuxserver/ubooquity:latest
@@ -44,10 +53,13 @@ services:
       - ${PERFADABEN_UBOOQUITY_PORT_ADMIN}:2203
     restart: unless-stopped
     volumes:
-      - ubooquity-app:/config
-      - thinmbahad-books:/books
+      - ${PERFADABEN_UBOOQUITY_PATH}:/config
       - thinmbahad-comics:/comics
-      - ubooquity-app-raw:/files
+      - ${PERFADABEN_UBOOQUITY_PATH}/files:/files
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
 
   calibre:
     image: lscr.io/linuxserver/calibre:latest
@@ -62,7 +74,11 @@ services:
       - ${PERFADABEN_CALIBRE_PORT_ADMIN}:8081
     restart: unless-stopped
     volumes:
-      - calibre-app:/config
+      - ${PERFADABEN_CALIBRE_PATH}:/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
 
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -74,78 +90,45 @@ services:
       DOCKER_MODS: linuxserver/mods:universal-calibre
       OAUTHLIB_RELAX_TOKEN_SCOPE: 1
     ports:
-      - ${PERFADABEN_CALIBRE_WEB_PORT}:8083
+      - ${PERFADABEN_CALIBRE_PORT_WEB}:8083
     restart: unless-stopped
     volumes:
-      - calibre-web-app:/config
+      - ${PERFADABEN_CALIBRE_PATH}/web:/config
       - thinmbahad-books:/books
-
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
 
 volumes:
-  lazylibrarian-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${ENEDOS_PATH}/perfadaben/lazylibrarian"
   cofbilion-books:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${COFBILION_PATH}/pimilor/public/books"
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${COFBILION_PATH}/public/books"
   thinmbahad-books:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${THINMBAHAD_PATH}/books/ebooks"
-  booksonic-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${ENEDOS_PATH}/perfadaben/booksonic"
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/books/ebooks"
   thinmbahad-audiobooks:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${THINMBAHAD_PATH}/books/audiobooks"
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/books/audiobooks"
   thinmbahad-podcasts:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${THINMBAHAD_PATH}/podcasts"
-  ubooquity-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${ENEDOS_PATH}/perfadaben/ubooquity"
-  ubooquity-app-raw:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${ENEDOS_PATH}/perfadaben/ubooquity/raw"
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/podcasts"
   thinmbahad-comics:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${THINMBAHAD_PATH}/books/comics"
-  calibre-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${ENEDOS_PATH}/perfadaben/calibre"
-  calibre-web-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${DROBO_IP},${DROBO_OPTIONS}
-      device: ":${ENEDOS_PATH}/perfadaben/calibre-web"
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/books/comics"
 
