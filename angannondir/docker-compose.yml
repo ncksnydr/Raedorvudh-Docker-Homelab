@@ -38,7 +38,7 @@ services:
       - ${ANGANNONDIR_NPM_PORT_ADMIN}:81
     restart: always
     volumes:
-      - ${ANGANNONDIR_NPM_PATH}:/data
+      - ${ANGANNONDIR_NPM_PATH}/app:/data
       - ${ANGANNONDIR_NPM_PATH}/letsencrypt:/etc/letsencrypt
     depends_on:
       - db
@@ -59,4 +59,4 @@ services:
       - ${ANGANNONDIR_NPM_PATH}/database:/var/lib/mysql
     deploy:
       placement:
-        constraints: [node.labels.database == true]
+        constraints: [node.labels.angannondir == true]
