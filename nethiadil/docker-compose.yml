@@ -17,7 +17,6 @@ services:
       - plex-media:/media
       - /etc/localtime:/etc/localtime:ro
     deploy:
-      replicas: 3
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -34,7 +33,6 @@ services:
     volumes:
       - ${NETHIADIL_TAUTULLI_PATH}:/config
     deploy:
-      replicas: 1
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -52,7 +50,6 @@ services:
       - ${NETHIADIL_OVERSEERR_PATH}:/app/config
     restart: unless-stopped
     deploy:
-      replicas: 1
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -63,11 +60,29 @@ services:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
+      # PMM_CONFIG: /config/config.yml
+      PMM_TIME: 03:00
     restart: unless-stopped
     volumes:
       - ${NETHIADIL_PMM_PATH}:/config
     deploy:
-      replicas: 1
+      placement:
+        constraints: [node.labels.nethiadil == true]
+
+  ersatztv:
+    image: jasongdove/ersatztv:develop-arm64
+    container_name: nethiadil-ersatztv
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${NETHIADIL_ERSATZTV_PORT}:8409
+    restart: unless-stopped
+    volumes:
+      - ${NETHIADIL_ERSATZTV_PATH}:/root/.local/share/ersatztv
+      - plex-media:/media/shared:ro
+    deploy:
       placement:
         constraints: [node.labels.nethiadil == true]
 

@@ -4,7 +4,14 @@
 barenfastad
 faenil
 
+
+
+
 lochuil/homer/tools/*
+lochuil/**/tish.css
+lochuil/**/tish.css.map
+
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,linux,images,audio,video,archives
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,linux,images,audio,video,archives

@@ -1,0 +1,134 @@
+version: "3.9"
+services:
+
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: perfadaben-lazylibrarian
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DOCKER_MODS: linuxserver/calibre-web:calibre|linuxserver/mods:lazylibrarian-ffmpeg
+    ports:
+      - ${PERFADABEN_LAZYLIBRARIAN_PORT}:5299
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_LAZYLIBRARIAN_PATH}:/config
+      - cofbilion-books:/downloads
+      - thinmbahad-books:/books
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
+
+  booksonic-air:
+    image: lscr.io/linuxserver/booksonic-air:latest
+    container_name: perfadaben-booksonic
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      CONTEXT_PATH: ${PERFADABEN_BOOKSONIC_URL}
+    ports:
+      - ${PERFADABEN_BOOKSONIC_PORT}:4040
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_BOOKSONIC_PATH}:/config
+      - thinmbahad-audiobooks:/audiobooks
+      - thinmbahad-podcasts:/podcasts
+    deploy:
+      replicas: 2
+      placement:
+        constraints: [node.labels.perfadaben == true]
+
+  ubooquity:
+    image: lscr.io/linuxserver/ubooquity:latest
+    container_name: perfadaben-ubooquity
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PERFADABEN_UBOOQUITY_PORT}:2202
+      - ${PERFADABEN_UBOOQUITY_PORT_ADMIN}:2203
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_UBOOQUITY_PATH}:/config
+      - thinmbahad-comics:/comics
+      - ${PERFADABEN_UBOOQUITY_PATH}/files:/files
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
+
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: perfadaben-calibre
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      PASSWORD: ${PERFADABEN_CALIBRE_PASSWORD}
+    ports:
+      - ${PERFADABEN_CALIBRE_PORT}:8080
+      - ${PERFADABEN_CALIBRE_PORT_ADMIN}:8081
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_CALIBRE_PATH}:/config
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: perfadaben-calibre-web
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      DOCKER_MODS: linuxserver/mods:universal-calibre
+      OAUTHLIB_RELAX_TOKEN_SCOPE: 1
+    ports:
+      - ${PERFADABEN_CALIBRE_PORT_WEB}:8083
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_CALIBRE_PATH}/web:/config
+      - thinmbahad-books:/books
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.perfadaben == true]
+
+volumes:
+  cofbilion-books:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${COFBILION_PATH}/public/books"
+  thinmbahad-books:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/books/ebooks"
+  thinmbahad-audiobooks:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/books/audiobooks"
+  thinmbahad-podcasts:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/podcasts"
+  thinmbahad-comics:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: ":${THINMBAHAD_PATH}/media/books/comics"
+

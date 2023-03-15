@@ -18,6 +18,9 @@ services:
     restart: always
     security_opt:
       - no-new-privileges:true
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
 
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
@@ -33,9 +36,9 @@ services:
       - ${ANGANNONDIR_NPM_PORT_HTTP}:80
       - ${ANGANNONDIR_NPM_PORT_HTTPS}:443
       - ${ANGANNONDIR_NPM_PORT_ADMIN}:81
-    restart: unless-stopped
+    restart: always
     volumes:
-      - ${ANGANNONDIR_NPM_PATH}:/data
+      - ${ANGANNONDIR_NPM_PATH}/app:/data
       - ${ANGANNONDIR_NPM_PATH}/letsencrypt:/etc/letsencrypt
     depends_on:
       - db
@@ -48,12 +51,12 @@ services:
     container_name: angannondir-npm-db
     environment:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
-      MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE}
-      MYSQL_USER: ${ANGANNONDIR_NPM_USERNAME}
-      MYSQL_PASSWORD: ${ROOT_PASSWORD}
-    restart: unless-stopped
+      MYSQL_DATABASE: ${ANGANNONDIR_DB_DATABASE}
+      MYSQL_USER: ${ANGANNONDIR_DB_USERNAME}
+      MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD}
+    restart: always
     volumes:
-      - ${ANGANNONDIR_DB_PATH}:/var/lib/mysql
+      - ${ANGANNONDIR_NPM_PATH}/database:/var/lib/mysql
     deploy:
       placement:
-        constraints: [node.labels.database == true]
+        constraints: [node.labels.angannondir == true]
