@@ -1,7 +1,7 @@
 version: "3.9"
 services:
-  transmission-openvpn:
-    image: haugene/transmission-openvpn:4.2
+  transmission:
+    image: haugene/transmission-openvpn:latest
     container_name: pimilor-transmission
     cap_add:
       - NET_ADMIN
@@ -15,6 +15,7 @@ services:
       PGID: ${PGID}
       TZ: ${TZ}
       DEBUG: "TRUE"
+      GLOBAL_APPLY_PERMISSIONS: "FALSE"
       LOCAL_NETWORK: ${NETWORK_RANGE}
       OPENVPN_PROVIDER: ${VPN_PROVIDER}
       OPENVPN_CONFIG: ${VPN_REGION}
@@ -22,7 +23,7 @@ services:
       OPENVPN_PASSWORD: ${VPN_PASSWORD}
       OPENVPN_OPTS: ${VPN_OPTIONS}
       WEBPROXY_ENABLED: "TRUE"
-      WEBPROXY_PORT: 8118
+      WEBPROXY_PORT: ${PIMILOR_TRANSMISSION_PORT_PROXY}
       TRANSMISSION_WEB_UI: transmission-web-control
     logging:
       driver: json-file
@@ -30,56 +31,78 @@ services:
         max-size: 10m
     ports:
       - ${PIMILOR_TRANSMISSION_PORT}:9091
-      - 8118:8118
-    restart: unless-stopped
+      - 8888:8888
+    restart: always
     security_opt:
       - seccomp:unconfined
     volumes:
       - cofbilion:/data
       - ${PIMILOR_TRANSMISSION_PATH}:/config
+      - /etc/localtime:/etc/localtime:ro
     deploy:
-      replicas: 1
       placement:
-        constraints: [node.hostname == gadathli]
+        constraints: [node.labels.pimilor == true]
 
-  transmission-openvpn-pt:
-    image: haugene/transmission-openvpn:4.0
-    container_name: pimilor-transmission-pt
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
+  rss:
+    image: haugene/transmission-rss:latest
+    container_name: pimilor-transmission-rss
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
-      DEBUG: "TRUE"
-      LOCAL_NETWORK: ${NETWORK_RANGE}
-      OPENVPN_PROVIDER: ${VPN_PROVIDER}
-      OPENVPN_CONFIG: ${VPN_REGION}
-      OPENVPN_USERNAME: ${VPN_USERNAME}
-      OPENVPN_PASSWORD: ${VPN_PASSWORD}
-      OPENVPN_OPTS: ${VPN_OPTIONS}
-      WEBPROXY_ENABLED: "TRUE"
-      WEBPROXY_PORT: 8120
-      TRANSMISSION_WEB_UI: transmission-web-control
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
-    ports:
-      - ${PIMILOR_TRANSMISSION_PT_PORT}:9091
-      - 8120:8120
+      RSS_URL: http://${RAEDORVUDH_IP}:${PIMILOR_TRANSMISSION_PORT}/pimilor.rss
+    links:
+      - transmission
     volumes:
-      - cofbilion:/data
-      - ${PIMILOR_TRANSMISSION_PT_PATH}:/config
+      - ${PIMILOR_TRANSMISSION_PATH}/transmission-rss.conf:/etc/transmission-rss.conf
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - transmission
     deploy:
-      replicas: 0
       placement:
-        constraints: [node.labels.pimilor-pt == true]
+        constraints: [node.labels.pimilor == true]
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: pimilor-radarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_RADARR_PORT}:7878
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_RADARR_PATH}:/config
+      - thinmbahad-movies:/movies
+      - cofbilion-movies:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - transmission
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: pimilor-sonarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_SONARR_PORT}:7878
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_SONARR_PATH}:/config
+      - thinmbahad-tv:/tv
+      - cofbilion-tv:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - transmission
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
 
   ytdl_material:
     image: tzahi12345/youtubedl-material:latest
@@ -111,7 +134,6 @@ services:
     depends_on:
       - ytdl-mongo-db
     deploy:
-      replicas: 0
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -126,9 +148,8 @@ services:
     volumes:
       - ${PIMILOR_YTDL_PATH}/database:/data/db
     deploy:
-      replicas: 0
       placement:
-        constraints: [node.labels.database == true]
+        constraints: [node.labels.pimilor == true]
 
 volumes:
   cofbilion:
@@ -143,9 +164,33 @@ volumes:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${COFBILION_PATH}/public/audio
+  cofbilion-movies:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/movies
+  cofbilion-tv:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/public/tv
   cofbilion-video:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${COFBILION_PATH}/public/video
+  thinmbahad-movies:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/movies
+  thinmbahad-tv:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/tv
