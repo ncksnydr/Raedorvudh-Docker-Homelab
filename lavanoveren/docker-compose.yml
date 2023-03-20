@@ -44,25 +44,25 @@ services:
       placement:
         constraints: [node.labels.lavanoveren == true]
 
-  # foundry:
-  #   image: felddy/foundryvtt:latest
-  #   container_name: lavanoveren-foundryvtt
-  #   environment:
-  #     PGID: ${PGID}
-  #     PUID: ${PUID}
-  #     TZ: ${TZ}
-  #     FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
-  #     FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
-  #     FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
-  #   hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
-  #   init: true
-  #   ports:
-  #     - ${LAVANOVEREN_FOUNDRY_PORT}:30000
-  #   volumes:
-  #     - ${LAVANOVEREN_FOUNDRY_PATH}:/data
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.lavanoveren == true]
+  foundry:
+    image: felddy/foundryvtt:latest
+    container_name: lavanoveren-foundryvtt
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
+      FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
+      FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
+      FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
+    hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
+    init: true
+    ports:
+      - ${LAVANOVEREN_FOUNDRY_PORT}:30000
+    volumes:
+      - ${LAVANOVEREN_FOUNDRY_PATH}:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
 
 
   emulatorjs:
