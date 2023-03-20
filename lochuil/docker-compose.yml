@@ -6,6 +6,7 @@ services:
     environment:
       PGID: ${PGID}
       PUID: ${PUID}
+      TZ: ${TZ}
       INIT_ASSETS: 1
     ports:
       - ${LOCHUIL_HOMER_PORT}:8080
@@ -22,11 +23,12 @@ services:
     environment:
       PGID: ${PGID}
       PUID: ${PUID}
+      TZ: ${TZ}
       INIT_ASSETS: 1
     ports:
       - ${LOCHUIL_HOMER_PORT_ADMIN}:8080
     volumes:
-      - ${LOCHUIL_HOMER_ADMIN_PATH}:/www/assets
+      - ${LOCHUIL_HOMER_PATH}/admin:/www/assets
     user: ${PUID}:${PGID}
     deploy:
       placement:
@@ -45,10 +47,9 @@ services:
       - ${LOCHUIL_VSCODE_PORT}:8443
     restart: unless-stopped
     volumes:
-       - ${LOCHUIL_HOMER_PATH}:/www
+       - ${LOCHUIL_HOMER_PATH}:/www/assets
+    depends_on:
+      - homer
     deploy:
       placement:
         constraints: [node.labels.lochuil == true]
-    depends_on:
-      - homer
-      - homer-admin
