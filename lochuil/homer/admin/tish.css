@@ -1,0 +1,23 @@
+@import "//cloud.typography.com/7455494/7805632/css/fonts.css";
+
+/**
+ *    Masthead
+ * -------------------------------------------------- */
+#bighead .first-line .dashboard-title h1,
+#bighead .first-line .dashboard-title span {
+  color: #141f1d;
+  font-family: "Gotham A", "Gotham B";
+  font-style: normal;
+}
+
+#bighead .first-line .dashboard-title h1 {
+  font-size: 2.4rem;
+  font-weight: 600;
+}
+
+#bighead .first-line .dashboard-title span.headline {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/*# sourceMappingURL=tish.css.map */

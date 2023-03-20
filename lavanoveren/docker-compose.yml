@@ -1,63 +1,94 @@
 version: "3.9"
 services:
   bds:
-    image: itzg/minecraft-server
+    image: itzg/minecraft-server:latest
     container_name: lavanoveren-minecraft
     environment:
       UID: ${PUID}
       GID: ${PGID}
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
       ALLOW_CHEATS: "TRUE"
       DIFFICULTY: normal
       EULA: "TRUE"
-      GAMEMODE: survival
+      GAMEMODE: SURVIVAL
+      TYPE: FORGE
+      GENERATE_STRUCTURES: "TRUE"
+      ALLOW_FLIGHT: "TRUE"
+      LEVEL_NAME: Millaidor
+      LEVEL_TYPE: AMPLIFIED
       SERVER_NAME: Nickopia
+      MAX_PLAYERS: 100
+      MOTD: At least it ain\u0027t New Jersey
+      ENABLE_RCON: "TRUE"
+      RCON_PASSWORD: ${LAVANOVEREN_MINECRAFT_PASSWORD}
     ports:
-      - ${LAVANOVEREN_MINECRAFT_PORT}:19132/udp
+      - ${LAVANOVEREN_MINECRAFT_PORT}:25565
     stdin_open: true
     tty: true
     volumes:
-      - minecraft-app:/data
+      - ${LAVANOVEREN_MINECRAFT_PATH}:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
+  rcon:
+    image: itzg/rcon
+    container_name: lavanoveren-minecraft-rcon
+    ports:
+      - 4326:4326
+      - 4327:4327
+    volumes:
+      - ${LAVANOVEREN_MINECRAFT_PATH}/rcon:/opt/rcon-web-admin/db
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
 
-  # https://hub.docker.com/r/felddy/foundryvtt
   # foundry:
-  #   image: felddy/foundryvtt:release
-  #   hostname: my_foundry_host
+  #   image: felddy/foundryvtt:latest
+  #   container_name: lavanoveren-foundryvtt
+  #   environment:
+  #     PGID: ${PGID}
+  #     PUID: ${PUID}
+  #     TZ: ${TZ}
+  #     FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
+  #     FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
+  #     FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
+  #   hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
   #   init: true
-  #   volumes:
-  #     - type: bind
-  #       source: <your_data_dir>
-  #       target: /data
-  #   environment:
-  #     - FOUNDRY_PASSWORD=<your_password>
-  #     - FOUNDRY_USERNAME=<your_username>
-  #     - FOUNDRY_ADMIN_KEY=atropos
   #   ports:
-  #     - target: 30000
-  #       published: 30000
-  #       protocol: tcp
-
-  # emulatorjs:
-  #   image: lscr.io/linuxserver/emulatorjs:latest
-  #   container_name: emulatorjs
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=Europe/London
-  #     - SUBFOLDER=/ #optional
+  #     - ${LAVANOVEREN_FOUNDRY_PORT}:30000
   #   volumes:
-  #     - /path/to/config:/config
-  #     - /path/to/data:/data
-  #   ports:
-  #     - 3000:3000
-  #     - 80:80
-  #     - 4001:4001 #optional
-  #   restart: unless-stopped
+  #     - ${LAVANOVEREN_FOUNDRY_PATH}:/data
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.lavanoveren == true]
 
+
+  emulatorjs:
+    image: lscr.io/linuxserver/emulatorjs:latest
+    container_name: emulatorjs
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
+    # SUBFOLDER: 
+    ports:
+      - ${LAVANOVEREN_EMULATORJS_PORT_ROM}:3000
+      - ${LAVANOVEREN_EMULATORJS_PORT_UI}:80
+      - ${LAVANOVEREN_EMULATORJS_PORT_PEER}:4001 
+    restart: unless-stopped
+    volumes:
+      - ${LAVANOVEREN_EMULATORJS_PATH}:/config
+      - thinmbahad-games:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
 
 volumes:
-  minecraft-app:
+  thinmbahad-games:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: ":${ENEDOS_PATH}/lavanoveren/minecraft"
+      device: :${THINMBAHAD_PATH}/assets/games/roms
