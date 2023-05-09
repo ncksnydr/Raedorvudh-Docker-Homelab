@@ -53,44 +53,30 @@ services:
       placement:
         constraints: [node.labels.goistor == true]
 
-  # TODO Find bookmarking link
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: "${LD_CONTAINER_NAME:-linkding}"
+    environment:
+      LD_CONTAINER_NAME: goistor-linkding
+      LD_HOST_PORT: 9090
+      LD_HOST_DATA_DIR: ./data
+      LD_SUPERUSER_NAME: ${GOISTOR_LINKDING_USERNAME}
+      LD_SUPERUSER_PASSWORD: ${GOISTOR_LINKDING_PASSWORD}
+      LD_DISABLE_BACKGROUND_TASKS: "FALSE"
+      LD_DISABLE_URL_VALIDATION: "FALSE"
+      LD_ENABLE_AUTH_PROXY: "FALSE"
+      LD_DB_ENGINE: sqlite
+      LD_DB_DATABASE: ${GOISTOR_LINKDING_DATABASE}
+      LD_DB_USER: ${GOISTOR_DB_USERNAME}
+      LD_DB_PASSWORD: ${GOISTOR_DB_PASSWORD}
+    ports:
+      - "${GOISTOR_LINKDING_PORT}:9090"
+    restart: unless-stopped
+    volumes:
+      - ${GOISTOR_LINKDING_PATH}:/etc/linkding/data
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
 
-  # TODO https://github.com/partkeepr/PartKeepr/blob/master/docker/development/docker-compose.yml
-  # partkeepr:
-  #   image: mhubig/partkeepr:latest
-  #   container_name: goistor-partkeepr
-  #   environment:
-  #     PARTKEEPR_DATABASE_HOST: db
-  #     PARTKEEPR_DATABASE_NAME: ${GOISTOR_PARTKEEPR_DATABASE}
-  #     PARTKEEPR_DATABASE_PORT: 3306
-  #     PARTKEEPR_DATABASE_USER: ${GOISTOR_DB_USERNAME}
-  #     PARTKEEPR_DATABASE_PASS: ${GOISTOR_DB_PASSWORD}
-  #     PARTKEEPR_SECRET: ${GOISTOR}
-  #   ports:
-  #     - ${GOISTOR_PARTKEEPR_PORT}:80
-  #   restart: on-failure
-  #   volumes:
-  #     - ${GOISTOR_PARTKEEPR_PATH}/config:/var/www/html/app/config
-  #     - ${GOISTOR_PARTKEEPR_PATH}:/var/www/html/data
-  #     - ${GOISTOR_PARTKEEPR_PATH}/web:/var/www/html/web
-  #   depends_on:
-  #     - db
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.goistor == true]
 
-  # cronjob:
-  #   image: mhubig/partkeepr:latest
-  #   container_name: goistor-partkeepr-cronjob
-  #   command: bash -c "crontab /etc/cron.d/partkeepr && cron -f"
-  #   entrypoint: []
-  #   restart: on-failure
-  #   volumes:
-  #     - ${GOISTOR_PARTKEEPR_PATH}/config:/var/www/html/app/config:ro
-  #     - ${GOISTOR_PARTKEEPR_PATH}:/var/www/html/data
-  #     - ${GOISTOR_PARTKEEPR_PATH}/web:/var/www/html/web
-  #   depends_on:
-  #     - partkeepr
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.goistor == true]
+    

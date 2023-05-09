@@ -21,7 +21,22 @@ services:
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
-
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: angannondir-duckdns
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      TZ: ${TZ}
+      SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN}
+      TOKEN: ${ANGANNONDIR_DUCKDNS_TOKEN}
+      LOG_FILE: "FALSE"
+    restart: unless-stopped
+    volumes:
+      - ${ANGANNONDIR_DUCKDNS_PATH}:/config
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
     container_name: angannondir-npm-app
@@ -45,7 +60,6 @@ services:
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
-
   db:
     image: yobasystems/alpine-mariadb:latest
     container_name: angannondir-npm-db

@@ -1,94 +1,81 @@
 version: "3.9"
 services:
   bds:
-    image: itzg/minecraft-server:latest
+    image: itzg/minecraft-server
     container_name: lavanoveren-minecraft
     environment:
       UID: ${PUID}
       GID: ${PGID}
-      PUID: ${PUID}
-      PGID: ${PGID}
       TZ: ${TZ}
-      ALLOW_CHEATS: "TRUE"
+      ALLOW_CHEATS: "true"
+      DEBUG: "true"
       DIFFICULTY: normal
-      EULA: "TRUE"
-      GAMEMODE: SURVIVAL
-      TYPE: FORGE
-      GENERATE_STRUCTURES: "TRUE"
-      ALLOW_FLIGHT: "TRUE"
+      EULA: "true"
+      GAMEMODE: survival
+      TYPE: forge
+      GENERATE_STRUCTURES: "true"
+      ALLOW_FLIGHT: "true"
       LEVEL_NAME: Millaidor
-      LEVEL_TYPE: AMPLIFIED
+      LEVEL_TYPE: amplified
       SERVER_NAME: Nickopia
       MAX_PLAYERS: 100
       MOTD: At least it ain\u0027t New Jersey
-      ENABLE_RCON: "TRUE"
+      ENABLE_RCON: "true"
       RCON_PASSWORD: ${LAVANOVEREN_MINECRAFT_PASSWORD}
     ports:
-      - ${LAVANOVEREN_MINECRAFT_PORT}:25565
-    stdin_open: true
-    tty: true
+      - 25565:25565
     volumes:
       - ${LAVANOVEREN_MINECRAFT_PATH}:/data
-    deploy:
-      placement:
-        constraints: [node.labels.lavanoveren == true]
-  rcon:
-    image: itzg/rcon
-    container_name: lavanoveren-minecraft-rcon
-    ports:
-      - 4326:4326
-      - 4327:4327
-    volumes:
-      - ${LAVANOVEREN_MINECRAFT_PATH}/rcon:/opt/rcon-web-admin/db
+      - ${LAVANOVEREN_MINECRAFT_PATH}/mods:/mods:ro
+    stdin_open: true
+    tty: true
     deploy:
       placement:
         constraints: [node.labels.lavanoveren == true]
 
-  foundry:
-    image: felddy/foundryvtt:latest
-    container_name: lavanoveren-foundryvtt
-    environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
-      TZ: ${TZ}
-      FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
-      FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
-      FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
-    hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
-    init: true
-    ports:
-      - ${LAVANOVEREN_FOUNDRY_PORT}:30000
-    volumes:
-      - ${LAVANOVEREN_FOUNDRY_PATH}:/data
-    deploy:
-      placement:
-        constraints: [node.labels.lavanoveren == true]
+  # foundry:
+  #   image: felddy/foundryvtt:latest
+  #   container_name: lavanoveren-foundryvtt
+  #   environment:
+  #     PGID: ${PGID}
+  #     PUID: ${PUID}
+  #     TZ: ${TZ}
+  #     FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
+  #     FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
+  #     FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
+  #   hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
+  #   init: true
+  #   ports:
+  #     - ${LAVANOVEREN_FOUNDRY_PORT}:30000
+  #   volumes:
+  #     - ${LAVANOVEREN_FOUNDRY_PATH}:/data
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.lavanoveren == true]
 
-
-  emulatorjs:
-    image: lscr.io/linuxserver/emulatorjs:latest
-    container_name: emulatorjs
-    environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
-      TZ: ${TZ}
-    # SUBFOLDER: 
-    ports:
-      - ${LAVANOVEREN_EMULATORJS_PORT_ROM}:3000
-      - ${LAVANOVEREN_EMULATORJS_PORT_UI}:80
-      - ${LAVANOVEREN_EMULATORJS_PORT_PEER}:4001 
-    restart: unless-stopped
-    volumes:
-      - ${LAVANOVEREN_EMULATORJS_PATH}:/config
-      - thinmbahad-games:/data
-    deploy:
-      placement:
-        constraints: [node.labels.lavanoveren == true]
-
-volumes:
-  thinmbahad-games:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/assets/games/roms
+  # emulatorjs:
+  #   image: lscr.io/linuxserver/emulatorjs:latest
+  #   container_name: emulatorjs
+  #   environment:
+  #     PGID: ${PGID}
+  #     PUID: ${PUID}
+  #     TZ: ${TZ}
+  #   # SUBFOLDER:
+  #   ports:
+  #     - ${LAVANOVEREN_EMULATORJS_PORT_ROM}:3000
+  #     - ${LAVANOVEREN_EMULATORJS_PORT_UI}:80
+  #     - ${LAVANOVEREN_EMULATORJS_PORT_PEER}:4001
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ${LAVANOVEREN_EMULATORJS_PATH}:/config
+  #     - thinmbahad-games:/data
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.lavanoveren == true]
+# volumes:
+#   thinmbahad-games:
+#     driver: local
+#     driver_opts:
+#       type: nfs
+#       o: addr=${NFS_IP},${NFS_OPTIONS}
+#       device: :${THINMBAHAD_PATH}/assets/games/roms

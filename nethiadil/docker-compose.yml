@@ -86,6 +86,110 @@ services:
       placement:
         constraints: [node.labels.nethiadil == true]
 
+  # db:
+  #   image: yobasystems/alpine-mariadb:latest
+  #   container_name: nethiadil-photoprism-db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: ${NETHIADIL_MYSQL_PASSWORD}
+  #     MYSQL_DATABASE: ${NETHIADIL_MYSQL_DATABASE}
+  #     MYSQL_USER: ${NETHIADIL_MYSQL_USERNAME}
+  #     MYSQL_PASSWORD: ${NETHIADIL_MYSQL_PASSWORD}
+  #   restart: always
+  #   volumes:
+  #     - ${NETHIADIL_PHOTOPRISM_PATH}/database:/var/lib/mysql
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.nethiadil == true]
+
+  # photoprism:
+  #   image: photoprism/photoprism:arm64
+  #   container_name: nethiadil-photoprism-app
+  #   devices:
+  #     - /dev/video11:/dev/video11
+  #   environment:
+  #     PHOTOPRISM_ADMIN_PASSWORD: ${NETHIADIL_PHOTOPRISM_PASSWORD}
+  #     PHOTOPRISM_ADMIN_USER: ${NETHIADIL_PHOTOPRISM_USERNAME}
+  #     PHOTOPRISM_AUTH_MODE: password
+  #     PHOTOPRISM_DATABASE_DRIVER: mysql
+  #     PHOTOPRISM_DATABASE_NAME: ${NETHIADIL_MYSQL_DATABASE}
+  #     PHOTOPRISM_DATABASE_PASSWORD: ${NETHIADIL_MYSQL_PASSWORD}
+  #     PHOTOPRISM_DATABASE_SERVER: db:3306
+  #     PHOTOPRISM_DATABASE_USER: ${NETHIADIL_MYSQL_USERNAME}
+  #     PHOTOPRISM_DEBUG: "TRUE"
+  #     PHOTOPRISM_DETECT_NSFW: "FALSE"
+  #     PHOTOPRISM_DISABLE_CHOWN: "FALSE"
+  #     PHOTOPRISM_DISABLE_CLASSIFICATION: "FALSE"
+  #     PHOTOPRISM_DISABLE_FACES: "FALSE"
+  #     PHOTOPRISM_DISABLE_FFMPEG: "FALSE"
+  #     PHOTOPRISM_DISABLE_HEIFCONVERT: "FALSE"
+  #     PHOTOPRISM_DISABLE_RAW: "TRUE"
+  #     PHOTOPRISM_DISABLE_SETTINGS: "FALSE"
+  #     PHOTOPRISM_DISABLE_TENSORFLOW: "FALSE"
+  #     PHOTOPRISM_DISABLE_WEBDAV: "FALSE"
+  #     PHOTOPRISM_EXPERIMENTAL: "TRUE"
+  #     PHOTOPRISM_FFMPEG_ENCODER: "raspberry"
+  #     PHOTOPRISM_GID: ${PGID}
+  #     PHOTOPRISM_HTTP_COMPRESSION: gzip
+  #     PHOTOPRISM_HTTP_PORT: ${NETHIADIL_PHOTOPRISM_PORT}
+  #     PHOTOPRISM_INIT: "https update davfs clitools clean tensorflow"
+  #     PHOTOPRISM_JPEG_QUALITY: 90
+  #     PHOTOPRISM_JPEG_SIZE: 30000
+  #     PHOTOPRISM_LOG_LEVEL: debug
+  #     PHOTOPRISM_ORIGINALS_LIMIT: -1
+  #     PHOTOPRISM_RAW_PRESETS: "FALSE"
+  #     PHOTOPRISM_READONLY: "FALSE"
+  #     PHOTOPRISM_RESOLUTION_LIMIT: -1
+  #     PHOTOPRISM_SESSION_MAXAGE: -1
+  #     PHOTOPRISM_SESSION_TIMEOUT: -1
+  #     PHOTOPRISM_SITE_URL: ${NETHIADIL_PHOTOPRISM_URL}
+  #     PHOTOPRISM_THUMB_FILTER: "blackman"
+  #     PHOTOPRISM_THUMB_SIZE: 7680
+  #     PHOTOPRISM_TRACE: "TRUE"
+  #     PHOTOPRISM_TRUSTED_PROXY: ${NETWORK_RANGE}
+  #     PHOTOPRISM_UID: ${PUID}
+  #     PHOTOPRISM_UPLOAD_NSFW: "TRUE"
+  #     PHOTOPRISM_WORKERS: 4
+  #     TF_CPP_MIN_LOG_LEVEL: 0
+  #   ports:
+  #     - ${NETHIADIL_PHOTOPRISM_PORT}:2342
+  #   restart: unless-stopped
+  #   security_opt:
+  #     - seccomp:unconfined
+  #     - apparmor:unconfined
+  #   volumes:
+  #     - photoprism-media:/photoprism/originals
+  #     - photoprism-media-import:/photoprism/import
+  #     - ${NETHIADIL_PHOTOPRISM_PATH}:/photoprism/storage
+  #   working_dir: "/photoprism"
+  #   depends_on:
+  #     - db
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.nethiadil == true]
+
+  # mariadb:
+  #   image: arm64v8/mariadb:10.10
+  #   container_name: nethiadil-photoprism-db
+  #   # command: mysqld --innodb-buffer-pool-size=256M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+  #   environment:
+  #     MARIADB_AUTO_UPGRADE: "1"
+  #     MARIADB_INITDB_SKIP_TZINFO: "1"
+  #     MARIADB_DATABASE: ${NETHIADIL_MYSQL_DATABASE}
+  #     MARIADB_USER: ${NETHIADIL_MYSQL_USERNAME}
+  #     MARIADB_PASSWORD: ${NETHIADIL_MYSQL_PASSWORD}
+  #     MARIADB_ROOT_PASSWORD: ${NETHIADIL_MYSQL_PASSWORD}
+  #   ports:
+  #     - 3306:3306
+  #   restart: unless-stopped
+  #   security_opt:
+  #     - seccomp:unconfined
+  #     - apparmor:unconfined
+  #   volumes:
+  #     - ${NETHIADIL_PHOTOPRISM_PATH}/database:/var/lib/mysql
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.nethiadil == true]
+
 volumes:
   plex-media:
     driver: local
@@ -93,3 +197,15 @@ volumes:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${THINMBAHAD_PATH}/media
+  photoprism-media:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/photos/gallery
+  photoprism-media-import:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/photos/import
