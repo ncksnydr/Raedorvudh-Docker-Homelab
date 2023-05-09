@@ -1,0 +1,82 @@
+version: "3.9"
+services:
+  db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: goistor-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_USER: ${GOISTOR_DB_USERNAME}
+      MYSQL_PASSWORD: ${GOISTOR_DB_PASSWORD}
+    restart: always
+    volumes:
+      - ${GOISTOR_DB_PATH}:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  sheetable:
+    image: vallezw/sheetable
+    container_name: goistor-sheetable
+    environment:
+      CONFIG_PATH: /app/config/
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    restart: unless-stopped
+    ports:
+      - ${GOISTOR_SHEETABLE_PORT}:8080
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${GOISTOR_SHEETABLE_PATH}:/app/config
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  monica-app:
+    image: monica
+    container_name: monica-app
+    environment:
+      # APP_KEY:
+      DB_HOST: db
+      DB_DATABASE: ${GOISTOR_MONICA_DATABASE}
+      DB_PORT: 3306
+      DB_USERNAME: ${GOISTOR_DB_USERNAME}
+      DB_PASSWORD: ${GOISTOR_DB_PASSWORD}
+    ports:
+      - ${GOISTOR_MONICA_PORT}:80
+    restart: always
+    volumes:
+      - ${GOISTOR_MONICA_PATH}:/var/www/html/storage
+    depends_on:
+      - db
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: "${LD_CONTAINER_NAME:-linkding}"
+    environment:
+      LD_CONTAINER_NAME: goistor-linkding
+      LD_HOST_PORT: 9090
+      LD_HOST_DATA_DIR: ./data
+      LD_SUPERUSER_NAME: ${GOISTOR_LINKDING_USERNAME}
+      LD_SUPERUSER_PASSWORD: ${GOISTOR_LINKDING_PASSWORD}
+      LD_DISABLE_BACKGROUND_TASKS: "FALSE"
+      LD_DISABLE_URL_VALIDATION: "FALSE"
+      LD_ENABLE_AUTH_PROXY: "FALSE"
+      LD_DB_ENGINE: sqlite
+      LD_DB_DATABASE: ${GOISTOR_LINKDING_DATABASE}
+      LD_DB_USER: ${GOISTOR_DB_USERNAME}
+      LD_DB_PASSWORD: ${GOISTOR_DB_PASSWORD}
+    ports:
+      - "${GOISTOR_LINKDING_PORT}:9090"
+    restart: unless-stopped
+    volumes:
+      - ${GOISTOR_LINKDING_PATH}:/etc/linkding/data
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+
+    

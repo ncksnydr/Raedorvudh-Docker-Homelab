@@ -1,196 +1,46 @@
 version: "3.9"
 services:
-  transmission:
-    image: haugene/transmission-openvpn:latest
-    container_name: pimilor-transmission
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
       TZ: ${TZ}
-      DEBUG: "TRUE"
-      GLOBAL_APPLY_PERMISSIONS: "FALSE"
-      LOCAL_NETWORK: ${NETWORK_RANGE}
-      OPENVPN_PROVIDER: ${VPN_PROVIDER}
-      OPENVPN_CONFIG: ${VPN_REGION}
-      OPENVPN_USERNAME: ${VPN_USERNAME}
+      VPN_SERVICE_PROVIDER: ${VPN_PROVIDER_STRING}
+      OPENVPN_USER: ${VPN_USERNAME}
       OPENVPN_PASSWORD: ${VPN_PASSWORD}
-      OPENVPN_OPTS: ${VPN_OPTIONS}
-      WEBPROXY_ENABLED: "TRUE"
-      WEBPROXY_PORT: ${PIMILOR_TRANSMISSION_PORT_PROXY}
-      TRANSMISSION_WEB_UI: transmission-web-control
-    logging:
-      driver: json-file
-      options:
-        max-size: 10m
+      SERVER_REGIONS: ${VPN_REGION_STRING}
     ports:
-      - ${PIMILOR_TRANSMISSION_PORT}:9091
-      - 8888:8888
-    restart: always
+      - 3000:3000/tcp
+      - 3001:3001/tcp
+    volumes:
+      - ${PIMILOR_GLUETUN_PATH}:/gluetun
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  firefox:
+    image: lscr.io/linuxserver/firefox:latest
+    container_name: pimilor-firefox
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    # ports:
+    # - 3000:3000
+    # - 3001:3001
+    network_mode: "service:gluetun"
+    restart: unless-stopped
     security_opt:
       - seccomp:unconfined
+    shm_size: "1gb"
     volumes:
-      - cofbilion:/data
-      - ${PIMILOR_TRANSMISSION_PATH}:/config
-      - /etc/localtime:/etc/localtime:ro
+      - ${PIMILOR_FIREFOX_PATH}:/config
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
-
-  rss:
-    image: haugene/transmission-rss:latest
-    container_name: pimilor-transmission-rss
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-      RSS_URL: http://${RAEDORVUDH_IP}:${PIMILOR_TRANSMISSION_PORT}/pimilor.rss
-    links:
-      - transmission
-    volumes:
-      - ${PIMILOR_TRANSMISSION_PATH}/transmission-rss.conf:/etc/transmission-rss.conf
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - transmission
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  radarr:
-    image: lscr.io/linuxserver/radarr:latest
-    container_name: pimilor-radarr
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    ports:
-      - ${PIMILOR_RADARR_PORT}:7878
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_RADARR_PATH}:/config
-      - thinmbahad-movies:/movies
-      - cofbilion-movies:/downloads
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - transmission
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
-    container_name: pimilor-sonarr
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    ports:
-      - ${PIMILOR_SONARR_PORT}:7878
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_SONARR_PATH}:/config
-      - thinmbahad-tv:/tv
-      - cofbilion-tv:/downloads
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - transmission
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  ytdl_material:
-    image: tzahi12345/youtubedl-material:latest
-    container_name: pimilor-ytdl-app
-    environment:
-      ALLOW_CONFIG_MUTATIONS: "TRUE"
-      write_ytdl_config: "TRUE"
-      ytdl_allow_advanced_download: "TRUE"
-      ytdl_allow_subscriptions: "TRUE"
-      ytdl_allow_theme_change: "TRUE"
-      ytdl_default_theme: "default"
-      ytdl_download_only_mode: "TRUE"
-      ytdl_include_metadata: "TRUE"
-      ytdl_include_thumbnail: "TRUE"
-      ytdl_max_concurrent_downloads: 3
-      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
-      ytdl_multi_user_mode: "TRUE"
-      ytdl_use_local_db: "TRUE"
-      ytdl_use_youtubedl_archive: "TRUE"
-    ports:
-      - ${PIMILOR_YTDL_PORT}:17442
-    restart: always
-    volumes:
-      - ${PIMILOR_YTDL_PATH}:/app/appdata
-      - cofbilion-audio:/app/audio
-      - cofbilion-video:/app/video
-      - cofbilion-video:/app/subscriptions
-      - cofbilion-video:/app/users
-    depends_on:
-      - ytdl-mongo-db
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  ytdl-mongo-db:
-    image: mongo:4.4.6
-    container_name: pimilor-ytdl-db
-    ports:
-      - ${PIMILOR_YTDL_DB_PORT}:27017
-    logging:
-      driver: "none"
-    restart: always
-    volumes:
-      - ${PIMILOR_YTDL_PATH}/database:/data/db
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-volumes:
-  cofbilion:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${COFBILION_PATH}
-  cofbilion-audio:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${COFBILION_PATH}/public/audio
-  cofbilion-movies:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${COFBILION_PATH}/public/movies
-  cofbilion-tv:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${COFBILION_PATH}/public/tv
-  cofbilion-video:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${COFBILION_PATH}/public/video
-  thinmbahad-movies:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/movies
-  thinmbahad-tv:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/tv
