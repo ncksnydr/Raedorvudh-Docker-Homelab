@@ -15,11 +15,11 @@ Recipe manager and meal planner.
 
 | Variable | Description | Default |
 |-----------|:----------:|:----------:|
-| `PUID` | User ID | `1000` |
-| `PGID` | Group ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
 | `AESORDUR_MEALIE_PATH` | Path to applications files | `./mealie` |
 | `AESORDUR_MEALIE_PORT` | Port for web UI | `80` |
+| `PGID` | Group ID | `1000` |
+| `PUID` | User ID | `1000` |
+| `TZ` | Timezone | `America/Los_Angeles` |
 
 ## Sindarin
 

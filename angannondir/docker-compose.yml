@@ -8,7 +8,7 @@ services:
       - all
     environment:
       CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN:-changeMe}
-      DOMAINS: ${DOMAINS:-changeMe.org}
+      DOMAINS: ${DOMAINS:-changeMe.biz}
       PGID: ${PGID:-1000}
       PROXIED: "TRUE"
       PUID: ${PUID:-1000}
@@ -30,7 +30,7 @@ services:
       PGID: ${PGID:-1000}
       PUID: ${PUID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN:-changeMe.org}
+      SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN:-changeMe.biz}
       TOKEN: ${ANGANNONDIR_DUCKDNS_TOKEN:-changeMe}
       LOG_FILE: "FALSE"
     restart: unless-stopped
@@ -44,6 +44,9 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: angannondir-npm-app
     environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       DB_MYSQL_HOST: "db"
       DB_MYSQL_NAME: ${ANGANNONDIR_DB_DATABASE:-npm}
       DB_MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD:-npm}
@@ -68,6 +71,9 @@ services:
     image: yobasystems/alpine-mariadb:latest
     container_name: angannondir-npm-db
     environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
       MYSQL_DATABASE: ${ANGANNONDIR_DB_DATABASE:-npm}
       MYSQL_USER: ${ANGANNONDIR_DB_USERNAME:-npm}
