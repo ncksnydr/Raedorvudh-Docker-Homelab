@@ -1,25 +1,38 @@
 version: "3.9"
 services:
-  gluetun:
-    image: qmcgaw/gluetun
-    container_name: gluetun
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: pimilor-deluge
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-      VPN_SERVICE_PROVIDER: ${VPN_PROVIDER_STRING}
-      OPENVPN_USER: ${VPN_USERNAME}
-      OPENVPN_PASSWORD: ${VPN_PASSWORD}
-      SERVER_REGIONS: ${VPN_REGION_STRING}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - 3000:3000/tcp
-      - 3001:3001/tcp
+      - ${PIMILOR_DELUGE_PORT_UI:-8112}:8112
+      - ${PIMILOR_DELUGE_PORT_INBOUND:-6881}:6881
+      - ${PIMILOR_DELUGE_PORT_INBOUND:-6881}:6881/udp
+    restart: unless-stopped
     volumes:
-      - ${PIMILOR_GLUETUN_PATH}:/gluetun
+      - ${PIMILOR_DELUGE_PATH:-./deluge}:/config
+      - cofbilion:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: pimilor-jackett
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      AUTO_UPDATE: "TRUE"
+    ports:
+      - ${PIMILOR_JACKETT_PORT:-9117}:9117
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_JACKETT_PATH:-./jackett}:/config
+      - cofbilion-blackhole:/downloads
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
@@ -28,19 +41,33 @@ services:
     image: lscr.io/linuxserver/firefox:latest
     container_name: pimilor-firefox
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    # ports:
-    # - 3000:3000
-    # - 3001:3001
-    network_mode: "service:gluetun"
-    restart: unless-stopped
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_FIREFOX_PORT:-3000}:3000
+      - ${PIMILOR_FIREFOX_PORT_HTTPS:-3001}:3001
     security_opt:
       - seccomp:unconfined
     shm_size: "1gb"
+    restart: unless-stopped
     volumes:
-      - ${PIMILOR_FIREFOX_PATH}:/config
+      - ${PIMILOR_FIREFOX_PATH:-./firefox}:/config
+      - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
+
+volumes:
+  cofbilion:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}
+  cofbilion-blackhole:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/blackhole
