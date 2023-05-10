@@ -4,9 +4,9 @@ services:
     image: itzg/minecraft-server
     container_name: lavanoveren-minecraft
     environment:
-      UID: ${PUID}
-      GID: ${PGID}
-      TZ: ${TZ}
+      UID: ${PUID:-1000}
+      GID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       ALLOW_CHEATS: "true"
       DEBUG: "true"
       DIFFICULTY: normal
@@ -15,67 +15,66 @@ services:
       TYPE: forge
       GENERATE_STRUCTURES: "true"
       ALLOW_FLIGHT: "true"
-      LEVEL_NAME: Millaidor
+      LEVEL_NAME: ${LAVANOVEREN_MINECRAFT_LEVEL_NAME:-World}
       LEVEL_TYPE: amplified
-      SERVER_NAME: Nickopia
       MAX_PLAYERS: 100
-      MOTD: At least it ain\u0027t New Jersey
+      MOTD: ${LAVANOVEREN_MINECRAFT_MOTD:-A Minecraft Server}
       ENABLE_RCON: "true"
-      RCON_PASSWORD: ${LAVANOVEREN_MINECRAFT_PASSWORD}
+      RCON_PASSWORD: ${LAVANOVEREN_MINECRAFT_PASSWORD:-changeMe}
     ports:
-      - 25565:25565
+      - ${LAVANOVEREN_MINECRAFT_PORT:-25565}:25565
     volumes:
-      - ${LAVANOVEREN_MINECRAFT_PATH}:/data
-      - ${LAVANOVEREN_MINECRAFT_PATH}/mods:/mods:ro
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}:/data
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/mods:/mods:ro
     stdin_open: true
     tty: true
     deploy:
       placement:
         constraints: [node.labels.lavanoveren == true]
 
-  # foundry:
-  #   image: felddy/foundryvtt:latest
-  #   container_name: lavanoveren-foundryvtt
-  #   environment:
-  #     PGID: ${PGID}
-  #     PUID: ${PUID}
-  #     TZ: ${TZ}
-  #     FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
-  #     FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
-  #     FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
-  #   hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
-  #   init: true
-  #   ports:
-  #     - ${LAVANOVEREN_FOUNDRY_PORT}:30000
-  #   volumes:
-  #     - ${LAVANOVEREN_FOUNDRY_PATH}:/data
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.lavanoveren == true]
+  foundry:
+    image: felddy/foundryvtt:latest
+    container_name: lavanoveren-foundryvtt
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRYVTT_PASSWORD:-changeMe}
+      FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRYVTT_USERNAME:-changeMe}
+      FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRYVTT_KEY:-changeMe}
+    hostname: ${LAVANOVEREN_FOUNDRYVTT_HOSTNAME:-FoundryVTT}
+    init: true
+    ports:
+      - ${LAVANOVEREN_FOUNDRYVTT_PORT:-30000}:30000
+    volumes:
+      - ${LAVANOVEREN_FOUNDRYVTT_PATH:-./foundryvtt}:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
 
-  # emulatorjs:
-  #   image: lscr.io/linuxserver/emulatorjs:latest
-  #   container_name: emulatorjs
-  #   environment:
-  #     PGID: ${PGID}
-  #     PUID: ${PUID}
-  #     TZ: ${TZ}
-  #   # SUBFOLDER:
-  #   ports:
-  #     - ${LAVANOVEREN_EMULATORJS_PORT_ROM}:3000
-  #     - ${LAVANOVEREN_EMULATORJS_PORT_UI}:80
-  #     - ${LAVANOVEREN_EMULATORJS_PORT_PEER}:4001
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ${LAVANOVEREN_EMULATORJS_PATH}:/config
-  #     - thinmbahad-games:/data
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.lavanoveren == true]
-# volumes:
-#   thinmbahad-games:
-#     driver: local
-#     driver_opts:
-#       type: nfs
-#       o: addr=${NFS_IP},${NFS_OPTIONS}
-#       device: :${THINMBAHAD_PATH}/assets/games/roms
+  emulatorjs:
+    image: lscr.io/linuxserver/emulatorjs:latest
+    container_name: emulatorjs
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${LAVANOVEREN_EMULATORJS_PORT_ROM:-3000}:3000
+      - ${LAVANOVEREN_EMULATORJS_PORT_UI:-80}:80
+      - ${LAVANOVEREN_EMULATORJS_PORT_PEER:-4001}:4001
+    restart: unless-stopped
+    volumes:
+      - ${LAVANOVEREN_EMULATORJS_PATH:-./emulatorjs}:/config
+      - thinmbahad-games:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
+
+volumes:
+  thinmbahad-games:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/assets/games/roms
