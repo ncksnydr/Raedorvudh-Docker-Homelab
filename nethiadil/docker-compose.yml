@@ -37,23 +37,6 @@ services:
       placement:
         constraints: [node.labels.nethiadil == true]
 
-  overseerr:
-    image: sctx/overseerr:latest
-    container_name: nethiadil-overseerr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      LOG_LEVEL: debug
-    ports:
-      - ${NETHIADIL_OVERSEERR_PORT:-5055}:5055
-    volumes:
-      - ${NETHIADIL_OVERSEERR_PATH:-./overseerr}:/app/config
-    restart: unless-stopped
-    deploy:
-      placement:
-        constraints: [node.labels.nethiadil == true]
-
   plex-meta-manager:
     image: lscr.io/linuxserver/plex-meta-manager:latest
     container_name: nethiadil-metadata

@@ -1,20 +1,24 @@
 version: "3.9"
 services:
-  deluge:
-    image: lscr.io/linuxserver/deluge:latest
-    container_name: pimilor-deluge
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: pimilor-transmission
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
+      TRANSMISSION_WEB_HOME: ${PIMILOR_TRANSMISSION_WEBUI:-kettu}
+      USER: ${PIMILOR_TRANSMISSION_USERNAME:-admin}
+      PASS: ${PIMILOR_TRANSMISSION_PASSWORD:-changeMe}
     ports:
-      - ${PIMILOR_DELUGE_PORT_UI:-8112}:8112
-      - ${PIMILOR_DELUGE_PORT_INBOUND:-6881}:6881
-      - ${PIMILOR_DELUGE_PORT_INBOUND:-6881}:6881/udp
+      - ${PIMILOR_TRANSMISSION_PORT_UI:-9091}:9091
+      - ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}:51413
+      - ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}:51413/udp
     restart: unless-stopped
     volumes:
-      - ${PIMILOR_DELUGE_PATH:-./deluge}:/config
+      - ${PIMILOR_TRANSMISSION_PATH}:/config
       - cofbilion:/downloads
+      - cofbilion-blackhole:/watch
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
@@ -37,6 +41,59 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
 
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: pimilor-sonarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_SONARR_PORT:-8989}:8989
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_SONARR_PATH:-./sonarr}:/config
+      - thinmbahad-tv:/tv
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: pimilor-radarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_RADARR_PORT:-7878}:7878
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_RADARR_PATH:-./radarr}:/config
+      - thinmbahad-movies:/movies 
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+    
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: nethiadil-overseerr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      LOG_LEVEL: debug
+    ports:
+      - ${PIMILOR_OVERSEERR_PORT:-5055}:5055
+    volumes:
+      - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/app/config
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
   firefox:
     image: lscr.io/linuxserver/firefox:latest
     container_name: pimilor-firefox
@@ -71,3 +128,15 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${COFBILION_PATH}/blackhole
+  thinmbahad-tv:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/tv
+  thinmbahad-movies:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/movies

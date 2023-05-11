@@ -39,21 +39,6 @@ Monitoring, analytics, and notification manager for Plex.
 
 ---
 
-### Overseerr
-
-Request management and discovery tool for Plex.
-[Container image via linuxserver/docker-overseerr](https://github.com/linuxserver/docker-overseerr)
-
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `NETHIADIL_OVERSEERR_PATH` | Path to application files | `./overseerr` |
-| `NETHIADIL_OVERSEERR_PORT` | Port for web UI | `5055` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
-
----
-
 ### Plex Meta Manager
 
 Custom metadata manager for Plex.  

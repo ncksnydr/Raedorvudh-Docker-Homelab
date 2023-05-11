@@ -8,16 +8,18 @@
 
 ## Applications in the stack
 
-### Deluge
+### Transmission
 
 Bit torrent client.  
-[Container image via linuxserver/docker-deluge](https://github.com/linuxserver/docker-deluge)
+[Container image via linuxserver/docker-transmission](https://github.com/linuxserver/docker-transmission)
 
 | Variable | Description | Default |
 |-----------|:----------:|:----------:|
-| `PIMILOR_DELUGE_PATH` | Path to applications files | `./deluge` |
-| `PIMILOR_DELUGE_PORT_INBOUND` | Port for inbound torrent traffic. | `6881` |
-| `PIMILOR_DELUGE_PORT_UI` | Port for web UI | `8112` |
+| `PIMILOR_TRANSMISSION_PASSWORD` | Web UI password | `changeMe` |
+| `PIMILOR_TRANSMISSION_PATH` | Path to applications files | `./transmission` |
+| `PIMILOR_TRANSMISSION_PORT_INBOUND` | Port for inbound torrent traffic. | `51413` |
+| `PIMILOR_TRANSMISSION_PORT_UI` | Port for web UI | `9091` |
+| `PIMILOR_TRANSMISSION_USERNAME` | Web UI username | `admin` |
 | `PGID` | Group ID | `1000` |
 | `PUID` | User ID | `1000` |
 | `TZ` | Timezone | `America/Los_Angeles` |
@@ -49,6 +51,51 @@ Web browser.
 | `PIMILOR_FIREFOX_PATH` | Path to applications files | `./firefox` |
 | `PIMILOR_FIREFOX_PORT` | Port for web UI | `3000` |
 | `PIMILOR_FIREFOX_PORT_HTTPS` | SSL port for web UI | `3001` |
+| `PGID` | Group ID | `1000` |
+| `PUID` | User ID | `1000` |
+| `TZ` | Timezone | `America/Los_Angeles` |
+
+---
+
+### Sonarr
+
+PVR for TV shows.  
+[Container image via linuxserver/docker-sonarr](https://github.com/linuxserver/docker-sonarr)
+
+| Variable | Description | Default |
+|-----------|:----------:|:----------:|
+| `PIMILOR_SONARR_PATH` | Path to applications files | `./sonarr` |
+| `PIMILOR_SONARR_PORT` | Port for web UI | `8989` |
+| `PGID` | Group ID | `1000` |
+| `PUID` | User ID | `1000` |
+| `TZ` | Timezone | `America/Los_Angeles` |
+
+---
+
+### Radarr
+
+PVR for movies.
+[Container image via linuxserver/docker-radarr](https://github.com/linuxserver/docker-radarr)
+
+| Variable | Description | Default |
+|-----------|:----------:|:----------:|
+| `PIMILOR_RADARR_PATH` | Path to applications files | `./radarr` |
+| `PIMILOR_RADARR_PORT` | Port for web UI | `7979` |
+| `PGID` | Group ID | `1000` |
+| `PUID` | User ID | `1000` |
+| `TZ` | Timezone | `America/Los_Angeles` |
+
+---
+
+### Overseerr
+
+Request management and discovery tool for Plex.
+[Container image via linuxserver/docker-overseerr](https://github.com/linuxserver/docker-overseerr)
+
+| Variable | Description | Default |
+|-----------|:----------:|:----------:|
+| `PIMILOR_OVERSEERR_PATH` | Path to application files | `./overseerr` |
+| `PIMILOR_OVERSEERR_PORT` | Port for web UI | `5055` |
 | `PGID` | Group ID | `1000` |
 | `PUID` | User ID | `1000` |
 | `TZ` | Timezone | `America/Los_Angeles` |
