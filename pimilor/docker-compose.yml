@@ -7,16 +7,15 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      TRANSMISSION_WEB_HOME: ${PIMILOR_TRANSMISSION_WEBUI:-kettu}
-      USER: ${PIMILOR_TRANSMISSION_USERNAME:-admin}
-      PASS: ${PIMILOR_TRANSMISSION_PASSWORD:-changeMe}
+      PEERPORT: ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}
+      TRANSMISSION_WEB_HOME: /ui/${PIMILOR_TRANSMISSION_WEBUI}
     ports:
       - ${PIMILOR_TRANSMISSION_PORT_UI:-9091}:9091
       - ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}:51413
       - ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}:51413/udp
     restart: unless-stopped
     volumes:
-      - ${PIMILOR_TRANSMISSION_PATH}:/config
+      - ${PIMILOR_TRANSMISSION_PATH:-./transmission}:/config
       - cofbilion:/downloads
       - cofbilion-blackhole:/watch
     deploy:
@@ -93,7 +92,44 @@ services:
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
-  
+
+  ytdl_material:
+    image: tzahi12345/youtubedl-material:latest
+    container_name: pimilor-ytdl-app
+    environment: 
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
+      ytdl_use_local_db: 'false'
+      write_ytdl_config: 'true'
+    ports:
+      - ${PIMILOR_YTDL_PORT:-17442}:17442
+    restart: always
+    volumes:
+      - ${PIMILOR_YTDL_PATH:-./ytdl}:/app/appdata
+      - cofbilion-audio:/app/audio
+      - cofbilion-video:/app/video
+      - cofbilion-video:/app/subscriptions
+      - cofbilion-video:/app/users
+    depends_on:
+      - ytdl-mongo-db
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+    
+  ytdl-mongo-db:
+    image: mongo:4.4.18
+    container_name: pimilor-ytdl-db
+    logging:
+        driver: "none"          
+    restart: always
+    volumes:
+        - ${PIMILOR_YTDL_PATH:-./ytdl}/database:/data/db
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
   firefox:
     image: lscr.io/linuxserver/firefox:latest
     container_name: pimilor-firefox
@@ -122,12 +158,24 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${COFBILION_PATH}
+  cofbilion-audio:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/audio
   cofbilion-blackhole:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}/blackhole
+        device: :${COFBILION_PATH}/watch
+  cofbilion-video:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/video
   thinmbahad-tv:
       driver: local
       driver_opts:

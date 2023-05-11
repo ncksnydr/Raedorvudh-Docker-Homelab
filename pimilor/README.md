@@ -15,11 +15,10 @@ Bit torrent client.
 
 | Variable | Description | Default |
 |-----------|:----------:|:----------:|
-| `PIMILOR_TRANSMISSION_PASSWORD` | Web UI password | `changeMe` |
 | `PIMILOR_TRANSMISSION_PATH` | Path to applications files | `./transmission` |
 | `PIMILOR_TRANSMISSION_PORT_INBOUND` | Port for inbound torrent traffic. | `51413` |
 | `PIMILOR_TRANSMISSION_PORT_UI` | Port for web UI | `9091` |
-| `PIMILOR_TRANSMISSION_USERNAME` | Web UI username | `admin` |
+| `PIMILOR_TRANSMISSION_WEBUI` | Path to alternate UI directories. | `FALSE` |
 | `PGID` | Group ID | `1000` |
 | `PUID` | User ID | `1000` |
 | `TZ` | Timezone | `America/Los_Angeles` |
@@ -96,6 +95,21 @@ Request management and discovery tool for Plex.
 |-----------|:----------:|:----------:|
 | `PIMILOR_OVERSEERR_PATH` | Path to application files | `./overseerr` |
 | `PIMILOR_OVERSEERR_PORT` | Port for web UI | `5055` |
+| `PGID` | Group ID | `1000` |
+| `PUID` | User ID | `1000` |
+| `TZ` | Timezone | `America/Los_Angeles` |
+
+---
+
+### YouTube-DL
+
+Request management and discovery tool for Plex.  
+[Container image via Tzahi12345/YoutubeDL-Material](https://github.com/Tzahi12345/YoutubeDL-Material)
+
+| Variable | Description | Default |
+|-----------|:----------:|:----------:|
+| `PIMILOR_YTDL_PATH` | Path to application files | `./ytdl` |
+| `PIMILOR_YTDL_PORT` | Port for web UI | `17442` |
 | `PGID` | Group ID | `1000` |
 | `PUID` | User ID | `1000` |
 | `TZ` | Timezone | `America/Los_Angeles` |
