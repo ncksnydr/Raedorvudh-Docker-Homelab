@@ -19,7 +19,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     deploy:
       placement:
-        constraints: [node.labels.nethiadil == true]
+        constraints: [node.labels.nethiadil-plex == true]
       replicas: 4
       resources:
         limits:
