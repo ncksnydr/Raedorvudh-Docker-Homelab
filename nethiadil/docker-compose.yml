@@ -20,6 +20,14 @@ services:
     deploy:
       placement:
         constraints: [node.labels.nethiadil == true]
+      replicas: 4
+      resources:
+        limits:
+          cpus: '3.00'
+          memory: 3G
+        reservations:
+          cpus: '1.00'
+          memory: 2G
 
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
