@@ -19,15 +19,14 @@ services:
       - /etc/localtime:/etc/localtime:ro
     deploy:
       placement:
-        constraints: [node.labels.nethiadil-plex == true]
-      replicas: 4
+        constraints: [node.labels.nethiadil == true]
       resources:
         limits:
-          cpus: '3.00'
-          memory: 3G
+          cpus: '7.00'
+          memory: 12G
         reservations:
-          cpus: '1.00'
-          memory: 2G
+          cpus: '4.00'
+          memory: 6G
 
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
