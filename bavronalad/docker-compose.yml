@@ -1,0 +1,102 @@
+version: "3.9"
+services:
+  photoprism:
+    image: photoprism/photoprism:preview-arm64
+    container_name: bavronalad-photoprism-app
+    devices:
+     - /dev/video11:/dev/video11
+    environment:
+      PHOTOPRISM_ADMIN_PASSWORD: ${BAVRONALAD_PHOTOPRISM_PASSWORD}
+      PHOTOPRISM_ADMIN_USER: ${BAVRONALAD_PHOTOPRISM_USERNAME}
+      PHOTOPRISM_AUTH_MODE: password
+      PHOTOPRISM_DATABASE_DRIVER: mysql
+      PHOTOPRISM_DATABASE_NAME: ${BAVRONALAD_MYSQL_DATABASE}
+      PHOTOPRISM_DATABASE_PASSWORD: ${BAVRONALAD_MYSQL_PASSWORD}
+      PHOTOPRISM_DATABASE_SERVER: mariadb:3306
+      PHOTOPRISM_DATABASE_USER: ${BAVRONALAD_MYSQL_USERNAME}
+      PHOTOPRISM_DEBUG: "TRUE"
+      PHOTOPRISM_DETECT_NSFW: "FALSE"
+      PHOTOPRISM_DISABLE_CHOWN: "FALSE"
+      PHOTOPRISM_DISABLE_CLASSIFICATION: "FALSE"
+      PHOTOPRISM_DISABLE_FACES: "FALSE"
+      PHOTOPRISM_DISABLE_FFMPEG: "FALSE"
+      PHOTOPRISM_DISABLE_HEIFCONVERT: "FALSE"
+      PHOTOPRISM_DISABLE_RAW: "TRUE"
+      PHOTOPRISM_DISABLE_SETTINGS: "FALSE"
+      PHOTOPRISM_DISABLE_TENSORFLOW: "FALSE"
+      PHOTOPRISM_DISABLE_WEBDAV: "FALSE"
+      PHOTOPRISM_EXPERIMENTAL: "TRUE"
+      PHOTOPRISM_FFMPEG_ENCODER: "raspberry"
+      PHOTOPRISM_GID: ${PGID}
+      PHOTOPRISM_HTTP_COMPRESSION: gzip
+      #PHOTOPRISM_HTTP_HOST: ${RAEDORVUDH_IP}
+      #PHOTOPRISM_HTTP_PORT: ${BAVRONALAD_PHOTOPRISM_PORT}
+      PHOTOPRISM_INIT: "tensorflow"
+      PHOTOPRISM_JPEG_QUALITY: 90
+      PHOTOPRISM_JPEG_SIZE: 30000
+      PHOTOPRISM_LOG_LEVEL: debug
+      PHOTOPRISM_ORIGINALS_LIMIT: -1
+      PHOTOPRISM_RAW_PRESETS: "FALSE"
+      PHOTOPRISM_READONLY: "FALSE"
+      PHOTOPRISM_RESOLUTION_LIMIT: -1
+      PHOTOPRISM_SESSION_MAXAGE: -1
+      PHOTOPRISM_SESSION_TIMEOUT: -1
+      PHOTOPRISM_SITE_URL: ${BAVRONALAD_PHOTOPRISM_URL}
+      PHOTOPRISM_THUMB_FILTER: "blackman"
+      PHOTOPRISM_THUMB_SIZE: 7680
+      PHOTOPRISM_TRACE: "TRUE"
+      PHOTOPRISM_UID: ${PUID}
+      PHOTOPRISM_UPLOAD_NSFW: "TRUE"
+      PHOTOPRISM_WORKERS: 2
+      TF_CPP_MIN_LOG_LEVEL: 0
+    ports:
+      - ${BAVRONALAD_PHOTOPRISM_PORT}:2342
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    volumes:
+      - photoprism-media:/photoprism/originals
+      - photoprism-media-import:/photoprism/import
+      - ${BAVRONALAD_PHOTOPRISM_PATH}:/photoprism/storage
+    working_dir: "/photoprism"
+    depends_on:
+      - mariadb
+    deploy:
+      placement:
+        constraints: [node.labels.bavronalad == true]
+
+  mariadb:
+    image: arm64v8/mariadb:10.10
+    container_name: faenil-photoprism-db
+    command: mysqld --innodb-buffer-pool-size=256M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+    environment:
+      MARIADB_AUTO_UPGRADE: "1"
+      MARIADB_INITDB_SKIP_TZINFO: "1"
+      MARIADB_DATABASE: ${BAVRONALAD_MYSQL_DATABASE}
+      MARIADB_USER: ${BAVRONALAD_MYSQL_USERNAME}
+      MARIADB_PASSWORD: ${BAVRONALAD_MYSQL_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${BAVRONALAD_MYSQL_PASSWORD}
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    volumes:
+      - ${BAVRONALAD_PHOTOPRISM_PATH}/database:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.labels.bavronalad == true]
+
+volumes:
+  photoprism-media:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/photos/gallery
+  photoprism-media-import:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/photos/import
