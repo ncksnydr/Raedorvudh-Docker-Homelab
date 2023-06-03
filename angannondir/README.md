@@ -2,7 +2,7 @@
 
 # Angannondír <br>_"The Iron Gatekeeper"_
 
-<img src="../resources/images/angannondir.svg" alt="Enedos written in Tengwar" style="max-width:100%;">
+<img src="../resources/images/angannondir.svg" alt="Angannondir written in Tengwar" style="max-width:100%;">
 
 </div>
 
@@ -74,6 +74,24 @@ Relational database powered by MySQL.
 | `PUID` | User ID | `1000` |
 | `ROOT_PASSWORD` | Password for root user | `changeMe` |
 | `TZ` | Timezone | `America/Los_Angeles` |
+
+---
+
+### PHPMyAdmin
+
+GUI for MariaDB.  
+[Container image via phpmyadmin](https://hub.docker.com/_/phpmyadmin)
+
+| Variable | Description | Default |
+|----------|:-----------:|:-------:|
+| `ANGANNONDIR_DB_USERNAME` | Database username       | `npm` |
+| `ANGANNONDIR_PHPMYADMIN_PORT` | Port to web UI           | `8080` |
+| `PGID` | Group ID | `1000` |
+| `PUID` | User ID | `1000` |
+| `ROOT_PASSWORD` | Password for root user | `changeMe` |
+| `TZ` | Timezone | `America/Los_Angeles` |
+
+---
 
 ## Sindarin
 
