@@ -1,17 +1,18 @@
 version: "3.9"
 services:
+
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: angannondir-cloudflare
     cap_drop:
       - all
     environment:
-      CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN}
-      DOMAINS: ${DOMAINS}
-      PGID: ${PGID}
+      CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN:-changeMe}
+      DOMAINS: ${DOMAINS:-changeMe.biz}
+      PGID: ${PGID:-1000}
       PROXIED: "TRUE"
-      PUID: ${PUID}
-      TZ: ${TZ}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       IP6_PROVIDER: "none"
     network_mode: host
     read_only: true
@@ -21,56 +22,86 @@ services:
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
+
   duckdns:
     image: lscr.io/linuxserver/duckdns:latest
     container_name: angannondir-duckdns
     environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
-      TZ: ${TZ}
-      SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN}
-      TOKEN: ${ANGANNONDIR_DUCKDNS_TOKEN}
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN:-changeMe.biz}
+      TOKEN: ${ANGANNONDIR_DUCKDNS_TOKEN:-changeMe}
       LOG_FILE: "FALSE"
     restart: unless-stopped
     volumes:
-      - ${ANGANNONDIR_DUCKDNS_PATH}:/config
+      - ${ANGANNONDIR_DUCKDNS_PATH:-./duckdns}:/config
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
+
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
     container_name: angannondir-npm-app
     environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       DB_MYSQL_HOST: "db"
-      DB_MYSQL_NAME: ${ANGANNONDIR_DB_DATABASE}
-      DB_MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD}
+      DB_MYSQL_NAME: ${ANGANNONDIR_DB_DATABASE:-npm}
+      DB_MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD:-npm}
       DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: ${ANGANNONDIR_DB_USERNAME}
+      DB_MYSQL_USER: ${ANGANNONDIR_DB_USERNAME:-npm}
       DISABLE_IPV6: "TRUE"
     ports:
-      - ${ANGANNONDIR_NPM_PORT_HTTP}:80
-      - ${ANGANNONDIR_NPM_PORT_HTTPS}:443
-      - ${ANGANNONDIR_NPM_PORT_ADMIN}:81
+      - ${ANGANNONDIR_NPM_PORT_HTTP:-80}:80
+      - ${ANGANNONDIR_NPM_PORT_HTTPS:-443}:443
+      - ${ANGANNONDIR_NPM_PORT_ADMIN:-81}:81
     restart: always
     volumes:
-      - ${ANGANNONDIR_NPM_PATH}/app:/data
-      - ${ANGANNONDIR_NPM_PATH}/letsencrypt:/etc/letsencrypt
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/app:/data
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/letsencrypt:/etc/letsencrypt
     depends_on:
       - db
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
+
   db:
     image: yobasystems/alpine-mariadb:latest
     container_name: angannondir-npm-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
-      MYSQL_DATABASE: ${ANGANNONDIR_DB_DATABASE}
-      MYSQL_USER: ${ANGANNONDIR_DB_USERNAME}
-      MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${ANGANNONDIR_DB_DATABASE:-npm}
+      MYSQL_USER: ${ANGANNONDIR_DB_USERNAME:-npm}
+      MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD:-npm}
+    ports:
+      - 3306:3306
     restart: always
     volumes:
-      - ${ANGANNONDIR_NPM_PATH}/database:/var/lib/mysql
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/database:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
+  
+  phpmyadmin:
+    image: phpmyadmin:apache
+    container_name: angannondir-phpmyadmin
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PMA_HOST: db
+      PMA_USER: ${ANGANNONDIR_DB_USERNAME:-npm}
+      PMA_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    ports:
+      - ${ANGANNONDIR_PHPMYADMIN_PORT:-8080}:80
+    restart: always
+    volumes:
+      - /sessions
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
