@@ -1,8 +1,15 @@
 # TODO Organize .gitignore file.
 
 .env
-barenfastad
 faenil
+
+
+
+
+
+lochuil/homer/tools/*
+lochuil/**/tish.css
+lochuil/**/tish.css.map
 
 
 

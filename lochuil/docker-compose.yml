@@ -4,55 +4,53 @@ services:
     image: b4bz/homer
     container_name: lochuil-homer
     environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       INIT_ASSETS: 1
     ports:
-      - ${LOCHUIL_HOMER_PORT}:8080
+      - ${LOCHUIL_HOMER_PORT:-8080}:8080
     volumes:
-      - homer-app:/www/assets
+      - ${LOCHUIL_HOMER_PATH:-./homer}:/www/assets
     user: ${PUID}:${PGID}
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]
 
   homer-admin:
     image: b4bz/homer
     container_name: lochuil-homer-admin
     environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       INIT_ASSETS: 1
     ports:
-      - ${LOCHUIL_HOMER_PORT_ADMIN}:8080
+      - ${LOCHUIL_HOMER_PORT_ADMIN:-8081}:8080
     volumes:
-      - homer-admin-app:/www/assets
+      - ${LOCHUIL_HOMER_PATH:-./homer}/admin:/www/assets
     user: ${PUID}:${PGID}
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]
 
   homer-editor:
     image: linuxserver/code-server
     container_name: lochuil-editor
     environment:
-      PUID: ${PUID}
-      GUID: ${PGID}
-      TZ: ${TZ}
-      PROXY_DOMAIN: ${LOCHUIL_VSCODE_URL}.${DOMAINS}
-      DEFAULT_WORKSPACE: ${LOCHUIL_VSCODE_WORKSPACE}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PASSWORD: ${LOCHUIL_VSCODE_PASSWORD:-changeMe}
+      PROXY_DOMAIN: ${LOCHUIL_VSCODE_URL:-vscode}.${DOMAINS:-changeMe.biz}
+      DEFAULT_WORKSPACE: ${LOCHUIL_VSCODE_WORKSPACE:-./}
     ports:
-      - ${LOCHUIL_VSCODE_PORT}:8443
+      - ${LOCHUIL_VSCODE_PORT:-8443}:8443
     restart: unless-stopped
     volumes:
-       - homer-app:/www/assets
+       - ${LOCHUIL_HOMER_PATH:-./homer}:/www/assets
     depends_on:
       - homer
-
-volumes:
-  homer-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/lochuil/homer
-  homer-admin-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/lochuil/homer/admin
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]

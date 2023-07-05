@@ -1,0 +1,69 @@
+version: "3.9"
+services:
+
+  db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: goistor-mariadb
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${GOISTOR_DB_DATABASE:-db}
+      MYSQL_USER: ${GOISTOR_DB_USERNAME:-db}
+      MYSQL_PASSWORD: ${GOISTOR_DB_PASSWORD:-db}
+    ports:
+      - ${GOISTOR_DB_PORT:-3306}:3306
+    restart: always
+    volumes:
+      - ${GOISTOR_DB_PATH:-db}:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+  
+  phpmyadmin:
+    image: phpmyadmin:apache
+    container_name: goistor-phpmyadmin
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PMA_HOST: db
+      PMA_USER: ${ROOT_USERNAME:-admin}
+      PMA_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    ports:
+      - ${GOISTOR_PHPMYADMIN_PORT:-8080}:80
+    restart: always
+    volumes:
+      - /sessions
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  monica-app:
+    image: monica:latest
+    container_name: goistor-monica-app
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      APP_KEY: ${GOISTOR_MONICA_APPKEY:-changeMe}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_DATABASE: ${GOISTOR_MONICA_DB_NAME:-monica}
+      DB_USERNAME: ${ROOT_USERNAME:-monica}
+      DB_PASSWORD:  ${ROOT_PASSWORD:-monica}
+      CACHE_DRIVER: database
+      SESSION_DRIVER: database
+      QUEUE_DRIVER: sync
+    ports:
+      - ${GOISTOR_MONICA_PORT:-80}:80
+    restart: always
+    volumes:
+      - ${GOISTOR_MONICA_PATH:-monica}:/var/www/html/storage
+    depends_on:
+      - db
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+  

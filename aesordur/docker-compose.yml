@@ -1,12 +1,13 @@
 version: "3.9"
 services:
+
   mealie:
     container_name: aesordur-mealie
     image: hkotel/mealie:latest
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       RECIPE_PUBLIC: "TRUE"
       RECIPE_SHOW_NUTRITION: "TRUE"
       RECIPE_SHOW_ASSETS: "TRUE"
@@ -14,19 +15,36 @@ services:
       RECIPE_DISABLE_COMMENTS: "FALSE"
       RECIPE_DISABLE_AMOUNT: "FALSE"
       WORKERS_PER_CORE: 3
+      TOKEN_TIME: 4383
     ports:
-      - ${AESORDUR_MEALIE_PORT}:80
+      - ${AESORDUR_MEALIE_PORT:-80}:80
     restart: always
     volumes:
-      - mealie-app:/app/data
+      - ${AESORDUR_MEALIE_PATH:-./mealie}:/app/data
     deploy:
-      replicas: 2
       placement:
         constraints: [node.labels.aesordur == true]
-volumes:
-  mealie-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/aesordur/mealie
+
+  mealie-beta:
+    container_name: aesordur-mealie-beta
+    image: hkotel/mealie:omni-nightly
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      RECIPE_PUBLIC: "TRUE"
+      RECIPE_SHOW_NUTRITION: "TRUE"
+      RECIPE_SHOW_ASSETS: "TRUE"
+      RECIPE_LANDSCAPE_VIEW: "TRUE"
+      RECIPE_DISABLE_COMMENTS: "FALSE"
+      RECIPE_DISABLE_AMOUNT: "FALSE"
+      WORKERS_PER_CORE: 3
+      TOKEN_TIME: 4383
+    ports:
+      - ${AESORDUR_MEALIE_BETA_PORT:-80}:80
+    restart: always
+    volumes:
+      - ${AESORDUR_MEALIE_BETA_PATH:-./mealie-beta}:/app/data
+    deploy:
+      placement:
+        constraints: [node.labels.aesordur == true]
