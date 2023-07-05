@@ -81,6 +81,24 @@ services:
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
+ 
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: pimilor-readarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_READARR_PORT:-8787}:8787
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_READARR_PATH:-./readarr}:/config
+      - thinmbahad-books:/books
+      - cofbilion:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
     
   overseerr:
     image: sctx/overseerr:latest
@@ -95,6 +113,28 @@ services:
     volumes:
       - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/app/config
     restart: unless-stopped
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  doplarr:
+    image: lscr.io/linuxserver/doplarr:latest
+    container_name: pimilor-doplarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      DISCORD__TOKEN: ${PIMILOR_DOPLARR_TOKEN}
+      OVERSEERR__API: ${PIMILOR_OVERSEERR_API}
+      OVERSEERR__URL: http://${RAEDORVUDH_IP}:${PIMILOR_OVERSEERR_PORT}
+      RADARR__API: ${PIMILOR_RADARR_API}
+      RADARR__URL: http://${RAEDORVUDH_IP}:${PIMILOR_RADARR_PORT}
+      SONARR__API: ${PIMILOR_SONARR_API}
+      SONARR__URL: http://${RAEDORVUDH_IP}:${PIMILOR_SONARR_PORT} 
+      PARTIAL_SEASONS: "TRUE"
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_DOPLARR_PATH:-./config}:/config
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
@@ -156,7 +196,7 @@ services:
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
-  # TODO Add Readarr
+
   # TODO Add Doplarr
 
 volumes:
@@ -190,3 +230,9 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${THINMBAHAD_PATH}/media/movies
+  thinmbahad-books:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books
