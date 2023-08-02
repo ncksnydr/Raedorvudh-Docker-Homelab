@@ -197,8 +197,7 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
 
-  # TODO Add Doplarr
-
+  
 volumes:
   cofbilion:
       driver: local
