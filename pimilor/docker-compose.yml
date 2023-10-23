@@ -101,7 +101,7 @@ services:
         constraints: [node.labels.pimilor == true]
     
   overseerr:
-    image: sctx/overseerr:latest
+    image: linuxserver/overseerr:latest
     container_name: nethiadil-overseerr
     environment:
       PUID: ${PUID:-1000}
@@ -177,7 +177,7 @@ services:
         constraints: [node.labels.pimilor == true]
 
   firefox:
-    image: lscr.io/linuxserver/firefox:latest
+    image: linuxserver/firefox:latest
     container_name: pimilor-firefox
     environment:
       PUID: ${PUID:-1000}
