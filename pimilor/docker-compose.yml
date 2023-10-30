@@ -1,5 +1,7 @@
 version: "3.9"
 services:
+
+  # Transmission (https://docs.linuxserver.io/images/docker-transmission)
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: pimilor-transmission
@@ -28,6 +30,7 @@ services:
           cpus: '2.00'
           memory: 6G
 
+  # Jackett (https://docs.linuxserver.io/images/docker-jackett)
   jackett:
     image: lscr.io/linuxserver/jackett:latest
     container_name: pimilor-jackett
@@ -41,13 +44,14 @@ services:
     restart: unless-stopped
     volumes:
       - ${PIMILOR_JACKETT_PATH:-./jackett}:/config
-      - cofbilion:/downloads
+      - cofbilion-blackhole:/downloads
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
 
+  # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
   sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
+    image: lscr.io/linuxserver/sonarr
     container_name: pimilor-sonarr
     environment:
       PUID: ${PUID:-1000}
@@ -59,11 +63,12 @@ services:
     volumes:
       - ${PIMILOR_SONARR_PATH:-./sonarr}:/config
       - thinmbahad-tv:/tv
-      - cofbilion:/downloads
+      - cofbilion-blackhole:/downloads
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
 
+  # Radarr (https://docs.linuxserver.io/images/docker-radarr)
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: pimilor-radarr
@@ -77,13 +82,32 @@ services:
     volumes:
       - ${PIMILOR_RADARR_PATH:-./radarr}:/config
       - thinmbahad-movies:/movies 
-      - cofbilion:/downloads
+      - cofbilion-blackhole:/downloads
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
- 
+
+  # Overseerr (https://docs.linuxserver.io/images/docker-overseerr)
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: nethiadil-overseerr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      LOG_LEVEL: debug
+    ports:
+      - ${PIMILOR_OVERSEERR_PORT:-5055}:5055
+    volumes:
+      - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/config
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Readarr (https://docs.linuxserver.io/images/docker-readarr)
   readarr:
-    image: lscr.io/linuxserver/readarr:develop
+    image: lscr.io/linuxserver/readarr:nightly
     container_name: pimilor-readarr
     environment:
       PUID: ${PUID:-1000}
@@ -94,90 +118,15 @@ services:
     restart: unless-stopped
     volumes:
       - ${PIMILOR_READARR_PATH:-./readarr}:/config
-      - thinmbahad-books:/books
-      - cofbilion:/downloads
+      - thinmbahad-ebooks:/books
+      - cofbilion-blackhole:/downloads
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
-    
-  overseerr:
-    image: linuxserver/overseerr:latest
-    container_name: nethiadil-overseerr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      LOG_LEVEL: debug
-    ports:
-      - ${PIMILOR_OVERSEERR_PORT:-5055}:5055
-    volumes:
-      - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/app/config
-    restart: unless-stopped
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  doplarr:
-    image: lscr.io/linuxserver/doplarr:latest
-    container_name: pimilor-doplarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      DISCORD__TOKEN: ${PIMILOR_DOPLARR_TOKEN}
-      OVERSEERR__API: ${PIMILOR_OVERSEERR_API}
-      OVERSEERR__URL: http://${RAEDORVUDH_IP}:${PIMILOR_OVERSEERR_PORT}
-      RADARR__API: ${PIMILOR_RADARR_API}
-      RADARR__URL: http://${RAEDORVUDH_IP}:${PIMILOR_RADARR_PORT}
-      SONARR__API: ${PIMILOR_SONARR_API}
-      SONARR__URL: http://${RAEDORVUDH_IP}:${PIMILOR_SONARR_PORT} 
-      PARTIAL_SEASONS: "TRUE"
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_DOPLARR_PATH:-./config}:/config
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  ytdl_material:
-    image: tzahi12345/youtubedl-material:latest
-    container_name: pimilor-ytdl-app
-    environment: 
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
-      ytdl_use_local_db: 'false'
-      write_ytdl_config: 'true'
-    ports:
-      - ${PIMILOR_YTDL_PORT:-17442}:17442
-    restart: always
-    volumes:
-      - ${PIMILOR_YTDL_PATH:-./ytdl}:/app/appdata
-      - cofbilion-audio:/app/audio
-      - cofbilion-video:/app/video
-      - cofbilion-video:/app/subscriptions
-      - cofbilion-video:/app/users
-    depends_on:
-      - ytdl-mongo-db
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-    
-  ytdl-mongo-db:
-    image: mongo:4.4.18
-    container_name: pimilor-ytdl-db
-    logging:
-        driver: "none"          
-    restart: always
-    volumes:
-        - ${PIMILOR_YTDL_PATH:-./ytdl}/database:/data/db
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
+  
+  # Firefox (https://docs.linuxserver.io/images/docker-firefox)
   firefox:
-    image: linuxserver/firefox:latest
+    image: lscr.io/linuxserver/firefox:latest
     container_name: pimilor-firefox
     environment:
       PUID: ${PUID:-1000}
@@ -197,7 +146,9 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
 
-  
+  # YTDL (https://github.com/Tzahi12345/YoutubeDL-Material)
+
+
 volumes:
   cofbilion:
       driver: local
@@ -211,6 +162,24 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${COFBILION_PATH}/public/audio
+  cofbilion-blackhole:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/blackhole
+  cofbilion-movies:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/movies
+  cofbilion-tv:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/tv
   cofbilion-video:
       driver: local
       driver_opts:
@@ -229,9 +198,9 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${THINMBAHAD_PATH}/media/movies
-  thinmbahad-books:
+  thinmbahad-ebooks:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books
+        device: :${THINMBAHAD_PATH}/media/books/ebooks

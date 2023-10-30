@@ -1,6 +1,53 @@
 version: "3.9"
 services:
 
+  # NGINX Proxy Manager (App)
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: angannondir-npm-app
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      DB_MYSQL_HOST: "nginx-proxy-manager-db"
+      DB_MYSQL_NAME: ${ANGANNONDIR_NPM_DATABASE:-npm}
+      DB_MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: ${ROOT_USERNAME:-npm}
+      DISABLE_IPV6: "TRUE"
+    ports:
+      - ${ANGANNONDIR_NPM_PORT_HTTP:-80}:80
+      - ${ANGANNONDIR_NPM_PORT_HTTPS:-443}:443
+      - ${ANGANNONDIR_NPM_PORT_ADMIN:-81}:81
+    restart: always
+    volumes:
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/app:/data
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - nginx-proxy-manager-db
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
+  
+  # NGINX Proxy Manager (DB)
+  nginx-proxy-manager-db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: angannondir-npm-db
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE:-npm}
+      MYSQL_USER: ${ROOT_USERNAME:-npm}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
+    network_mode: "service:goistor_mysql"
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  # Cloudflare (DDNS)
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: angannondir-cloudflare
@@ -23,6 +70,7 @@ services:
       placement:
         constraints: [node.labels.angannondir == true]
 
+  # DuckDNS (DDNS)
   duckdns:
     image: lscr.io/linuxserver/duckdns:latest
     container_name: angannondir-duckdns
@@ -40,68 +88,4 @@ services:
       placement:
         constraints: [node.labels.angannondir == true]
 
-  nginx-proxy-manager:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: angannondir-npm-app
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      DB_MYSQL_HOST: "db"
-      DB_MYSQL_NAME: ${ANGANNONDIR_DB_DATABASE:-npm}
-      DB_MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: ${ROOT_USERNAME:-npm}
-      DISABLE_IPV6: "TRUE"
-    ports:
-      - ${ANGANNONDIR_NPM_PORT_HTTP:-80}:80
-      - ${ANGANNONDIR_NPM_PORT_HTTPS:-443}:443
-      - ${ANGANNONDIR_NPM_PORT_ADMIN:-81}:81
-    restart: always
-    volumes:
-      - ${ANGANNONDIR_NPM_PATH:-./npm}/app:/data
-      - ${ANGANNONDIR_NPM_PATH:-./npm}/letsencrypt:/etc/letsencrypt
-    depends_on:
-      - db
-    deploy:
-      placement:
-        constraints: [node.labels.angannondir == true]
-
-  db:
-    image: yobasystems/alpine-mariadb:latest
-    container_name: angannondir-npm-db
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
-      MYSQL_DATABASE: ${ANGANNONDIR_DB_DATABASE:-npm}
-      MYSQL_USER: ${ROOT_USERNAME:-npm}
-      MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
-    ports:
-      - 3306:3306
-    restart: always
-    volumes:
-      - ${ANGANNONDIR_DB_PATH:-./npm/database}:/var/lib/mysql
-    deploy:
-      placement:
-        constraints: [node.labels.angannondir == true]
-  
-  phpmyadmin:
-    image: phpmyadmin:apache
-    container_name: angannondir-phpmyadmin
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      PMA_HOST: db
-      PMA_USER: ${ROOT_USERNAME:-npm}
-      PMA_PASSWORD: ${ROOT_PASSWORD:-changeMe}
-    ports:
-      - ${ANGANNONDIR_PHPMYADMIN_PORT:-8080}:80
-    restart: always
-    volumes:
-      - /sessions
-    deploy:
-      placement:
-        constraints: [node.labels.angannondir == true]
+  # PiHole (https://github.com/pi-hole/docker-pi-hole/)
