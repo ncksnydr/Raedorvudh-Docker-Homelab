@@ -2,9 +2,10 @@ version: "3.9"
 services:
 
   mealie:
+    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1
     container_name: aesordur-mealie
-    image: hkotel/mealie:latest
     environment:
+      # TODO Add custom colors (https://nightly.mealie.io/documentation/getting-started/installation/backend-config/#themeing)
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
@@ -15,36 +16,17 @@ services:
       RECIPE_DISABLE_COMMENTS: "FALSE"
       RECIPE_DISABLE_AMOUNT: "FALSE"
       WORKERS_PER_CORE: 3
+      DB_ENGINE: sqlite
       TOKEN_TIME: 4383
+      MAX_WORKERS: 1
+      WEB_CONCURRENCY: 1
+      BASE_URL: ${AESORDUR_MEALIE_URL:-https://mealie.example.com}
+      ALLOW_SIGNUP: "FALSE"
     ports:
-      - ${AESORDUR_MEALIE_PORT:-80}:80
+      - ${AESORDUR_MEALIE_PORT:-9000}:9000
     restart: always
     volumes:
       - ${AESORDUR_MEALIE_PATH:-./mealie}:/app/data
-    deploy:
-      placement:
-        constraints: [node.labels.aesordur == true]
-
-  mealie-beta:
-    container_name: aesordur-mealie-beta
-    image: hkotel/mealie:omni-nightly
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      RECIPE_PUBLIC: "TRUE"
-      RECIPE_SHOW_NUTRITION: "TRUE"
-      RECIPE_SHOW_ASSETS: "TRUE"
-      RECIPE_LANDSCAPE_VIEW: "TRUE"
-      RECIPE_DISABLE_COMMENTS: "FALSE"
-      RECIPE_DISABLE_AMOUNT: "FALSE"
-      WORKERS_PER_CORE: 3
-      TOKEN_TIME: 4383
-    ports:
-      - ${AESORDUR_MEALIE_BETA_PORT:-80}:80
-    restart: always
-    volumes:
-      - ${AESORDUR_MEALIE_BETA_PATH:-./mealie-beta}:/app/data
     deploy:
       placement:
         constraints: [node.labels.aesordur == true]
