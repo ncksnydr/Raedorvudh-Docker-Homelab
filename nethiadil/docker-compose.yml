@@ -1,5 +1,7 @@
 version: "3.9"
 services:
+
+  # Plex (https://docs.linuxserver.io/images/docker-plex)
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: nethiadil-plex
@@ -19,18 +21,12 @@ services:
       - /etc/localtime:/etc/localtime:ro
     deploy:
       placement:
-        constraints: [node.labels.nethiadil == true]
-      resources:
-        limits:
-          cpus: '7.00'
-          memory: 12G
-        reservations:
-          cpus: '4.00'
-          memory: 6G
+        constraints: [node.labels.nethiadil_plex == true]
 
+  # Tautilli (https://docs.linuxserver.io/images/docker-tautulli)
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
-    container_name: nethiadil-stats
+    container_name: nethiadil-plex-stats
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
@@ -44,6 +40,7 @@ services:
       placement:
         constraints: [node.labels.nethiadil == true]
 
+  # Plex Meta Manager (https://docs.linuxserver.io/images/docker-plex-meta-manager)
   plex-meta-manager:
     image: lscr.io/linuxserver/plex-meta-manager:latest
     container_name: nethiadil-metadata
@@ -51,28 +48,11 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      PMM_CONFIG: ${NETHIADIL_PMM_PATH:-./plex-meta-manager}/${NETHIADIL_PMM_CONFIG_FILE:-.config.yaml}
+      PMM_CONFIG: /config/config.yml
       PMM_TIME: ${NETHIADIL_PMM_UPDATE_TIME:-00:00}
     restart: unless-stopped
     volumes:
-      - ${NETHIADIL_PMM_PATH:-./plex-meta-manager}:/config
-    deploy:
-      placement:
-        constraints: [node.labels.nethiadil == true]
-
-  ersatztv:
-    image: jasongdove/ersatztv:develop-arm64
-    container_name: nethiadil-ersatztv
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${NETHIADIL_ERSATZTV_PORT:-8409}:8409
-    restart: unless-stopped
-    volumes:
-      - ${NETHIADIL_ERSATZTV_PATH:-./ersatztv}:/root/.local/share/ersatztv
-      - plex-media:/media/shared:ro
+      - ${NETHIADIL_PMM_PATH:-./plex-meta-manager}:/config:rw
     deploy:
       placement:
         constraints: [node.labels.nethiadil == true]

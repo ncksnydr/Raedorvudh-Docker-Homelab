@@ -1,0 +1,111 @@
+libraries:
+  
+  Movies:
+    metadata_path:
+      - pmm: basic
+      - pmm: imdb
+      - file: config/Movies.yml
+    overlay_path:
+      - remove_overlays: false
+      - pmm: resolution
+      - pmm: streaming
+      - pmm: ratings
+        template_variables:
+          rating1: user
+          rating1_image: rt_tomato
+          rating1_font: config/custom_fonts/Adlib.ttf
+          rating1_font_size: 63
+  
+          rating2: critic
+          rating2_image: imdb
+          rating2_font: config/custom_fonts/Impact.ttf
+          rating2_font_size: 70  
+
+          horizontal_position: right
+    operations:
+      mass_user_rating_update: mdb_tomatoes
+      mass_critic_rating_update: imdb
+
+  TV Shows:
+    metadata_path:
+      - pmm: basic
+      - pmm: imdb
+      - file: config/TV.yml
+    overlay_path:
+      - remove_overlays: false
+      - pmm: resolution
+      - pmm: streaming
+      - pmm: ratings
+        template_variables:
+          rating1: user
+          rating1_image: rt_tomato
+          rating1_font: config/custom_fonts/Adlib.ttf
+          rating1_font_size: 63
+  
+          rating2: critic
+          rating2_image: imdb
+          rating2_font: config/custom_fonts/Impact.ttf
+          rating2_font_size: 70  
+
+          horizontal_position: right
+    operations:
+      mass_user_rating_update: mdb_tomatoes
+      mass_critic_rating_update: imdb
+
+playlist_files:
+  - pmm: playlist
+    template_variables:
+      libraries: Movies, TV Shows
+
+settings:
+  cache: true
+  cache_expiration: 60
+  asset_directory: config/assets
+  asset_folders: true
+  asset_depth: 0
+  create_asset_folders: false
+  prioritize_assets: false
+  dimensional_asset_rename: false
+  download_url_assets: false
+  show_missing_season_assets: false
+  show_missing_episode_assets: false
+  show_asset_not_needed: true
+  sync_mode: append
+  minimum_items: 1
+  default_collection_order:
+  delete_below_minimum: true
+  delete_not_scheduled: false
+  run_again_delay: 2
+  missing_only_released: false
+  only_filter_missing: false
+  show_unmanaged: true
+  show_unconfigured: true
+  show_filtered: false
+  show_options: false
+  show_missing: true
+  show_missing_assets: true
+  save_report: false
+  tvdb_language: eng
+  ignore_ids:
+  ignore_imdb_ids:
+  item_refresh_delay: 0
+  playlist_sync_to_user: all
+  playlist_exclude_users:
+  playlist_report: false
+  verify_ssl: true
+  custom_repo:
+  check_nightly: false
+plex:
+  url: http://10.0.1.45:32400
+  token: EZuX1yRJ-HaNx-d8zDsJ
+  timeout: 60
+  db_cache:
+  clean_bundles: false
+  empty_trash: false
+  optimize: false
+tmdb:                            # REQUIRED for the script to run
+  apikey: 386c50a8f2fa4e7410b86fa632fc6b2c
+  language: en
+tautulli:
+  url: http://10.0.1.45:45162
+  apikey: dfa83da7df3a4e0d8b7cf627e6ba8765
