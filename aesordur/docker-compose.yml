@@ -1,6 +1,30 @@
 version: "3.9"
 services:
 
+  mealie-old:
+    container_name: aesordur-mealie
+    image: hkotel/mealie:latest
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      RECIPE_PUBLIC: "TRUE"
+      RECIPE_SHOW_NUTRITION: "TRUE"
+      RECIPE_SHOW_ASSETS: "TRUE"
+      RECIPE_LANDSCAPE_VIEW: "TRUE"
+      RECIPE_DISABLE_COMMENTS: "FALSE"
+      RECIPE_DISABLE_AMOUNT: "FALSE"
+      WORKERS_PER_CORE: 3
+      TOKEN_TIME: 4383
+    ports:
+      - 41900:80
+    restart: always
+    volumes:
+      - /home/herupa/enedos/aesordur/mealie-backup:/app/data
+    deploy:
+      placement:
+        constraints: [node.labels.aesordur == true]
+
   mealie:
     image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1
     container_name: aesordur-mealie
