@@ -1,72 +1,91 @@
 version: "3.9"
 services:
+
+  # NGINX Proxy Manager (App)
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: angannondir-npm-app
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      DB_MYSQL_HOST: "nginx-proxy-manager-db"
+      DB_MYSQL_NAME: ${ANGANNONDIR_NPM_DATABASE:-npm}
+      DB_MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: ${ROOT_USERNAME:-npm}
+      DISABLE_IPV6: "TRUE"
+    ports:
+      - ${ANGANNONDIR_NPM_PORT_HTTP:-80}:80
+      - ${ANGANNONDIR_NPM_PORT_HTTPS:-443}:443
+      - ${ANGANNONDIR_NPM_PORT_ADMIN:-81}:81
+    restart: always
+    volumes:
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/app:/data
+      - ${ANGANNONDIR_NPM_PATH:-./npm}/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - nginx-proxy-manager-db
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
+  
+  # NGINX Proxy Manager (DB)
+  nginx-proxy-manager-db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: angannondir-npm-db
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE:-npm}
+      MYSQL_USER: ${ROOT_USERNAME:-npm}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
+    network_mode: "service:goistor_mysql"
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  # Cloudflare (DDNS)
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: angannondir-cloudflare
     cap_drop:
       - all
     environment:
-      CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN}
-      DOMAINS: ${DOMAINS}
-      PGID: ${PGID}
+      CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN:-changeMe}
+      DOMAINS: ${DOMAINS:-changeMe.biz}
+      PGID: ${PGID:-1000}
       PROXIED: "TRUE"
-      PUID: ${PUID}
-      TZ: ${TZ}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       IP6_PROVIDER: "none"
     network_mode: host
     read_only: true
     restart: always
     security_opt:
       - no-new-privileges:true
-
-  nginx-proxy-manager:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: angannondir-npm-app
-    environment:
-      DB_MYSQL_HOST: "db"
-      DB_MYSQL_NAME: ${ANGANNONDIR_DB_DATABASE}
-      DB_MYSQL_PASSWORD: ${ANGANNONDIR_DB_PASSWORD}
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: ${ANGANNONDIR_DB_USERNAME}
-      DISABLE_IPV6: "TRUE"
-    ports:
-      - ${ANGANNONDIR_NPM_PORT_HTTP}:80
-      - ${ANGANNONDIR_NPM_PORT_HTTPS}:443
-      - ${ANGANNONDIR_NPM_PORT_ADMIN}:81
-    restart: unless-stopped
-    volumes:
-      - nginx-proxy-manager-app:/data
-      - nginx-proxy-manager-letsencrypt:/etc/letsencrypt
-    depends_on:
-      - db
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
 
-  db:
-    image: yobasystems/alpine-mariadb:latest
-    container_name: angannondir-npm-db
+  # DuckDNS (DDNS)
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: angannondir-duckdns
     environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
-      MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE}
-      MYSQL_USER: ${ANGANNONDIR_NPM_USERNAME}
-      MYSQL_PASSWORD: ${ANGANNONDIR_NPM_PASSWORD}
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN:-changeMe.biz}
+      TOKEN: ${ANGANNONDIR_DUCKDNS_TOKEN:-changeMe}
+      LOG_FILE: "FALSE"
     restart: unless-stopped
     volumes:
-      - ${ANGANNONDIR_DB_PATH}:/var/lib/mysql
+      - ${ANGANNONDIR_DUCKDNS_PATH:-./duckdns}:/config
     deploy:
       placement:
-        constraints: [node.labels.database == true]
-volumes:
-  nginx-proxy-manager-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/angannondir/nginx-proxy-manager
-  nginx-proxy-manager-letsencrypt:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/angannondir/nginx-proxy-manager/letsencrypt
+        constraints: [node.labels.angannondir == true]
+
+  # PiHole (https://github.com/pi-hole/docker-pi-hole/)

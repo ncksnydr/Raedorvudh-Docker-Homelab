@@ -1,103 +1,66 @@
 version: "3.9"
 services:
+
+  # Plex (https://docs.linuxserver.io/images/docker-plex)
   plex:
     image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    network_mode: host
+    container_name: nethiadil-plex
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       VERSION: docker
-      PLEX_CLAIM: ${NETHIADIL_PLEX_CLAIM}
+      PLEX_CLAIM: ${NETHIADIL_PLEX_CLAIM:-changeMe}
+    network_mode: host
     ports:
-      - ${NETHIADIL_PLEX_PORT}:32400/tcp
+      - ${NETHIADIL_PLEX_PORT:-32400}:32400/tcp
     restart: unless-stopped
     volumes:
-      - plex-app:/config
+      - ${NETHIADIL_PLEX_PATH:-./plex}:/config
       - plex-media:/media
       - /etc/localtime:/etc/localtime:ro
     deploy:
-      replicas: 1
       placement:
-        constraints: [node.labels.nethiadil == true]
+        constraints: [node.labels.nethiadil_plex == true]
 
+  # Tautilli (https://docs.linuxserver.io/images/docker-tautulli)
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
-    container_name: nethiadil-stats
+    container_name: nethiadil-plex-stats
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - ${NETHIADIL_TAUTULLI_PORT}:8181
+      - ${NETHIADIL_TAUTULLI_PORT:-8181}:8181
     restart: unless-stopped
     volumes:
-      - tautulli-app:/config
+      - ${NETHIADIL_TAUTULLI_PATH:-./tautulli}:/config
     deploy:
-      replicas: 1
       placement:
         constraints: [node.labels.nethiadil == true]
 
-  ombi:
-    image: lscr.io/linuxserver/ombi:latest
-    container_name: nethiadil-requests
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    ports:
-      - ${NETHIADIL_OMBI_PORT}:3579
-    restart: unless-stopped
-    volumes:
-      - ombi-app:/config
-    deploy:
-      replicas: 1
-      placement:
-        constraints: [node.labels.nethiadil == true]
-
+  # Plex Meta Manager (https://docs.linuxserver.io/images/docker-plex-meta-manager)
   plex-meta-manager:
     image: lscr.io/linuxserver/plex-meta-manager:latest
     container_name: nethiadil-metadata
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PMM_CONFIG: /config/config.yml
+      PMM_TIME: ${NETHIADIL_PMM_UPDATE_TIME:-00:00}
     restart: unless-stopped
     volumes:
-      - plex-meta-manager-app:/config
+      - ${NETHIADIL_PMM_PATH:-./plex-meta-manager}:/config:rw
     deploy:
-      replicas: 1
       placement:
         constraints: [node.labels.nethiadil == true]
 
 volumes:
-  plex-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/plex
   plex-media:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
       device: :${THINMBAHAD_PATH}/media
-  plex-meta-manager-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/metadata
-  ombi-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/requests
-  tautulli-app:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${ENEDOS_PATH}/nethiadil/stats

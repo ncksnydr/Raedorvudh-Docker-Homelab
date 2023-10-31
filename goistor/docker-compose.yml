@@ -1,0 +1,76 @@
+version: "3.9"
+services:
+
+  # MySQL/MariaDB (https://github.com/yobasystems/alpine-mariadb)
+  mysql:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: goistor-mysql
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_USER: ${ROOT_USERNAME:-root}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    ports:
+      - ${GOISTOR_MYSQL_PORT:-3306}:3306
+    restart: always
+    volumes:
+      - ${GOISTOR_MYSQL_PATH:-./mysql}:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  # PHPMyAdmin (https://github.com/phpmyadmin/docker)
+  phpmyadmin:
+    image: phpmyadmin:apache
+    container_name: goistor-phpmyadmin
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PMA_HOST: mysql
+      PMA_USER: ${ROOT_USERNAME:-root}
+      PMA_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    ports:
+      - ${GOISTOR_PHPMYADMIN_PORT:-8080}:80
+    restart: always
+    volumes:
+      - /sessions
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  # Postgres (https://hub.docker.com/_/postgres)
+  postgres:
+    image: postgres:latest
+    container_name: goistor-postgres
+    environment:
+      POSTGRES_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    ports:
+      - ${GOISTOR_POSTGRES_PORT:-5432}:5432
+    restart: always
+    volumes:
+      - ${GOISTOR_POSTGRES_PATH:-./postgres}:/var/lib/postgresql/data/
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+  
+  # PGAdmin (https://www.pgadmin.org)
+  postgres-admin:
+    image: dpage/pgadmin4
+    container_name: goistor-postgres-admin
+    environment:
+      POSTGRES_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      PGADMIN_DEFAULT_EMAIL: ${ROOT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    ports:
+      - ${GOISTOR_POSTGRES_ADMIN_PORT:-15432}:80
+    restart: always
+    volumes:
+      - ${GOISTOR_POSTGRES_ADMIN_PATH:-./postgres-admin}:/var/lib/pgadmin/
+    depends_on:
+      - postgres
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]

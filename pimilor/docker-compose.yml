@@ -1,0 +1,206 @@
+version: "3.9"
+services:
+
+  # Transmission (https://docs.linuxserver.io/images/docker-transmission)
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: pimilor-transmission
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PEERPORT: ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}
+      TRANSMISSION_WEB_HOME: /config/ui/${PIMILOR_TRANSMISSION_WEBUI}
+    ports:
+      - ${PIMILOR_TRANSMISSION_PORT_UI:-9091}:9091
+      - ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}:51413
+      - ${PIMILOR_TRANSMISSION_PORT_INBOUND:-51413}:51413/udp
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_TRANSMISSION_PATH:-./transmission}:/config
+      - cofbilion:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+      resources:
+        limits:
+          cpus: '4.00'
+          memory: 8G
+        reservations:
+          cpus: '2.00'
+          memory: 6G
+
+  # Jackett (https://docs.linuxserver.io/images/docker-jackett)
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: pimilor-jackett
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      AUTO_UPDATE: "TRUE"
+    ports:
+      - ${PIMILOR_JACKETT_PORT:-9117}:9117
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_JACKETT_PATH:-./jackett}:/config
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: pimilor-sonarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_SONARR_PORT:-8989}:8989
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_SONARR_PATH:-./sonarr}:/config
+      - thinmbahad-tv:/tv
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Radarr (https://docs.linuxserver.io/images/docker-radarr)
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: pimilor-radarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_RADARR_PORT:-7878}:7878
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_RADARR_PATH:-./radarr}:/config
+      - thinmbahad-movies:/movies 
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Overseerr (https://docs.linuxserver.io/images/docker-overseerr)
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: nethiadil-overseerr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      LOG_LEVEL: debug
+    ports:
+      - ${PIMILOR_OVERSEERR_PORT:-5055}:5055
+    volumes:
+      - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/config
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Readarr (https://docs.linuxserver.io/images/docker-readarr)
+  readarr:
+    image: lscr.io/linuxserver/readarr:nightly
+    container_name: pimilor-readarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_READARR_PORT:-8787}:8787
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_READARR_PATH:-./readarr}:/config
+      - thinmbahad-ebooks:/books
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Firefox (https://docs.linuxserver.io/images/docker-firefox)
+  firefox:
+    image: lscr.io/linuxserver/firefox:latest
+    container_name: pimilor-firefox
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_FIREFOX_PORT:-3000}:3000
+      - ${PIMILOR_FIREFOX_PORT_HTTPS:-3001}:3001
+    security_opt:
+      - seccomp:unconfined
+    shm_size: "1gb"
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_FIREFOX_PATH:-./firefox}:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # YTDL (https://github.com/Tzahi12345/YoutubeDL-Material)
+
+
+volumes:
+  cofbilion:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}
+  cofbilion-audio:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/audio
+  cofbilion-blackhole:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/blackhole
+  cofbilion-movies:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/movies
+  cofbilion-tv:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/tv
+  cofbilion-video:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${COFBILION_PATH}/public/video
+  thinmbahad-tv:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/tv
+  thinmbahad-movies:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/movies
+  thinmbahad-ebooks:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/ebooks
