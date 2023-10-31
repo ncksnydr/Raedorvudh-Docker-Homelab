@@ -1,85 +1,78 @@
 version: "3.9"
 services:
-  bds:
-    image: itzg/minecraft-server:latest
+
+  # Minecraft (https://github.com/itzg/docker-minecraft-server)
+  # CurseForce Modpacks (https://legacy.curseforge.com/minecraft/modpacks)
+  minecraft:
+    image: itzg/minecraft-server:java8-multiarch
     container_name: lavanoveren-minecraft
     environment:
-      UID: ${PUID}
-      GID: ${PGID}
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
+      # CF_API_KEY: ${LAVANOVEREN_MINECRAFT_CURSEFORGE_API:-1234567890}
       ALLOW_CHEATS: "TRUE"
       DIFFICULTY: normal
       EULA: "TRUE"
       GAMEMODE: SURVIVAL
-      TYPE: FORGE
       GENERATE_STRUCTURES: "TRUE"
-      ALLOW_FLIGHT: "TRUE"
-      LEVEL_NAME: Millaidor
-      LEVEL_TYPE: AMPLIFIED
-      SERVER_NAME: Nickopia
+      GID: ${PGID:-1000}
+      LEVEL_NAME: ${LAVANOVEREN_MINECRAFT_LEVEL_NAME:-Level}
       MAX_PLAYERS: 100
-      MOTD: At least it ain\u0027t New Jersey
-      ENABLE_RCON: "TRUE"
-      RCON_PASSWORD: ${LAVANOVEREN_MINECRAFT_PASSWORD}
+      MEMORY: 8G
+      MOTD: ${LAVANOVEREN_MINECRAFT_MOTD:-Oh hello there}
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      SERVER_NAME: ${LAVANOVEREN_MINECRAFT_SERVER_NAME:-Server}
+      TYPE: FORGE
+      TZ: ${TZ:-America/Los_Angeles}
+      UID: ${PUID:-1000}
+      VERSION: 1.7.10
     ports:
-      - ${LAVANOVEREN_MINECRAFT_PORT}:25565
+      - ${LAVANOVEREN_MINECRAFT_PORT:-25565}:25565
     stdin_open: true
     tty: true
     volumes:
-      - ${LAVANOVEREN_MINECRAFT_PATH}:/data
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/app:/data
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/mods:/mods:ro
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/modpacks:/modpacks:ro
     deploy:
       placement:
-        constraints: [node.labels.lavanoveren == true]
-  rcon:
-    image: itzg/rcon
-    container_name: lavanoveren-minecraft-rcon
+        constraints: [node.labels.lavanoveren_minecraft == true]
+
+  # Foundry VTT (https://github.com/felddy/foundryvtt-docker)
+  foundry-vtt:
+    image: felddy/foundryvtt:latest
+    container_name: lavanoveren-foundryvtt
+    environment:
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRYVTT_PASSWORD:-changeMe}
+      FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRYVTT_USERNAME:-admin}
+      FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRYVTT_KEY:-1234567890}
+    hostname: ${LAVANOVEREN_FOUNDRYVTT_HOSTNAME:-Foundry}
+    init: true
     ports:
-      - 4326:4326
-      - 4327:4327
+      - ${LAVANOVEREN_FOUNDRYVTT_PORT:-3000}:30000
     volumes:
-      - ${LAVANOVEREN_MINECRAFT_PATH}/rcon:/opt/rcon-web-admin/db
+      - ${LAVANOVEREN_FOUNDRYVTT_PATH:-./foundry}:/data
     deploy:
       placement:
         constraints: [node.labels.lavanoveren == true]
 
-  # foundry:
-  #   image: felddy/foundryvtt:latest
-  #   container_name: lavanoveren-foundryvtt
-  #   environment:
-  #     PGID: ${PGID}
-  #     PUID: ${PUID}
-  #     TZ: ${TZ}
-  #     FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRY_PASSWORD}
-  #     FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRY_USERNAME}
-  #     FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRY_KEY}
-  #   hostname: ${LAVANOVEREN_FOUNDRY_HOSTNAME}
-  #   init: true
-  #   ports:
-  #     - ${LAVANOVEREN_FOUNDRY_PORT}:30000
-  #   volumes:
-  #     - ${LAVANOVEREN_FOUNDRY_PATH}:/data
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.lavanoveren == true]
-
-
+  # EmulatorJS (https://docs.linuxserver.io/images/docker-emulatorjs)
   emulatorjs:
     image: lscr.io/linuxserver/emulatorjs:latest
-    container_name: emulatorjs
+    container_name: lavanoveren-emulatorjs
     environment:
-      PGID: ${PGID}
-      PUID: ${PUID}
-      TZ: ${TZ}
-    # SUBFOLDER: 
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - ${LAVANOVEREN_EMULATORJS_PORT_ROM}:3000
-      - ${LAVANOVEREN_EMULATORJS_PORT_UI}:80
-      - ${LAVANOVEREN_EMULATORJS_PORT_PEER}:4001 
+      - ${LAVANOVEREN_EMULATORJS_PORT_ROM:-3000}:3000
+      - ${LAVANOVEREN_EMULATORJS_PORT_UI:-80}:80
+      - ${LAVANOVEREN_EMULATORJS_PORT_PEER:-4001}:4001 
     restart: unless-stopped
     volumes:
-      - ${LAVANOVEREN_EMULATORJS_PATH}:/config
+      - ${LAVANOVEREN_EMULATORJS_PATH:-./emulatorjs}:/config
       - thinmbahad-games:/data
     deploy:
       placement:
@@ -91,4 +84,4 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/assets/games/roms
+      device: :${THINMBAHAD_PATH}/media/games/roms
