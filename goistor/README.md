@@ -8,57 +8,71 @@
 
 ## Applications in the stack
 
-### MariaDB
+### MySQL/MariaDB
 
 Relational database powered by MySQL.  
 [Container image via yobasystems/alpine-mariadb](https://github.com/yobasystems/alpine-mariadb)
 
-| Variable | Description | Default |
-|----------|:-----------:|:-------:|
-| `GOISTOR_DB_DATABASE` | Database name           | `db` |
-| `GOISTOR_DB_PASSWORD` | Database password       | `db` |
-| `GOISTOR_DB_USERNAME` | Database username       | `db` |
-| `GOISTOR_DB_PATH`     | Path to application files  | `db` |
-| `GOISTOR_DB_PORT`     | Port for database access  | `3306` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `ROOT_PASSWORD` | Password for root user | `changeMe` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable             |        Description        |        Default        |
+| -------------------- | :-----------------------: | :-------------------: |
+| `GOISTOR_MYSQL_PATH` | Path to application files |       `./mysql`       |
+| `GOISTOR_MYSQL_PORT` | Port for database access  |        `3306`         |
+| `PGID`               |         Group ID          |        `1000`         |
+| `PUID`               |          User ID          |        `1000`         |
+| `ROOT_PASSWORD`      |  Password for root user   |      `changeMe`       |
+| `ROOT_USERNAME`      |     Database username     |        `admin`        |
+| `TZ`                 |         Timezone          | `America/Los_Angeles` |
 
 ---
 
 ### PHPMyAdmin
 
-An admin version of the home page for the server.  
+Administration tool for MySQL and MariaDB.
 [Container image via phpmyadmin/docker](https://github.com/phpmyadmin/docker)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `GOISTOR_PHPMYADMIN_PORT` | Port for web UI | `8080` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `ROOT_PASSWORD` | Password for root user | `changeMe` |
-| `ROOT_USERNAME` | Username for root user | `admin` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable                  |      Description       |        Default        |
+| ------------------------- | :--------------------: | :-------------------: |
+| `GOISTOR_PHPMYADMIN_PORT` |    Port for web UI     |        `8080`         |
+| `PGID`                    |        Group ID        |        `1000`         |
+| `PUID`                    |        User ID         |        `1000`         |
+| `ROOT_PASSWORD`           | Password for root user |      `changeMe`       |
+| `ROOT_USERNAME`           | Username for root user |        `admin`        |
+| `TZ`                      |        Timezone        | `America/Los_Angeles` |
 
 ---
 
-### Monica
+### Postgres
 
-A client relationship manager (CRM) for personal use.  
-[Container image via monicahq/docker](https://github.com/monicahq/docker)
+A free and open-source relational database management system emphasizing extensibility and SQL compliance.
+[Container image via docker-library/postgres](https://github.com/docker-library/postgres)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `GOISTOR_MONICA_APPKEY` | Base64 application key | `changeMe` |
-| `GOISTOR_MONICA_DB_NAME` | Database name | `monica` |
-| `GOISTOR_MONICA_PATH` | Path to application files | `monica` |
-| `GOISTOR_MONICA_PORT` | Port to web UI | `80` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `ROOT_PASSWORD` | Password for root user | `monica` |
-| `ROOT_USERNAME` | Username for root user | `monica` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable                |        Description        |        Default        |
+| ----------------------- | :-----------------------: | :-------------------: |
+| `GOISTOR_POSTGRES_PATH` | Path to application files |     `./postgres`      |
+| `GOISTOR_POSTGRES_PORT` | Port for database access  |        `5432`         |
+| `PGID`                  |         Group ID          |        `1000`         |
+| `PUID`                  |          User ID          |        `1000`         |
+| `ROOT_PASSWORD`         |  Password for root user   |      `changeMe`       |
+| `TZ`                    |         Timezone          | `America/Los_Angeles` |
+
+---
+
+### Postgres Admin
+
+Administration and development platform for PostgreSQL.
+[Container image via phpmyadmin/docker](https://github.com/phpmyadmin/docker)
+
+| Variable                      |         Description         |        Default        |
+| ----------------------------- | :-------------------------: | :-------------------: |
+| `GOISTOR_POSTGRES_ADMIN_PATH` |  Path to application files  |  `./postgres-admin`   |
+| `GOISTOR_POSTGRES_ADMIN_PORT` |       Port for web UI       |         `80`          |
+| `PGID`                        |          Group ID           |        `1000`         |
+| `PUID`                        |           User ID           |        `1000`         |
+| `ROOT_EMAIL`                  | Email address for root user |  `admin@example.com`  |
+| `ROOT_PASSWORD`               |   Password for root user    |      `changeMe`       |
+| `TZ`                          |          Timezone           | `America/Los_Angeles` |
+
+---
 
 ## Sindarin
 
@@ -75,11 +89,11 @@ _guy-EE-star_
 
 ### Etymology
 
-| Root word | Definition |
-|-----------|:----------:|
-| [go-](https://www.elfdict.com/wt/515148)       | together, all        |
-| [ist](https://www.elfdict.com/wt/130653)     | knowledge       |
-| [-or](https://www.elfdict.com/wt/518972)     | agental suffix       |
+| Root word                                |   Definition   |
+| ---------------------------------------- | :------------: |
+| [go-](https://www.elfdict.com/wt/515148) | together, all  |
+| [ist](https://www.elfdict.com/wt/130653) |   knowledge    |
+| [-or](https://www.elfdict.com/wt/518972) | agental suffix |
 
 </div>
 

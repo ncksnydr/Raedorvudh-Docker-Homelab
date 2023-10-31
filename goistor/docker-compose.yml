@@ -1,6 +1,7 @@
 version: "3.9"
 services:
 
+  # MySQL/MariaDB (https://github.com/yobasystems/alpine-mariadb)
   mysql:
     image: yobasystems/alpine-mariadb:latest
     container_name: goistor-mysql
@@ -20,6 +21,7 @@ services:
       placement:
         constraints: [node.labels.goistor == true]
 
+  # PHPMyAdmin (https://github.com/phpmyadmin/docker)
   phpmyadmin:
     image: phpmyadmin:apache
     container_name: goistor-phpmyadmin
@@ -39,6 +41,7 @@ services:
       placement:
         constraints: [node.labels.goistor == true]
 
+  # Postgres (https://hub.docker.com/_/postgres)
   postgres:
     image: postgres:latest
     container_name: goistor-postgres
@@ -53,6 +56,7 @@ services:
       placement:
         constraints: [node.labels.goistor == true]
   
+  # PGAdmin (https://www.pgadmin.org)
   postgres-admin:
     image: dpage/pgadmin4
     container_name: goistor-postgres-admin

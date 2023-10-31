@@ -10,8 +10,8 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 [Configuration](#configuration) •
 [Etymology](#etymology) •
 [Contributions](#contributions)
-</div>
 
+</div>
 
 ## Getting started
 
@@ -19,42 +19,40 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 
 ### Configuration
 
-
-
-
 ## Etymology
 
 ## The Regions
 
 ### Single-board computers
-| Region | Translation | Type |
-|--------|:-----------:|:--------------:|
-| Raedorvudh | _"Fly catcher"_ | Raspberry Pi 4
-| Butharad | _"South fly"_ | Orange Pi 3 LTS
-| Budhdún | _"West fly"_ | Orange Pi 3 LTS
-| Budhforod | _"North fly"_ | Orange Pi 3 LTS
-| Budganthui | _"Fourth fly"_ | Orange Pi 5
-| gadathli | _"Fifth fly"_ | Orange Pi 5
-| amonvedui | _"Honey trap"_ | Orange Pi 4 LTS
-| nadhrawlos | _"Last hill"_ | Orange Pi 4 LTS
 
+| Region     |   Translation   |      Type       |
+| ---------- | :-------------: | :-------------: |
+| Raedorvudh | _"Fly catcher"_ | Raspberry Pi 4  |
+| Butharad   |  _"South fly"_  | Orange Pi 3 LTS |
+| Budhdún    |  _"West fly"_   | Orange Pi 3 LTS |
+| Budhforod  |  _"North fly"_  | Orange Pi 3 LTS |
+| Budganthui | _"Fourth fly"_  |   Orange Pi 5   |
+| gadathli   |  _"Fifth fly"_  |   Orange Pi 5   |
+| amonvedui  | _"Honey trap"_  | Orange Pi 4 LTS |
+| nadhrawlos |  _"Last hill"_  | Orange Pi 4 LTS |
 
 ### NFS drives
-| Region | Translation | Responsibility |
-|--------|:-----------:|:--------------:|
-| Cofbilion | _"Bay of Thieves"_ | Downloader scratch disk
-| Enedos | _"Center City"_ | Application data
-| Thinmbahad | _"Gray Market"_ | Asset storage
+
+| Region     |    Translation     |     Responsibility      |
+| ---------- | :----------------: | :---------------------: |
+| Cofbilion  | _"Bay of Thieves"_ | Downloader scratch disk |
+| Enedos     |  _"Center City"_   |    Application data     |
+| Thinmbahad |  _"Gray Market"_   |      Asset storage      |
 
 ## The Workers
 
-| Worker | Occupation | Applications in stack |
-|---------------------------------------|:------------------:|:---------------------:|
-| [Aesordúr](aesordur/README.md) | Chef | [Mealie](https://mealie.io/) |
-| [Angannondír](angannondir/README.md)  | Sentry | [CloudFlare DDNS](https://github.com/favonia/cloudflare-ddns), [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) |
-| [Lochuil](lochuil/README.md) | Innkeeper | [Homer](https://github.com/bastienwirtz/homer) |
-| [Nethiadil](nethiadil/README.md) | Bard | [Plex](https://www.plex.tv/), [Tautulli](https://tautulli.com/), [Ombi](https://ombi.io/), [Plex Meta Manager](https://metamanager.wiki/en/latest/) |
-| [Pímilor](pimilor/README.md) | Smuggler | [Transmission](https://transmissionbt.com/), [Youtube-DL](https://youtube-dl.org/) |
-
+| Worker                               | Occupation |                                                                     Applications in stack                                                                     |
+| ------------------------------------ | :--------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [Aesordúr](aesordur/README.md)       |    Chef    |                                                                 [Mealie](https://mealie.io/)                                                                  |
+| [Angannondír](angannondir/README.md) |   Sentry   |        [CloudFlare DDNS](https://github.com/favonia/cloudflare-ddns), [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager)         |
+| [Goistor](goistor/README.md)         |    Sage    | [MySQL](https://mariadb.org/), [PHPMyAdmin](https://www.phpmyadmin.net/), [Postgres](https://www.postgresql.org/), [Postgres Admin](https://www.pgadmin.org/) |
+| [Lavanoveren](lavanoveren/README.md) |    Lush    |                 [Minecraft](https://www.minecraft.net/en-us), [Foundry](https://foundryvtt.com/), [EmulatorJS](https://emulatorjs.org/docs/)                  |
+| [Nethiadil](nethiadil/README.md)     |    Bard    |      [Plex](https://www.plex.tv/), [Tautulli](https://tautulli.com/), [Ombi](https://ombi.io/), [Plex Meta Manager](https://metamanager.wiki/en/latest/)      |
+| [Pímilor](pimilor/README.md)         |  Smuggler  |                                      [Transmission](https://transmissionbt.com/), [Youtube-DL](https://youtube-dl.org/)                                       |
 
 ## Contributions
