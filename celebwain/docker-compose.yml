@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+
+  # Firefly III (https://github.com/firefly-iii/firefly-iii)
+  fireflyiii-app:
+    image: fireflyiii/core:latest
+    container_name: celebwain-fireflyiii-app
+    ports:
+      - ${CELEBWAIN_FIREFLYIII_PORT:-8080}:8080
+    restart: always
+    volumes:
+      - ${CELEBWAIN_FIREFLYIII_PATH:-./firefly-iii}:/var/www/html/storage/upload
+    depends_on:
+      - fireflyiii-db
+    deploy:
+      placement:
+        constraints: [node.labels.celebwain == true]
+
+  fireflyiii-db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: celebwain-fireflyiii-db
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${CELEBWAIN_FIREFLYIII_DATABASE:-fireflyiii}
+      MYSQL_USER: ${ROOT_USERNAME:-npm}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
+    network_mode: "service:goistor_mysql"
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+  
+  # Nano Wallet (https://github.com/linuxserver/nano-wallet)
+  nano-wallet:
+    image: lscr.io/linuxserver/nano-wallet:latest
+    container_name: celebwain-nano-wallet
+    ports:
+      - ${CELEBWAIN_NANO_WALLET_PORT:-80}:80
+    restart: unless-stopped
+    deploy:
+      placement:
+        constraints: [node.labels.celebwain == true]
+
