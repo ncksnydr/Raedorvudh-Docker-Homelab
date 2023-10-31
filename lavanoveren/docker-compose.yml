@@ -1,68 +1,75 @@
 version: "3.9"
 services:
-  bds:
-    image: itzg/minecraft-server
+
+  # Minecraft (https://github.com/itzg/docker-minecraft-server)
+  # CurseForce Modpacks (https://legacy.curseforge.com/minecraft/modpacks)
+  minecraft:
+    image: itzg/minecraft-server:java8-multiarch
     container_name: lavanoveren-minecraft
     environment:
-      UID: ${PUID:-1000}
-      GID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      ALLOW_CHEATS: "true"
-      DEBUG: "true"
+      # CF_API_KEY: ${LAVANOVEREN_MINECRAFT_CURSEFORGE_API:-1234567890}
+      ALLOW_CHEATS: "TRUE"
       DIFFICULTY: normal
-      EULA: "true"
-      GAMEMODE: survival
-      TYPE: forge
-      GENERATE_STRUCTURES: "true"
-      ALLOW_FLIGHT: "true"
-      LEVEL_NAME: ${LAVANOVEREN_MINECRAFT_LEVEL_NAME:-World}
-      LEVEL_TYPE: amplified
+      EULA: "TRUE"
+      GAMEMODE: SURVIVAL
+      GENERATE_STRUCTURES: "TRUE"
+      GID: ${PGID:-1000}
+      LEVEL_NAME: ${LAVANOVEREN_MINECRAFT_LEVEL_NAME:-Level}
       MAX_PLAYERS: 100
-      MOTD: ${LAVANOVEREN_MINECRAFT_MOTD:-A Minecraft Server}
-      ENABLE_RCON: "true"
-      RCON_PASSWORD: ${LAVANOVEREN_MINECRAFT_PASSWORD:-changeMe}
+      MEMORY: 8G
+      MOTD: ${LAVANOVEREN_MINECRAFT_MOTD:-Oh hello there}
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      SERVER_NAME: ${LAVANOVEREN_MINECRAFT_SERVER_NAME:-Server}
+      TYPE: FORGE
+      TZ: ${TZ:-America/Los_Angeles}
+      UID: ${PUID:-1000}
+      VERSION: 1.7.10
     ports:
       - ${LAVANOVEREN_MINECRAFT_PORT:-25565}:25565
-    volumes:
-      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}:/data
-      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/mods:/mods:ro
     stdin_open: true
     tty: true
+    volumes:
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/app:/data
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/mods:/mods:ro
+      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/modpacks:/modpacks:ro
     deploy:
       placement:
-        constraints: [node.labels.lavanoveren == true]
+        constraints: [node.labels.lavanoveren_minecraft == true]
 
-  foundry:
+  # Foundry VTT (https://github.com/felddy/foundryvtt-docker)
+  foundry-vtt:
     image: felddy/foundryvtt:latest
     container_name: lavanoveren-foundryvtt
     environment:
-      PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
       FOUNDRY_PASSWORD: ${LAVANOVEREN_FOUNDRYVTT_PASSWORD:-changeMe}
-      FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRYVTT_USERNAME:-changeMe}
-      FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRYVTT_KEY:-changeMe}
-    hostname: ${LAVANOVEREN_FOUNDRYVTT_HOSTNAME:-FoundryVTT}
+      FOUNDRY_USERNAME: ${LAVANOVEREN_FOUNDRYVTT_USERNAME:-admin}
+      FOUNDRY_ADMIN_KEY: ${LAVANOVEREN_FOUNDRYVTT_KEY:-1234567890}
+    hostname: ${LAVANOVEREN_FOUNDRYVTT_HOSTNAME:-Foundry}
     init: true
     ports:
-      - ${LAVANOVEREN_FOUNDRYVTT_PORT:-30000}:30000
+      - ${LAVANOVEREN_FOUNDRYVTT_PORT:-3000}:30000
     volumes:
-      - ${LAVANOVEREN_FOUNDRYVTT_PATH:-./foundryvtt}:/data
+      - ${LAVANOVEREN_FOUNDRYVTT_PATH:-./foundry}:/data
     deploy:
       placement:
         constraints: [node.labels.lavanoveren == true]
 
+  # EmulatorJS (https://docs.linuxserver.io/images/docker-emulatorjs)
   emulatorjs:
     image: lscr.io/linuxserver/emulatorjs:latest
-    container_name: emulatorjs
+    container_name: lavanoveren-emulatorjs
     environment:
-      PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
     ports:
       - ${LAVANOVEREN_EMULATORJS_PORT_ROM:-3000}:3000
       - ${LAVANOVEREN_EMULATORJS_PORT_UI:-80}:80
-      - ${LAVANOVEREN_EMULATORJS_PORT_PEER:-4001}:4001
+      - ${LAVANOVEREN_EMULATORJS_PORT_PEER:-4001}:4001 
     restart: unless-stopped
     volumes:
       - ${LAVANOVEREN_EMULATORJS_PATH:-./emulatorjs}:/config
@@ -77,4 +84,4 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/assets/games/roms
+      device: :${THINMBAHAD_PATH}/media/games/roms
