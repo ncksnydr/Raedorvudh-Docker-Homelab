@@ -1,69 +1,46 @@
-version: '3.3'
+version: "3.9"
 services:
-  app:
+
+  # Firefly III (https://github.com/firefly-iii/firefly-iii)
+  fireflyiii-app:
     image: fireflyiii/core:latest
-    container_name: celebwain-firefly3-app
+    container_name: celebwain-fireflyiii-app
     ports:
-      - ${FF3_PORT}:8080
-    volumes:
-      - ${FF3_PATH}:/var/www/html/storage/upload
-    # TODO: Convert .env file to environment variables in this file.
-    # env_file: ${FF3_PATH}/.env
+      - ${CELEBWAIN_FIREFLYIII_PORT:-8080}:8080
     restart: always
+    volumes:
+      - ${CELEBWAIN_FIREFLYIII_PATH:-./firefly-iii}:/var/www/html/storage/upload
     depends_on:
-      - db
-  db:
-    image: mariadb
-    container_name: celebwain-firefly3-db
+      - fireflyiii-db
+    deploy:
+      placement:
+        constraints: [node.labels.celebwain == true]
+
+  fireflyiii-db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: celebwain-fireflyiii-db
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-      MYSQL_RANDOM_ROOT_PASSWORD: yes
-      MYSQL_USER: ${FF3_DB_USER}
-      MYSQL_PASSWORD: ${FF3_DB_PASSWORD}
-      MYSQL_DATABASE: ${FF3_DB_DATABASE}
-    hostname: fireflyiiidb
-    volumes:
-      - ${FF3_PATH}/database:/var/lib/mysql
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${CELEBWAIN_FIREFLYIII_DATABASE:-fireflyiii}
+      MYSQL_USER: ${ROOT_USERNAME:-npm}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
+    network_mode: "service:goistor_mysql"
     restart: always
-
-  paperless-ng:
-    image: lscr.io/linuxserver/paperless-ng:latest
-    container_name: celebwain-paperless
-    ports:
-      - ${PAPERLESS_PORT}:8000
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    volumes:
-      - ${PAPERLESS_PATH}/config:/config
-      - ${PAPERLESS_PATH}/data:/data
-    restart: unless-stopped
-
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+  
+  # Nano Wallet (https://github.com/linuxserver/nano-wallet)
   nano-wallet:
     image: lscr.io/linuxserver/nano-wallet:latest
-    container_name: nano-wallet
+    container_name: celebwain-nano-wallet
     ports:
-      - 80:80
+      - ${CELEBWAIN_NANO_WALLET_PORT:-80}:80
     restart: unless-stopped
+    deploy:
+      placement:
+        constraints: [node.labels.celebwain == true]
 
-  papermerge:
-    image: lscr.io/linuxserver/papermerge:latest
-    container_name: papermerge
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-      - REDIS_URL= #optional
-    volumes:
-      - </path/to/appdata/config>:/config
-      - </path/to/appdata/data>:/data
-    ports:
-      - 8000:8000
-    restart: unless-stopped
-
-volumes:
-  firefly_iii_upload:
-  firefly_iii_db:

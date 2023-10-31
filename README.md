@@ -46,13 +46,15 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 
 ## The Workers
 
-| Worker                               | Occupation |                                                                     Applications in stack                                                                     |
-| ------------------------------------ | :--------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [Aesordúr](aesordur/README.md)       |    Chef    |                                                                 [Mealie](https://mealie.io/)                                                                  |
-| [Angannondír](angannondir/README.md) |   Sentry   |        [CloudFlare DDNS](https://github.com/favonia/cloudflare-ddns), [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager)         |
-| [Goistor](goistor/README.md)         |    Sage    | [MySQL](https://mariadb.org/), [PHPMyAdmin](https://www.phpmyadmin.net/), [Postgres](https://www.postgresql.org/), [Postgres Admin](https://www.pgadmin.org/) |
-| [Lavanoveren](lavanoveren/README.md) |    Lush    |                 [Minecraft](https://www.minecraft.net/en-us), [Foundry](https://foundryvtt.com/), [EmulatorJS](https://emulatorjs.org/docs/)                  |
-| [Nethiadil](nethiadil/README.md)     |    Bard    |      [Plex](https://www.plex.tv/), [Tautulli](https://tautulli.com/), [Ombi](https://ombi.io/), [Plex Meta Manager](https://metamanager.wiki/en/latest/)      |
-| [Pímilor](pimilor/README.md)         |  Smuggler  |                                      [Transmission](https://transmissionbt.com/), [Youtube-DL](https://youtube-dl.org/)                                       |
+| Worker                               | Occupation |                                                             Applications in stack                                                              |
+| ------------------------------------ | :--------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
+| [Aesordúr](aesordur/README.md)       |    Chef    |                                                          [Mealie](https://mealie.io/)                                                          |
+| [Angannondír](angannondir/README.md) |   Sentry   | [CloudFlare DDNS](https://github.com/favonia/cloudflare-ddns), [NGINX Proxy Manager](https://github.com/NginxProxyManager/nginx-proxy-manager) |
+| [Celebwain](celebwain/README.md)     |   Banker   |                [Firefly III](https://www.firefly-iii.org/), [Nano Wallet](https://github.com/linuxserver/docker-documentation)                 |
+
+| [Goistor](goistor/README.md) | Sage | [MySQL](https://mariadb.org/), [PHPMyAdmin](https://www.phpmyadmin.net/), [Postgres](https://www.postgresql.org/), [Postgres Admin](https://www.pgadmin.org/) |
+| [Lavanoveren](lavanoveren/README.md) | Lush | [Minecraft](https://www.minecraft.net/en-us), [Foundry](https://foundryvtt.com/), [EmulatorJS](https://emulatorjs.org/docs/) |
+| [Nethiadil](nethiadil/README.md) | Bard | [Plex](https://www.plex.tv/), [Tautulli](https://tautulli.com/), [Ombi](https://ombi.io/), [Plex Meta Manager](https://metamanager.wiki/en/latest/) |
+| [Pímilor](pimilor/README.md) | Smuggler | [Transmission](https://transmissionbt.com/), [Youtube-DL](https://youtube-dl.org/) |
 
 ## Contributions
