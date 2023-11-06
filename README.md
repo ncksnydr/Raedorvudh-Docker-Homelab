@@ -34,7 +34,7 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 | Budganthui |      _"Fourth fly"_      |   Orange Pi 5   | 115G |
 | Budhlefnui |      _"Fifth fly"_       |   Orange Pi 5   | 32G  |
 | Gadathli   |      _"Honey trap"_      |   Orange Pi 5   | 32G  |
-| Amonvedui  |      _"Last Hill"_       |   Orange Pi 5   | 32G  |
+| Amonvedui  |      _"Last Hill"_       | Orange Pi 4 LTS | 32G  |
 | Nadhrawlos | _"Valley of the Hollow"_ | Orange Pi 4 LTS | 32G  |
 
 ### NFS drives
