@@ -13,26 +13,19 @@
 AI-powered photo organizer.  
 [Container image via photoprism/photoprism](https://github.com/photoprism/photoprism)
 
-| Variable | Description | Default |
-|----------|:-----------:|:-------:|
-| `BAVRONALAD_PHOTOPRISM_PATH` |  | `changeMe` |
-| `BAVRONALAD_PHOTOPRISM_USERNAME` |  | `changeMe` |
-| `BAVRONALAD_PHOTOPRISM_PASSWORD` |  | `changeMe` |
-| `BAVRONALAD_PHOTOPRISM_URL` |  | `changeMe` |
-| `BAVRONALAD_PHOTOPRISM_PORT` |  | `changeMe` |
-| `BAVRONALAD_MYSQL_DATABASE` |  | `changeMe` |
-| `BAVRONALAD_MYSQL_USERNAME` |  | `changeMe` |
-| `BAVRONALAD_MYSQL_PASSWORD` |  | `changeMe` |
-
-### MariaDB
-
-[Container image via arm64v8/mariadb](https://hub.docker.com/r/arm64v8/mariadb/)
-
-| Variable | Description | Default |
-|----------|:-----------:|:-------:|
-| `BAVRONALAD_MYSQL_DATABASE` | Database name | `changeMe` |
-| `BAVRONALAD_MYSQL_USERNAME` | Database username | `changeMe` |
-| `BAVRONALAD_MYSQL_PASSWORD` | Database password | `changeMe` |
+| Variable                         |        Description        |        Default        |
+| -------------------------------- | :-----------------------: | :-------------------: |
+| `BAVRONALAD_PHOTOPRISM_PATH`     | Path to application files |      `changeMe`       |
+| `BAVRONALAD_PHOTOPRISM_USERNAME` |      Admin username       |        `admin`        |
+| `BAVRONALAD_PHOTOPRISM_PASSWORD` |      Admin password       |      `changeMe`       |
+| `BAVRONALAD_PHOTOPRISM_URL`      |       URL to web UI       |      `changeMe`       |
+| `BAVRONALAD_PHOTOPRISM_PORT`     |      Port to web UI       |      `changeMe`       |
+| `BAVRONALAD_PHOTOPRISM_DATABASE` |     Name of database      |      `changeMe`       |
+| `PGID`                           |         Group ID          |        `1000`         |
+| `PUID`                           |          User ID          |        `1000`         |
+| `ROOT_PASSWORD`                  |  Password for root user   |      `changeMe`       |
+| `ROOT_USERNAME`                  |     Database username     |        `admin`        |
+| `TZ`                             |         Timezone          | `America/Los_Angeles` |
 
 ## Sindarin
 
@@ -42,7 +35,7 @@ AI-powered photo organizer.
 
 _/bav[r]ɒnalad/_
 bahv-RON-al-ad
-__
+\_\_
 
 </div>
 
@@ -50,10 +43,10 @@ __
 
 ### Etymology
 
-| Root word | Definition |
-|-----------|:----------:|
-| [bavon](https://www.elfdict.com/wt/386444)       | shepherd, herdsman       |
-| [galad](https://www.elfdict.com/wt/514697)     | light         |
+| Root word                                  |     Definition     |
+| ------------------------------------------ | :----------------: |
+| [bavon](https://www.elfdict.com/wt/386444) | shepherd, herdsman |
+| [galad](https://www.elfdict.com/wt/514697) |       light        |
 
 </div>
 
