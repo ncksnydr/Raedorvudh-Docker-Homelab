@@ -25,16 +25,17 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 
 ### Single-board computers
 
-| Region     |   Translation   |      Type       |
-| ---------- | :-------------: | :-------------: |
-| Raedorvudh | _"Fly catcher"_ | Raspberry Pi 4  |
-| Butharad   |  _"South fly"_  | Orange Pi 3 LTS |
-| Budhdún    |  _"West fly"_   | Orange Pi 3 LTS |
-| Budhforod  |  _"North fly"_  | Orange Pi 3 LTS |
-| Budganthui | _"Fourth fly"_  |   Orange Pi 5   |
-| gadathli   |  _"Fifth fly"_  |   Orange Pi 5   |
-| amonvedui  | _"Honey trap"_  | Orange Pi 4 LTS |
-| nadhrawlos |  _"Last hill"_  | Orange Pi 4 LTS |
+| Region     |       Translation        |      Type       | HDD  |
+| ---------- | :----------------------: | :-------------: | :--: |
+| Raedorvudh |     _"Fly catcher"_      | Raspberry Pi 4  | 115G |
+| Butharad   |      _"South fly"_       |   Orange Pi 5   | 115G |
+| Budhdún    |       _"West fly"_       |   Orange Pi 5   | 115G |
+| Budhforod  |      _"North fly"_       |   Orange Pi 5   | 32G  |
+| Budganthui |      _"Fourth fly"_      |   Orange Pi 5   | 115G |
+| Budhlefnui |      _"Fifth fly"_       |   Orange Pi 5   | 32G  |
+| Gadathli   |      _"Honey trap"_      |   Orange Pi 5   | 32G  |
+| Amonvedui  |      _"Last Hill"_       |   Orange Pi 5   | 32G  |
+| Nadhrawlos | _"Valley of the Hollow"_ | Orange Pi 4 LTS | 32G  |
 
 ### NFS drives
 
