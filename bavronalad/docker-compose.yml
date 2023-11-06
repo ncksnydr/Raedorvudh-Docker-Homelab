@@ -1,19 +1,21 @@
 version: "3.9"
 services:
+
+  # PhotoPrism (https://www.photoprism.app)
   photoprism:
     image: photoprism/photoprism:preview-arm64
     container_name: bavronalad-photoprism-app
     devices:
-     - /dev/video11:/dev/video11
+      - /dev/video11:/dev/video11
     environment:
       PHOTOPRISM_ADMIN_PASSWORD: ${BAVRONALAD_PHOTOPRISM_PASSWORD}
       PHOTOPRISM_ADMIN_USER: ${BAVRONALAD_PHOTOPRISM_USERNAME}
       PHOTOPRISM_AUTH_MODE: password
       PHOTOPRISM_DATABASE_DRIVER: mysql
-      PHOTOPRISM_DATABASE_NAME: ${BAVRONALAD_MYSQL_DATABASE}
-      PHOTOPRISM_DATABASE_PASSWORD: ${BAVRONALAD_MYSQL_PASSWORD}
-      PHOTOPRISM_DATABASE_SERVER: mariadb:3306
-      PHOTOPRISM_DATABASE_USER: ${BAVRONALAD_MYSQL_USERNAME}
+      PHOTOPRISM_DATABASE_NAME: ${BAVRONALAD_PHOTOPRISM_DATABASE}
+      PHOTOPRISM_DATABASE_PASSWORD: ${ROOT_PASSWORD}
+      PHOTOPRISM_DATABASE_SERVER: photoprism-db:3306
+      PHOTOPRISM_DATABASE_USER: ${ROOT_USERNAME}
       PHOTOPRISM_DEBUG: "TRUE"
       PHOTOPRISM_DETECT_NSFW: "FALSE"
       PHOTOPRISM_DISABLE_CHOWN: "FALSE"
@@ -29,8 +31,6 @@ services:
       PHOTOPRISM_FFMPEG_ENCODER: "raspberry"
       PHOTOPRISM_GID: ${PGID}
       PHOTOPRISM_HTTP_COMPRESSION: gzip
-      #PHOTOPRISM_HTTP_HOST: ${RAEDORVUDH_IP}
-      #PHOTOPRISM_HTTP_PORT: ${BAVRONALAD_PHOTOPRISM_PORT}
       PHOTOPRISM_INIT: "tensorflow"
       PHOTOPRISM_JPEG_QUALITY: 90
       PHOTOPRISM_JPEG_SIZE: 30000
@@ -61,31 +61,28 @@ services:
       - ${BAVRONALAD_PHOTOPRISM_PATH}:/photoprism/storage
     working_dir: "/photoprism"
     depends_on:
-      - mariadb
+      - photoprism-db
     deploy:
       placement:
         constraints: [node.labels.bavronalad == true]
 
-  mariadb:
-    image: arm64v8/mariadb:10.10
-    container_name: faenil-photoprism-db
-    command: mysqld --innodb-buffer-pool-size=256M --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120
+  # PhotoPrism (DB)
+  photoprism-db:
+    image: yobasystems/alpine-mariadb:latest
+    container_name: bavronalad-photoprism-db
     environment:
-      MARIADB_AUTO_UPGRADE: "1"
-      MARIADB_INITDB_SKIP_TZINFO: "1"
-      MARIADB_DATABASE: ${BAVRONALAD_MYSQL_DATABASE}
-      MARIADB_USER: ${BAVRONALAD_MYSQL_USERNAME}
-      MARIADB_PASSWORD: ${BAVRONALAD_MYSQL_PASSWORD}
-      MARIADB_ROOT_PASSWORD: ${BAVRONALAD_MYSQL_PASSWORD}
-    restart: unless-stopped
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
-    volumes:
-      - ${BAVRONALAD_PHOTOPRISM_PATH}/database:/var/lib/mysql
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MYSQL_DATABASE: ${BAVRONALAD_PHOTOPRISM_DATABASE:-npm}
+      MYSQL_USER: ${ROOT_USERNAME:-root}
+      MYSQL_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    network_mode: "service:goistor_mysql"
+    restart: always
     deploy:
       placement:
-        constraints: [node.labels.bavronalad == true]
+        constraints: [node.labels.goistor == true]
 
 volumes:
   photoprism-media:
