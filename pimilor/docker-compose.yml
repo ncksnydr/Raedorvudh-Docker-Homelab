@@ -164,6 +164,25 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
   
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: pimilor-lidarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_LIDARR_PORT:-8686}:8686
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_LIDARR_PATH:-./lidarr}:/config
+      - thinmbahad-music:/music #optional
+      - cofbilion:/downloads #optional
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+
   # YTDL (https://github.com/Tzahi12345/YoutubeDL-Material)
 
 volumes:
@@ -215,6 +234,12 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${THINMBAHAD_PATH}/media/movies
+  thinmbahad-music:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/music
   thinmbahad-ebooks:
       driver: local
       driver_opts:
