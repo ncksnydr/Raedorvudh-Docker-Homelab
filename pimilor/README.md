@@ -25,21 +25,6 @@ Bit torrent client.
 
 ---
 
-### Jackett
-
-Proxy server for translating request queries into tracker-site-specific queries.  
-[Container image via linuxserver/docker-jackett](https://github.com/linuxserver/docker-jackett)
-
-| Variable               |        Description         |        Default        |
-| ---------------------- | :------------------------: | :-------------------: |
-| `PIMILOR_JACKETT_PATH` | Path to applications files |      `./jackett`      |
-| `PIMILOR_JACKETT_PORT` |      Port for web UI       |        `9117`         |
-| `PGID`                 |          Group ID          |        `1000`         |
-| `PUID`                 |          User ID           |        `1000`         |
-| `TZ`                   |          Timezone          | `America/Los_Angeles` |
-
----
-
 ### Firefox
 
 Web browser.  

@@ -55,28 +55,6 @@ services:
           cpus: '2.00'
           memory: 6G
 
-  # Jackett (https://docs.linuxserver.io/images/docker-jackett)
-  jackett:
-    image: lscr.io/linuxserver/jackett:latest
-    container_name: pimilor-jackett
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      AUTO_UPDATE: "TRUE"
-    logging:
-      options:
-        max-size: 10m
-    ports:
-      - ${PIMILOR_JACKETT_PORT:-9117}:9117
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_JACKETT_PATH:-./jackett}:/config
-      - cofbilion:/downloads
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
   # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
   sonarr:
     image: lscr.io/linuxserver/sonarr
