@@ -116,6 +116,19 @@ Indexer manager for PVRs.
 
 ---
 
+### LazyLibrarian
+
+PVR for books.
+[Container image via linuxserver/docker-docker-lazylibrarian](https://github.com/linuxserver/docker-lazylibrarian)
+
+| Variable                     |        Description        |        Default        |
+| ---------------------------- | :-----------------------: | :-------------------: |
+| `PIMILOR_LAZYLIBRARIAN_PATH` | Path to application files |   `./lazylibrarian`   |
+| `PIMILOR_LAZYLIBRARIAN_PORT` |      Port for web UI      |        `5299`         |
+| `PGID`                       |         Group ID          |        `1000`         |
+| `PUID`                       |          User ID          |        `1000`         |
+| `TZ`                         |         Timezone          | `America/Los_Angeles` |
+
 ---
 
 ## Sindarin
