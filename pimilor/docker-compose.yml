@@ -120,28 +120,7 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
   
-  # Readarr (https://docs.linuxserver.io/images/docker-readarr)
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: pimilor-readarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    logging:
-      options:
-        max-size: 10m
-    ports:
-      - ${PIMILOR_READARR_PORT:-8787}:8787
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_READARR_PATH:-./readarr}:/config
-      - thinmbahad-ebooks:/books
-      - cofbilion:/downloads
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-  
+  # Lidarr (https://github.com/linuxserver/docker-lidarr)
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: pimilor-lidarr
@@ -177,7 +156,24 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
 
-
+  # LazyLibrarian (https://github.com/linuxserver/docker-lazylibrarian)
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: pimilor-lazylibrarian
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_LAZYLIBRARIAN_PORT:-5299}:5299
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_LAZYLIBRARIAN_PATH:-./lazylibrarian}:/config
+      - cofbilion-blackhole:/downloads
+      - thinmbahad-books:/books 
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
 
   # YTDL (https://github.com/Tzahi12345/YoutubeDL-Material)
 
@@ -236,9 +232,9 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${THINMBAHAD_PATH}/media/music
-  thinmbahad-ebooks:
+  thinmbahad-books:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/ebooks
+        device: :${THINMBAHAD_PATH}/media/books
