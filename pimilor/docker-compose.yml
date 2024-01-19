@@ -50,10 +50,10 @@ services:
       resources:
         limits:
           cpus: '4.00'
-          memory: 8G
+          memory: 10G
         reservations:
           cpus: '2.00'
-          memory: 6G
+          memory: 8G
 
   # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
   sonarr:
@@ -157,20 +157,38 @@ services:
         constraints: [node.labels.pimilor == true]
 
   # LazyLibrarian (https://github.com/linuxserver/docker-lazylibrarian)
-  lazylibrarian:
-    image: lscr.io/linuxserver/lazylibrarian:latest
-    container_name: pimilor-lazylibrarian
+  # lazylibrarian:
+  #   image: lscr.io/linuxserver/lazylibrarian:latest
+  #   container_name: pimilor-lazylibrarian
+  #   environment:
+  #     PUID: ${PUID:-1000}
+  #     PGID: ${PGID:-1000}
+  #     TZ: ${TZ:-America/Los_Angeles}
+  #   ports:
+  #     - ${PIMILOR_LAZYLIBRARIAN_PORT:-5299}:5299
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ${PIMILOR_LAZYLIBRARIAN_PATH:-./lazylibrarian}:/config
+  #     - cofbilion-blackhole:/downloads
+  #     - thinmbahad-books:/books 
+  #   deploy:
+  #     placement:
+  #       constraints: [node.labels.pimilor == true]
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: pimilor-bazarr
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - ${PIMILOR_LAZYLIBRARIAN_PORT:-5299}:5299
+      - ${PIMILOR_BAZARR_PORT:-6767}:6767
     restart: unless-stopped
     volumes:
-      - ${PIMILOR_LAZYLIBRARIAN_PATH:-./lazylibrarian}:/config
-      - cofbilion-blackhole:/downloads
-      - thinmbahad-books:/books 
+      - ${PIMILOR_BAZARR_PATH:-./bazarr}:/config
+      - thinmbahad-movies:/movies #optional
+      - thinmbahad-tv:/tv #optional
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
@@ -184,36 +202,12 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${COFBILION_PATH}
-  cofbilion-audio:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}/public/audio
   cofbilion-blackhole:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${COFBILION_PATH}/blackhole
-  cofbilion-movies:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}/public/movies
-  cofbilion-tv:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}/public/tv
-  cofbilion-video:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}/public/video
   thinmbahad-tv:
       driver: local
       driver_opts:
