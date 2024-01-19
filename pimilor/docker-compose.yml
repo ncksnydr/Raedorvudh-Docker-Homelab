@@ -157,6 +157,7 @@ services:
         constraints: [node.labels.pimilor == true]
 
   # LazyLibrarian (https://github.com/linuxserver/docker-lazylibrarian)
+<<<<<<< HEAD
   # lazylibrarian:
   #   image: lscr.io/linuxserver/lazylibrarian:latest
   #   container_name: pimilor-lazylibrarian
@@ -178,17 +179,31 @@ services:
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: pimilor-bazarr
+=======
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: pimilor-lazylibrarian
+>>>>>>> 5ecb04c408bc4fd5ca576e1f7a34744883592420
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
     ports:
+<<<<<<< HEAD
       - ${PIMILOR_BAZARR_PORT:-6767}:6767
     restart: unless-stopped
     volumes:
       - ${PIMILOR_BAZARR_PATH:-./bazarr}:/config
       - thinmbahad-movies:/movies #optional
       - thinmbahad-tv:/tv #optional
+=======
+      - ${PIMILOR_LAZYLIBRARIAN_PORT:-5299}:5299
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_LAZYLIBRARIAN_PATH:-./lazylibrarian}:/config
+      - cofbilion-blackhole:/downloads
+      - thinmbahad-books:/books 
+>>>>>>> 5ecb04c408bc4fd5ca576e1f7a34744883592420
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
