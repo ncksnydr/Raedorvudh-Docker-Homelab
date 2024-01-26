@@ -1,6 +1,5 @@
 version: "3.9"
 services:
-
   # MySQL/MariaDB (https://github.com/yobasystems/alpine-mariadb)
   mysql:
     image: yobasystems/alpine-mariadb:latest
@@ -46,7 +45,12 @@ services:
     image: postgres:latest
     container_name: goistor-postgres
     environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      POSTGRES_USER: ${ROOT_USERNAME:-changeMe}
       POSTGRES_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      POSTGRES_DB: ${ROOT_USERNAME:-changeMe}
     ports:
       - ${GOISTOR_POSTGRES_PORT:-5432}:5432
     restart: always
@@ -55,13 +59,15 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
-  
+
   # PGAdmin (https://www.pgadmin.org)
   postgres-admin:
     image: dpage/pgadmin4
     container_name: goistor-postgres-admin
     environment:
-      POSTGRES_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
       PGADMIN_DEFAULT_EMAIL: ${ROOT_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
     ports:
@@ -71,6 +77,23 @@ services:
       - ${GOISTOR_POSTGRES_ADMIN_PATH:-./postgres-admin}:/var/lib/pgadmin/
     depends_on:
       - postgres
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  # Redis (https://github.com/docker-library/redis)
+  redis:
+    image: redis:6.2-alpine
+    container_name: goistor-redis
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${GOISTOR_REDIS_PORT:-6379}:6379
+    restart: always
+    volumes:
+      - ${GOISTOR_REDIS_PATH:-./redis}:/data
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
