@@ -1,7 +1,6 @@
 version: "3.9"
 services:
-
-  # NGINX Proxy Manager (App)
+  # NGINX Proxy Manager (https://github.com/NginxProxyManager/nginx-proxy-manager)
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
     container_name: angannondir-npm-app
@@ -9,7 +8,7 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      DB_MYSQL_HOST: "nginx-proxy-manager-db"
+      DB_MYSQL_HOST: "mysql"
       DB_MYSQL_NAME: ${ANGANNONDIR_NPM_DATABASE:-npm}
       DB_MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
       DB_MYSQL_PORT: 3306
@@ -24,30 +23,14 @@ services:
       - ${ANGANNONDIR_NPM_PATH:-./npm}/app:/data
       - ${ANGANNONDIR_NPM_PATH:-./npm}/letsencrypt:/etc/letsencrypt
     depends_on:
-      - nginx-proxy-manager-db
+      - mysql
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
-  
-  # NGINX Proxy Manager (DB)
-  nginx-proxy-manager-db:
-    image: yobasystems/alpine-mariadb:latest
-    container_name: angannondir-npm-db
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
-      MYSQL_DATABASE: ${ANGANNONDIR_NPM_DATABASE:-npm}
-      MYSQL_USER: ${ROOT_USERNAME:-npm}
-      MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
-    network_mode: "service:goistor_mysql"
-    restart: always
-    deploy:
-      placement:
-        constraints: [node.labels.goistor == true]
+    networks:
+      - gulhir
 
-  # Cloudflare (DDNS)
+  # Cloudflare (https://github.com/favonia/cloudflare-ddns)
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: angannondir-cloudflare
@@ -70,7 +53,7 @@ services:
       placement:
         constraints: [node.labels.angannondir == true]
 
-  # DuckDNS (DDNS)
+  # DuckDNS (https://github.com/linuxserver/docker-duckdns)
   duckdns:
     image: lscr.io/linuxserver/duckdns:latest
     container_name: angannondir-duckdns
@@ -88,4 +71,6 @@ services:
       placement:
         constraints: [node.labels.angannondir == true]
 
-  # PiHole (https://github.com/pi-hole/docker-pi-hole/)
+networks:
+  gulhir:
+    external: true

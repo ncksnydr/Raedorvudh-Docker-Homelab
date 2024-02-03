@@ -27,13 +27,13 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 
 | Region     |       Translation        |      Type       |  HDD  |
 | ---------- | :----------------------: | :-------------: | :---: |
-| Raedorvudh |     _"Fly catcher"_      | Raspberry Pi 4  | 115G  |
-| Butharad   |      _"South fly"_       |   Orange Pi 5   | 115G  |
-| Budhdún    |       _"West fly"_       |   Orange Pi 5   | 115G  |
+| Raedorvudh |     _"Fly catcher"_      | Raspberry Pi 4  | 128G  |
+| Butharad   |      _"South fly"_       |   Orange Pi 5   | 128G  |
+| Budhdún    |       _"West fly"_       |   Orange Pi 5   | 128G  |
 | Budhforod  |      _"North fly"_       |   Orange Pi 5   |  32G  |
-| Budganthui |      _"Fourth fly"_      |   Orange Pi 5   | 115G  |
+| Budganthui |      _"Fourth fly"_      |   Orange Pi 5   | 128G  |
 | Budhlefnui |      _"Fifth fly"_       |   Orange Pi 5   |  32G  |
-| Gadathli   |      _"Honey trap"_      |   Orange Pi 5   |  32G  |
+| Gadathli   |      _"Honey trap"_      |   Orange Pi 5   | 128G  |
 | Amonvedui  |      _"Last Hill"_       | Orange Pi 4 LTS |  32G  |
 | Nadhrawlos | _"Valley of the Hollow"_ | Orange Pi 4 LTS |  32G  |
 
@@ -44,6 +44,12 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 | Cofbilion  | _"Bay of Thieves"_ | Downloader scratch disk |
 | Enedos     |  _"Center City"_   |    Application data     |
 | Thinmbahad |  _"Gray Market"_   |      Asset storage      |
+
+### Networks
+
+| Network |     Translation      |    Responsibility    |
+| ------- | :------------------: | :------------------: |
+| Gúlhír  | _"Knowledge Stream"_ | Database connections |
 
 ## The Workers
 
@@ -56,7 +62,5 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 | [Lavanoveren](lavanoveren/README.md) | Lush       | [Minecraft](https://www.minecraft.net/en-us), [Foundry](https://foundryvtt.com/)                                                                                                                                                                                                                                |
 | [Nethiadil](nethiadil/README.md)     | Bard       | [Plex](https://www.plex.tv/), [Plex Meta Manager](https://metamanager.wiki/en/latest/), [Tautulli](https://tautulli.com/)                                                                                                                                                                                       |
 | [Pímilor](pimilor/README.md)         | Smuggler   | [Bazarr](https://www.bazarr.media/), [Firefox](https://www.mozilla.org/en-US/firefox/new/), [Lidarr](https://lidarr.audio/), [Overseerr](https://overseerr.dev/), [Prowlarr](https://prowlarr.com/), [Radarr](https://radarr.video/), [Sonarr](https://sonarr.tv/), [Transmission](https://transmissionbt.com/) |
-
-
 
 ## Contributions
