@@ -13,14 +13,14 @@
 Streaming service for hosted videos.  
 [Container image via linuxserver/docker-plex](https://github.com/linuxserver/docker-plex)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `NETHIADIL_PLEX_CLAIM` | [Claim ID for Plex](https://www.plex.tv/claim/). | `changeMe` |
-| `NETHIADIL_PLEX_PATH` | Path to application files | `./plex` |
-| `NETHIADIL_PLEX_PORT` | Port for web UI | `32400` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable               |                   Description                    |        Default        |
+| ---------------------- | :----------------------------------------------: | :-------------------: |
+| `NETHIADIL_PLEX_CLAIM` | [Claim ID for Plex](https://www.plex.tv/claim/). |      `changeMe`       |
+| `NETHIADIL_PLEX_PATH`  |            Path to application files             |       `./plex`        |
+| `NETHIADIL_PLEX_PORT`  |                 Port for web UI                  |        `32400`        |
+| `PGID`                 |                     Group ID                     |        `1000`         |
+| `PUID`                 |                     User ID                      |        `1000`         |
+| `TZ`                   |                     Timezone                     | `America/Los_Angeles` |
 
 ---
 
@@ -29,13 +29,13 @@ Streaming service for hosted videos.
 Monitoring, analytics, and notification manager for Plex.  
 [Container image via linuxserver/docker-tautulli](https://github.com/linuxserver/docker-tautulli)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `NETHIADIL_TAUTULLI_PATH` | Path to application files | `./tautulli` |
-| `NETHIADIL_TAUTULLI_PORT` | Port for web UI | `8181` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable                  |        Description        |        Default        |
+| ------------------------- | :-----------------------: | :-------------------: |
+| `NETHIADIL_TAUTULLI_PATH` | Path to application files |     `./tautulli`      |
+| `NETHIADIL_TAUTULLI_PORT` |      Port for web UI      |        `8181`         |
+| `PGID`                    |         Group ID          |        `1000`         |
+| `PUID`                    |          User ID          |        `1000`         |
+| `TZ`                      |         Timezone          | `America/Los_Angeles` |
 
 ---
 
@@ -44,45 +44,32 @@ Monitoring, analytics, and notification manager for Plex.
 Custom metadata manager for Plex.  
 [Container image via linuxserver/docker-plex-meta-manager](https://github.com/linuxserver/docker-plex-meta-manager)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `NETHIADIL_PMM_PATH` | Path to application files | `./plex-meta-manager` |
-| `NETHIADIL_PMM_UPDATE_TIME` | Time to updated each day; formatted as `HH:MM` | `00:00` |
-| `NETHIADIL_PMM_CONFIG_FILE` | Path to custom configuration file | `./plex-meta-manager/config.yml` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable                    |                  Description                   |             Default              |
+| --------------------------- | :--------------------------------------------: | :------------------------------: |
+| `NETHIADIL_PMM_CONFIG_FILE` |       Path to custom configuration file        | `./plex-meta-manager/config.yml` |
+| `NETHIADIL_PMM_PATH`        |           Path to application files            |      `./plex-meta-manager`       |
+| `NETHIADIL_PMM_UPDATE_TIME` | Time to updated each day; formatted as `HH:MM` |             `00:00`              |
+| `PGID`                      |                    Group ID                    |              `1000`              |
+| `PUID`                      |                    User ID                     |              `1000`              |
+| `TZ`                        |                    Timezone                    |      `America/Los_Angeles`       |
 
 ---
 
-### Plex Meta Manager
+### Navidrome
 
-Custom metadata manager for Plex.  
-[Container image via linuxserver/docker-plex-meta-manager](https://github.com/linuxserver/docker-plex-meta-manager)
+Streaming service and music player.  
+[Container image via navidrome/navidrome](https://github.com/navidrome/navidrome/)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `NETHIADIL_PMM_PATH` | Path to application files | `./plex-meta-manager` |
-| `NETHIADIL_PMM_UPDATE_TIME` | Time to updated each day; formatted as `HH:MM` | `00:00` |
-| `NETHIADIL_PMM_CONFIG_FILE` | Path to custom configuration file | `./plex-meta-manager/config.yml` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
-
----
-
-### ErsatzTV
-
-Custom live streaming channels using Plex.  
-[Container image via jasongdove/ErsatzTV](https://github.com/jasongdove/ErsatzTV)
-
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `NETHIADIL_ERSATZTV_PATH` | Path to application files | `./ersatztv` |
-| `NETHIADIL_ERSATZTV_PORT` | Port to web UI | `8409` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable                      |              Description               |        Default        |
+| ----------------------------- | :------------------------------------: | :-------------------: |
+| `NETHIADIL_NAVIDROME_GA`      |          Google Analytics ID           |        `none`         |
+| `NETHIADIL_NAVIDROME_PATH`    |       Path to application files        |     `./navidrome`     |
+| `NETHIADIL_NAVIDROME_PORT`    |            Port for web UI             |        `4533`         |
+| `NETHIADIL_NAVIDROME_WELCOME` | The welcome message for the login page |     `Hello World`     |
+| `NETWORK_RANGE`               |      List of network IP addresses      |   `192.168.0.0/16`    |
+| `PGID`                        |                Group ID                |        `1000`         |
+| `PUID`                        |                User ID                 |        `1000`         |
+| `TZ`                          |                Timezone                | `America/Los_Angeles` |
 
 ---
 
@@ -101,10 +88,10 @@ _TODO_
 
 ### Etymology
 
-| Root word | Definition |
-|-----------|:----------:|
-| [nethia-](https://www.elfdict.com/wt/14193)       | to entertain, make feel welcome        |
-| [-(n)dil](https://www.elfdict.com/wt/513239)     | friend, lover       |
+| Root word                                    |           Definition            |
+| -------------------------------------------- | :-----------------------------: |
+| [nethia-](https://www.elfdict.com/wt/14193)  | to entertain, make feel welcome |
+| [-(n)dil](https://www.elfdict.com/wt/513239) |          friend, lover          |
 
 </div>
 
