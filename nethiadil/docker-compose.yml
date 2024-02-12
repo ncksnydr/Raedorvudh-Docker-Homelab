@@ -61,22 +61,24 @@ services:
     image: deluan/navidrome:latest
     container_name: nethiadil-navidrome
     environment:
-      # ND_BASEURL: ${NETHIADIL_NAVIDROME_URL:-navidrome.example.com}
+      ND_AUTHREQUESTLIMIT: 0
       ND_ENABLEDOWNLOADS: "FALSE"
       ND_ENABLEFAVOURITES: "TRUE"
       ND_ENABLEGRAVATAR: "TRUE"
+      ND_ENABLESHARING: "TRUE"
       ND_ENABLETRANSCODINGCONFIG: "TRUE"
       ND_LOGLEVEL: info
       ND_MAXSIDEBARPLAYLISTS: 60
       ND_REVERSEPROXYWHITELIST: ${NETWORK_RANGE:-192.168.0.0/16}
       ND_SESSIONTIMEOUT: 729h
       ND_UIWELCOMEMESSAGE: ${NETHIADIL_NAVIDROME_WELCOME:-Hello World}
+      ND_GATRACKINGID: ${NETHIADIL_NAVIDROME_GA}
       # TODO ND_UILOGINBACKGROUNDURL:
       PGID: ${PGID}
       PUID: ${PUID}
       TZ: ${TZ}
     ports:
-      - ${NETHIADIL_NAVIDROME_PORT:-}:4533
+      - ${NETHIADIL_NAVIDROME_PORT:-4533}:4533
     restart: unless-stopped
     user: ${PUID}:${PGID}
     volumes:
