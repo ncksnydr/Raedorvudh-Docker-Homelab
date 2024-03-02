@@ -74,6 +74,8 @@ services:
       ND_UIWELCOMEMESSAGE: ${NETHIADIL_NAVIDROME_WELCOME:-Hello World}
       ND_GATRACKINGID: ${NETHIADIL_NAVIDROME_GA}
       # TODO ND_UILOGINBACKGROUNDURL:
+      ND_LASTFM_APIKEY: ${NETHIADIL_NAVIDROME_LASTFM_APIKEY}
+      ND_LASTFM_SECRET: ${NETHIADIL_NAVIDROME_LASTFM_SECRET}
       PGID: ${PGID}
       PUID: ${PUID}
       TZ: ${TZ}
@@ -84,6 +86,24 @@ services:
     volumes:
       - ${NETHIADIL_NAVIDROME_PATH:-./navidrome}:/data
       - thinmbahad-music:/music:ro
+    deploy:
+      placement:
+        constraints: [node.labels.nethiadil_music == true]
+
+  # Beets (https://beets.io/)
+  beets:
+    image: lscr.io/linuxserver/beets:latest
+    container_name: nethiadil-beets
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${NETHIADIL_BEETS_PORT:-8337}:8337
+    restart: unless-stopped
+    volumes:
+      - ${NETHIADIL_BEETS_PATH:-./beets}:/config
+      - thinmbahad-music:/music
     deploy:
       placement:
         constraints: [node.labels.nethiadil_music == true]

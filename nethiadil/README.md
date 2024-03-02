@@ -73,6 +73,21 @@ Streaming service and music player.
 
 ---
 
+### Beets
+
+Music library manager.  
+[Container image via linuxserver/docker-beets](https://github.com/linuxserver/docker-beets/)
+
+| Variable                   |        Description        |        Default        |
+| -------------------------- | :-----------------------: | :-------------------: |
+| `NETHIADIL_NAVIDROME_PATH` | Path to application files |       `./beets`       |
+| `NETHIADIL_NAVIDROME_PORT` |      Port for web UI      |        `8337`         |
+| `PGID`                     |         Group ID          |        `1000`         |
+| `PUID`                     |          User ID          |        `1000`         |
+| `TZ`                       |         Timezone          | `America/Los_Angeles` |
+
+---
+
 ## Sindarin
 
 <div style="width:49%; margin-right:1%; float:left;">
