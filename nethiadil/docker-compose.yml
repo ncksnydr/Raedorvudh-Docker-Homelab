@@ -85,7 +85,7 @@ services:
     user: ${PUID}:${PGID}
     volumes:
       - ${NETHIADIL_NAVIDROME_PATH:-./navidrome}:/data
-      - thinmbahad-music:/music:ro
+      - thinmbahad-music-library:/music:ro
     deploy:
       placement:
         constraints: [node.labels.nethiadil_music == true]
@@ -103,7 +103,8 @@ services:
     restart: unless-stopped
     volumes:
       - ${NETHIADIL_BEETS_PATH:-./beets}:/config
-      - thinmbahad-music:/music
+      - thinmbahad-music-library:/music
+      - thinmbahad-music:/downloads
     deploy:
       placement:
         constraints: [node.labels.nethiadil_music == true]
@@ -120,4 +121,10 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/music
+      device: :${THINMBAHAD_PATH}/media/music/unprocessed
+  thinmbahad-music-library:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/music/library
