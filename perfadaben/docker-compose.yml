@@ -1,0 +1,74 @@
+version: "3.9"
+services:
+
+  # Audiobookshelf (https://www.audiobookshelf.org/)
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: perfadaben-audiobookshelf
+    environment:
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/New_York}
+    ports:
+      - ${PERFADABEN_AUDIOBOOKSHELF_PORT:-80}:80
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_AUDIOBOOKSHELF_PATH:-./audiobookshelf}/app:/config
+      - ${PERFADABEN_AUDIOBOOKSHELF_PATH:-./audiobookshelf}/metadata:/metadata
+      - thinmbahad-audiobooks:/audiobooks   
+    deploy:
+      placement:
+        constraints: [node.labels.perfadaben == true]   
+
+  # Kavita (https://www.kavitareader.com/)
+  kavita:
+    image: lscr.io/linuxserver/kavita:latest
+    container_name: perfadaben-kavita
+    environment:
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/New_York}
+    ports:
+      - ${PERFADABEN_KAVITA_PORT:-5000}:5000
+    restart: unless-stopped
+    volumes:
+      - ${PERFADABEN_KAVITA_PATH:-./kavita}:/config
+      - thinmbahad-books:/data/books
+      - thinmbahad-comics:/data/comics
+      - thinmbahad-magazines:/data/magazines
+      - thinmbahad-rpgs:/data/rpgs
+    deploy:
+      placement:
+        constraints: [node.labels.perfadaben == true]
+
+volumes:
+  thinmbahad-audiobooks:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/audiobooks
+  thinmbahad-books:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/ebooks
+  thinmbahad-comics:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/comics
+  thinmbahad-magazines:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/magazines
+  thinmbahad-rpgs:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/rpgs
