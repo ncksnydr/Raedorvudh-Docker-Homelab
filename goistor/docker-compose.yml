@@ -11,6 +11,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
       MYSQL_USER: ${ROOT_USERNAME:-root}
       MYSQL_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    networks:
+      - gulhir
     ports:
       - ${GOISTOR_MYSQL_PORT:-3306}:3306
     restart: always
@@ -19,6 +21,7 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+    
 
   # PHPMyAdmin (https://github.com/phpmyadmin/docker)
   phpmyadmin:
@@ -29,8 +32,8 @@ services:
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
       PMA_HOST: mysql
-      PMA_USER: ${ROOT_USERNAME:-root}
-      PMA_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    networks:
+      - gulhir
     ports:
       - ${GOISTOR_PHPMYADMIN_PORT:-8080}:80
     restart: always
@@ -51,6 +54,8 @@ services:
       POSTGRES_USER: ${ROOT_USERNAME:-changeMe}
       POSTGRES_PASSWORD: ${ROOT_PASSWORD:-changeMe}
       POSTGRES_DB: ${ROOT_USERNAME:-changeMe}
+    networks:
+      - gulhir
     ports:
       - ${GOISTOR_POSTGRES_PORT:-5432}:5432
     restart: always
@@ -70,6 +75,8 @@ services:
       TZ: ${TZ:-America/Los_Angeles}
       PGADMIN_DEFAULT_EMAIL: ${ROOT_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+    networks:
+      - gulhir
     ports:
       - ${GOISTOR_POSTGRES_ADMIN_PORT:-15432}:80
     restart: always
@@ -89,6 +96,8 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
+    networks:
+      - gulhir
     ports:
       - ${GOISTOR_REDIS_PORT:-6379}:6379
     restart: always
@@ -97,3 +106,11 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+
+networks:
+  gulhir:
+    external: true
+# River of Knowledge
+# gûlhir
+# hîr
+
