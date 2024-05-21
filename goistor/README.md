@@ -89,11 +89,16 @@ _guy-EE-star_
 
 ### Etymology
 
-| Root word                                |   Definition   |
-| ---------------------------------------- | :------------: |
+|                Root word                 |   Definition   |
+| :--------------------------------------: | :------------: |
 | [go-](https://www.elfdict.com/wt/515148) | together, all  |
 | [ist](https://www.elfdict.com/wt/130653) |   knowledge    |
 | [-or](https://www.elfdict.com/wt/518972) | agental suffix |
+
+|                Root word                 | Definition |
+| :--------------------------------------: | :--------: |
+| [gûl](https://www.elfdict.com/wt/21589)  | knowledge  |
+| [sîr](https://www.elfdict.com/wt/520354) |   river    |
 
 </div>
 

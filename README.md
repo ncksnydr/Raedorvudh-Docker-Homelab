@@ -45,6 +45,12 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 | Enedos     |  _"Center City"_   |    Application data     |
 | Thinmbahad |  _"Gray Market"_   |      Asset storage      |
 
+### Networks
+
+| Landmark |      Translation       |           Purpose            |
+| :------: | :--------------------: | :--------------------------: |
+|  Gúlhír  | _"River of Knowledge"_ | Connection bridge to Goistor |
+
 ## The Workers
 
 | Worker                               | Occupation | Applications in stack                                                                                                                                                                                                                                                                                                                                       |
