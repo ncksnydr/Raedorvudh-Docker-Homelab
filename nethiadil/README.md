@@ -55,24 +55,6 @@ Custom metadata manager for Plex.
 
 ---
 
-### Navidrome
-
-Streaming service and music player.  
-[Container image via navidrome/navidrome](https://github.com/navidrome/navidrome/)
-
-| Variable                      |              Description               |        Default        |
-| ----------------------------- | :------------------------------------: | :-------------------: |
-| `NETHIADIL_NAVIDROME_GA`      |          Google Analytics ID           |        `none`         |
-| `NETHIADIL_NAVIDROME_PATH`    |       Path to application files        |     `./navidrome`     |
-| `NETHIADIL_NAVIDROME_PORT`    |            Port for web UI             |        `4533`         |
-| `NETHIADIL_NAVIDROME_WELCOME` | The welcome message for the login page |     `Hello World`     |
-| `NETWORK_RANGE`               |      List of network IP addresses      |   `192.168.0.0/16`    |
-| `PGID`                        |                Group ID                |        `1000`         |
-| `PUID`                        |                User ID                 |        `1000`         |
-| `TZ`                          |                Timezone                | `America/Los_Angeles` |
-
----
-
 ### Beets
 
 Music library manager.  

@@ -56,40 +56,6 @@ services:
       placement:
         constraints: [node.labels.nethiadil == true]
 
-  # Navidrome (https://www.navidrome.org)
-  navidrome:
-    image: deluan/navidrome:latest
-    container_name: nethiadil-navidrome
-    environment:
-      ND_AUTHREQUESTLIMIT: 0
-      ND_ENABLEDOWNLOADS: "FALSE"
-      ND_ENABLEFAVOURITES: "TRUE"
-      ND_ENABLEGRAVATAR: "TRUE"
-      ND_ENABLESHARING: "TRUE"
-      ND_ENABLETRANSCODINGCONFIG: "TRUE"
-      ND_LOGLEVEL: info
-      ND_MAXSIDEBARPLAYLISTS: 60
-      ND_REVERSEPROXYWHITELIST: ${NETWORK_RANGE:-192.168.0.0/16}
-      ND_SESSIONTIMEOUT: 729h
-      ND_UIWELCOMEMESSAGE: ${NETHIADIL_NAVIDROME_WELCOME:-Hello World}
-      ND_GATRACKINGID: ${NETHIADIL_NAVIDROME_GA}
-      # TODO ND_UILOGINBACKGROUNDURL:
-      ND_LASTFM_APIKEY: ${NETHIADIL_NAVIDROME_LASTFM_APIKEY}
-      ND_LASTFM_SECRET: ${NETHIADIL_NAVIDROME_LASTFM_SECRET}
-      PGID: ${PGID}
-      PUID: ${PUID}
-      TZ: ${TZ}
-    ports:
-      - ${NETHIADIL_NAVIDROME_PORT:-4533}:4533
-    restart: unless-stopped
-    user: ${PUID}:${PGID}
-    volumes:
-      - ${NETHIADIL_NAVIDROME_PATH:-./navidrome}:/data
-      - thinmbahad-music-library:/music:ro
-    deploy:
-      placement:
-        constraints: [node.labels.nethiadil_music == true]
-
   # Beets (https://beets.io/)
   beets:
     image: lscr.io/linuxserver/beets:latest
