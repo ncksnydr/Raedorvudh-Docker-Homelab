@@ -1,4 +1,4 @@
-plugins: fetchart embedart convert scrub replaygain lastgenre chroma web
+plugins: fetchart embedart convert scrub replaygain lastgenre chroma web discogs missing the
 directory: /music
 library: /config/musiclibrary.blb
 art_filename: albumart
@@ -12,13 +12,13 @@ convert:
     opts: -ab 320k -ac 2 -ar 48000
     max_bitrate: 320
     threads: 1
-    
+
 paths:
-    default: $albumartist/$album%aunique{} ($original_year)/$track - $title
+    default: %the{$albumartist}/$album%aunique{} ($original_year)/$track - $title
     singleton: Non-Album/$artist - $title
     comp: Compilations/$album%aunique{}/$track - $title
-    albumtype_soundtrack: Soundtracks/$album/$track $title 
-        
+    albumtype_soundtrack: Soundtracks/$album/$track $title
+
 import:
     write: yes
     copy: yes
@@ -28,6 +28,17 @@ import:
     quiet_fallback: skip
     timid: no
     log: /config/beet.log
+
+chroma:
+    auto: yes
+
+acoustid:
+    apikey: W4lF8LUz5Q
+
+discogs:
+    user_token: "gPwynJJjFXPsWBJAFSaFDhfkLRvpqVMZVJwTRtix"
+    index_tracks: yes
+    source_weight: 0.1
 
 lastgenre:
     auto: yes
@@ -41,7 +52,12 @@ fetchart:
     enforce_ratio: yes
     sources: coverart itunes albumart wikipedia amazon
     cover_names: front cover album
-    
+
+missing:
+    format: $albumartist - $album - $title
+    count: yes
+    total: no
+
 replaygain:
     auto: no
 
