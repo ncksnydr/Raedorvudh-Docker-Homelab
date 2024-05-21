@@ -8,21 +8,6 @@
 
 ## Applications in the stack
 
-### Audiobookshelf
-
-Audiobook and podcast server.
-[Container image via advplyr/audiobookshelf](https://github.com/advplyr/audiobookshelf)
-
-| Variable                         |        Description         |        Default        |
-| -------------------------------- | :------------------------: | :-------------------: |
-| `PERFADABEN_AUDIOBOOKSHELF_PATH` | Path to applications files |  `./audiobookshelf`   |
-| `PERFADABEN_AUDIOBOOKSHELF_PORT` |      Port for web UI       |         `80`          |
-| `PGID`                           |          Group ID          |        `1000`         |
-| `PUID`                           |          User ID           |        `1000`         |
-| `TZ`                             |          Timezone          | `America/Los_Angeles` |
-
----
-
 ### Kavita
 
 Comics, eBooks, and manga server.  
