@@ -72,26 +72,6 @@ services:
       placement:
         constraints: [node.labels.angannondir == true]
 
-  # PiHole (https://github.com/pi-hole/docker-pi-hole/)
-  # pihole:
-  #   image: pihole/pihole:latest
-  #   container_name: angannondir-pihole
-  #   environment:
-  #     PGID: ${PGID:-1000}
-  #     PUID: ${PUID:-1000}
-  #     TZ: ${TZ:-America/Los_Angeles}
-  #     WEBPASSWORD: ${ANGANNONDIR_PIHOLE_PASSWORD:-changeMe}
-  #   ports:
-  #     - ${ANGANNONDIR_PIHOLE_PORT_DNS:-53}:53/tcp
-  #     - ${ANGANNONDIR_PIHOLE_PORT_DNS:-53}:53/udp
-  #     - ${ANGANNONDIR_PIHOLE_PORT:-80}:80/tcp
-  #   volumes:
-  #     - ${ANGANNONDIR_PIHOLE_PATH:-./pihole}/app:/etc/pihole
-  #     - ${ANGANNONDIR_PIHOLE_PATH:-./pihole}/dns:/etc/dnsmasq.d
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.angannondir == true]
-
 networks:
   gulhir:
     external: true

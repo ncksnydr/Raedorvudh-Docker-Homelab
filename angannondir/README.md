@@ -6,6 +6,10 @@
 
 </div>
 
+## TODO
+
+- Add and configure [Pi-hole](https://pi-hole.net/)
+
 ## Applications in the stack
 
 ### CloudFlare DDNS
@@ -56,23 +60,6 @@ A reverse proxy to safely expose web applications.
 | `PGID`                       |            Group ID            |        `1000`         |
 | `PUID`                       |            User ID             |        `1000`         |
 | `TZ`                         |            Timezone            | `America/Los_Angeles` |
-
----
-
-### Pi-hole
-
-Ad blocker.
-[Container image via pi-hole/docker-pi-hole](https://github.com/pi-hole/docker-pi-hole)
-
-| Variable                      |        Description        |        Default        |
-| ----------------------------- | :-----------------------: | :-------------------: |
-| `ANGANNONDIR_PIHOLE_PASSWORD` |    Password for web UI    |      `changeMe`       |
-| `ANGANNONDIR_PIHOLE_PATH`     | Path to application files |      `./pihole`       |
-| `ANGANNONDIR_PIHOLE_PORT_DNS` |      Port to web UI       |         `53`          |
-| `ANGANNONDIR_PIHOLE_PORT`     |      Port to web UI       |         `80`          |
-| `PGID`                        |         Group ID          |        `1000`         |
-| `PUID`                        |          User ID          |        `1000`         |
-| `TZ`                          |         Timezone          | `America/Los_Angeles` |
 
 ---
 
