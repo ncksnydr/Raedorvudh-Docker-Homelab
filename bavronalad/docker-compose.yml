@@ -78,11 +78,16 @@ services:
       MYSQL_DATABASE: ${BAVRONALAD_PHOTOPRISM_DATABASE:-npm}
       MYSQL_USER: ${ROOT_USERNAME:-root}
       MYSQL_PASSWORD: ${ROOT_PASSWORD:-changeMe}
-    network_mode: "service:goistor_mysql"
+    networks:
+      - gulhir
     restart: always
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+
+networks:
+  gulhir:
+    external: true
 
 volumes:
   photoprism-media:
