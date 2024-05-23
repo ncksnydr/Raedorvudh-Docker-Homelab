@@ -78,22 +78,44 @@ services:
     container_name: angannondir-wireguard
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE #optional
+      - SYS_MODULE
     environment:
       PGID: ${PGID:-1000}
       PUID: ${PUID:-1000}
       TZ: ${TZ:-America/Los_Angeles}      
-      SERVERPORT: ${ANGANNONDIR_WIREGUARD_PORT:-51820}
-      ALLOWEDIPS: ${NETWORK_RANGE}
-      LOG_CONFS: true 
     ports:
+      - ${ANGANNONDIR_WIREGUARD_PORT_UI:-5000}:5000
       - ${ANGANNONDIR_WIREGUARD_PORT:-51820}:51820/udp
     restart: unless-stopped
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
     volumes:
       - ${ANGANNONDIR_WIREGUARD_PATH:-./wireguard}:/config
       - /lib/modules:/lib/modules 
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
+
+
+  # WireGuard UI (VPN)
+  wireguard-ui:
+    image: ngoduykhanh/wireguard-ui:latest
+    container_name: angannondir-wireguard-ui
+    cap_add:
+      - NET_ADMIN
+    depends_on:
+      - wireguard
+    environment:
+      WGUI_USERNAME: ${ANGANNONDIR_WIREGUARD_USERNAME:-admin}
+      WGUI_PASSWORD: ${ANGANNONDIR_WIREGUARD_PASSWORD:-changeMe}
+      WGUI_MANAGE_START: "TRUE"
+      WGUI_MANAGE_RESTART: "TRUE"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    restart: unless-stopped
+    volumes:
+      - ${ANGANNONDIR_WIREGUARD_PATH:-./wireguard}/ui/db:/app/db
+      - ${ANGANNONDIR_WIREGUARD_PATH:-./wireguard}/ui/app:/etc/wireguard
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
