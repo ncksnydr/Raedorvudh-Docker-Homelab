@@ -1,25 +1,6 @@
 version: "3.9"
 services:
 
-  # Audiobookshelf (https://www.audiobookshelf.org/)
-  audiobookshelf:
-    image: ghcr.io/advplyr/audiobookshelf:latest
-    container_name: perfadaben-audiobookshelf
-    environment:
-      PGID: ${PGID:-1000}
-      PUID: ${PUID:-1000}
-      TZ: ${TZ:-America/New_York}
-    ports:
-      - ${PERFADABEN_AUDIOBOOKSHELF_PORT:-80}:80
-    restart: unless-stopped
-    volumes:
-      - ${PERFADABEN_AUDIOBOOKSHELF_PATH:-./audiobookshelf}/app:/config
-      - ${PERFADABEN_AUDIOBOOKSHELF_PATH:-./audiobookshelf}/metadata:/metadata
-      - thinmbahad-audiobooks:/audiobooks   
-    deploy:
-      placement:
-        constraints: [node.labels.perfadaben == true]   
-
   # Kavita (https://www.kavitareader.com/)
   kavita:
     image: lscr.io/linuxserver/kavita:latest
@@ -40,14 +21,36 @@ services:
     deploy:
       placement:
         constraints: [node.labels.perfadaben == true]
+  
+  # Calibre (https://calibre-ebook.com/)
+  calibre:
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: perfadaben-calibre
+    environment:
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/New_York}
+      PASSWORD: ${PERFADABEN_CALIBRE_PASSWORD:-changeMe}
+    ports:
+      - ${PERFADABEN_CALIBRE_PORT:-8080}:8080
+      - ${PERFADABEN_CALIBRE_PORT_SSL:-8181}:8181
+      - ${PERFADABEN_CALIBRE_PORT_SERVER:-8081}:8081
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - thinmbahad-books-root:/config
+    deploy:
+      placement:
+        constraints: [node.labels.perfadaben == true]
 
 volumes:
-  thinmbahad-audiobooks:
+  thinmbahad-books-root:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/audiobooks
+        device: :${THINMBAHAD_PATH}/media/books
   thinmbahad-books:
       driver: local
       driver_opts:
