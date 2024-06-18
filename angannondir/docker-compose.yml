@@ -71,6 +71,32 @@ services:
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
+  
+  # WireGuard (VPN)
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: angannondir-wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE #optional
+    environment:
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}      
+      SERVERPORT: ${ANGANNONDIR_WIREGUARD_PORT:-51820}
+      ALLOWEDIPS: ${NETWORK_RANGE}
+      LOG_CONFS: true 
+    ports:
+      - ${ANGANNONDIR_WIREGUARD_PORT:-51820}:51820/udp
+    restart: unless-stopped
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    volumes:
+      - ${ANGANNONDIR_WIREGUARD_PATH:-./wireguard}:/config
+      - /lib/modules:/lib/modules 
+    deploy:
+      placement:
+        constraints: [node.labels.angannondir == true]
 
 networks:
   gulhir:
