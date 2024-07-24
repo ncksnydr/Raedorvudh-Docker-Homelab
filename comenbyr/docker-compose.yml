@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  nodejs:
+    image: node:22-alpine
+    container_name: comenbyr-node
+    command: ${COMENBYR_NODE_COMMAND:-npm start}
+    environment:
+      NODE_ENV: ${COMENBYR_NODE_ENV:-production}
+      PGID: ${PGID:-1000}
+      PUID: ${PUID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${COMENBYR_NODE_PORT:-3000}:3000
+    user: ${COMENBYR_NODE_USER:-node}
+    volumes:
+      - ${COMENBYR_NODE_PATH:-./node}:/home/node/project
+    working_dir: ${COMENBYR_NODE_PATH:-./node}
+    networks:
+        - gulhir
+
+networks:
+  gulhir:
+    external: true
