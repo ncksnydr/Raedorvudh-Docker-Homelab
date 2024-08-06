@@ -8,6 +8,22 @@
 
 ## Applications in the stack
 
+### WordPress
+
+Content management system.
+[Container image via docker-library/wordpress](https://github.com/docker-library/wordpress/)
+
+| Variable             |        Description        |        Default        |
+| -------------------- | :-----------------------: | :-------------------: |
+| `COMENBYR_EXPOS_WORDPRESS_DB_NAME` | Command on start-up  |        `wordpress`         |
+| `COMENBYR_EXPOS_WORDPRESS_PATH` | Path to application files |       `./wordpress`       |
+| `COMENBYR_EXPOS_WORDPRESS_PORT` | Port for UI |        `80`         |
+| `PGID`               |         Group ID          |        `1000`         |
+| `PUID`               |          User ID          |        `1000`         |
+| `TZ`                 |         Timezone          | `America/Los_Angeles` |
+
+---
+
 ### Node
 
 JavaScript runtime engine.
