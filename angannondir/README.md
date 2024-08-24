@@ -63,6 +63,31 @@ A reverse proxy to safely expose web applications.
 
 ---
 
+### Wireguard
+
+A virutal private network (VPN).
+[Container image via linuxserver/docker-wireguard](https://github.com/linuxserver/docker-wireguard)
+
+| Variable                     |          Description           |        Default        |
+| ---------------------------- | :----------------------------: | :-------------------: |
+| `ANGANNONDIR_WIREGUARD_PASSWORD`    |         Password for web UI access          |         `changeMe`         |
+| `ANGANNONDIR_WIREGUARD_PATH`    |         Path to application files          |         `./wireguard`         |
+| `ANGANNONDIR_WIREGUARD_PORT_UI`    |         Port for Wireguard UI          |         `5000`         |
+| `ANGANNONDIR_WIREGUARD_PORT`    |         Port for network access         |         `51820`         |
+| `ANGANNONDIR_WIREGUARD_USERNAME`    |         Username for web UI access          |         `admin`         |
+| `PGID`                       |            Group ID            |        `1000`         |
+| `PUID`                       |            User ID             |        `1000`         |
+| `TZ`                         |            Timezone            | `America/Los_Angeles` |
+
+---
+
+### Wireguard UI
+
+A web user interface to manage Wireguard.  
+[Container image via ngoduykhanh/wireguard-ui](https://github.com/ngoduykhanh/wireguard-ui)
+
+---
+
 ## Sindarin
 
 <div style="width:49%; margin-right:1%; float:left;">
