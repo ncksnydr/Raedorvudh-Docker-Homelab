@@ -35,14 +35,13 @@ services:
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: angannondir-cloudflare
+    user: "${PUID:-1000}:${PGID:-1000}"
     cap_drop:
       - all
     environment:
       CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN:-changeMe}
       DOMAINS: ${DOMAINS:-changeMe.biz}
-      PGID: ${PGID:-1000}
       PROXIED: "TRUE"
-      PUID: ${PUID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
       IP6_PROVIDER: "none"
     network_mode: host
