@@ -33,7 +33,7 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 | Budhforod  |      _"North fly"_       |   Orange Pi 5   |  32G  |
 | Budganthui |      _"Fourth fly"_      |   Orange Pi 5   | 128G  |
 | Budhlefnui |      _"Fifth fly"_       |   Orange Pi 5   |  32G  |
-| Gadathli   |      _"Honey trap"_      |   Orange Pi 5   |  32G  |
+| Gadathli   |      _"Honey trap"_      |   Orange Pi 5   | 128G  |
 | Amonvedui  |      _"Last Hill"_       | Orange Pi 4 LTS |  32G  |
 | Nadhrawlos | _"Valley of the Hollow"_ | Orange Pi 4 LTS |  32G  |
 
@@ -47,9 +47,9 @@ A [home lab](https://www.seeedstudio.com/blog/2020/12/22/what-is-a-home-lab-gett
 
 ### Networks
 
-| Landmark |      Translation       |           Purpose            |
-| :------: | :--------------------: | :--------------------------: |
-|  Gúlhír  | _"River of Knowledge"_ | Connection bridge to Goistor |
+| Network |     Translation      |    Responsibility    |
+| ------- | :------------------: | :------------------: |
+| Gúlhír  | _"Knowledge Stream"_ | Database connections |
 
 ## The Workers
 

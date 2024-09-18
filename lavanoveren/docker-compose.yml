@@ -6,9 +6,9 @@ services:
     image: itzg/minecraft-server:latest
     container_name: lavanoveren-minecraft
     environment:
-      CF_API_KEY: ${LAVANOVEREN_MINECRAFT_CURSEFORGE_API:-1234567890}
       ALLOW_CHEATS: "TRUE"
       DIFFICULTY: normal
+      DISABLE_HEALTHCHECK: "TRUE"
       EULA: "TRUE"
       GAMEMODE: SURVIVAL
       GENERATE_STRUCTURES: "TRUE"
@@ -20,7 +20,7 @@ services:
       PGID: ${PGID:-1000}
       PUID: ${PUID:-1000}
       SERVER_NAME: ${LAVANOVEREN_MINECRAFT_SERVER_NAME:-Server}
-      TYPE: FORGE
+      TYPE: PAPER
       TZ: ${TZ:-America/Los_Angeles}
       UID: ${PUID:-1000}
     ports:
@@ -30,7 +30,6 @@ services:
     volumes:
       - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/app:/data
       - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/mods:/mods:ro
-      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/modpacks:/modpacks:ro
     deploy:
       placement:
         constraints: [node.labels.lavanoveren_minecraft == true]

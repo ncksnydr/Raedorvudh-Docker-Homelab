@@ -21,7 +21,6 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
-    
 
   # PHPMyAdmin (https://github.com/phpmyadmin/docker)
   phpmyadmin:
@@ -42,6 +41,8 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+    networks:
+      - gulhir
 
   # Postgres (https://hub.docker.com/_/postgres)
   postgres:
@@ -64,6 +65,8 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+    networks:
+      - gulhir
 
   # PGAdmin (https://www.pgadmin.org)
   postgres-admin:
@@ -87,6 +90,8 @@ services:
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+    networks:
+      - gulhir
 
   # Redis (https://github.com/docker-library/redis)
   redis:
@@ -110,7 +115,3 @@ services:
 networks:
   gulhir:
     external: true
-# River of Knowledge
-# gûlhir
-# hîr
-
