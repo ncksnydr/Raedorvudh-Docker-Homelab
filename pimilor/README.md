@@ -116,18 +116,33 @@ Indexer manager for PVRs.
 
 ---
 
-### LazyLibrarian
+### Readarr
 
 PVR for books.
-[Container image via linuxserver/docker-docker-lazylibrarian](https://github.com/linuxserver/docker-lazylibrarian)
+[Container image via linuxserver/docker-readarr](https://github.com/linuxserver/docker-readarr)
 
-| Variable                     |        Description        |        Default        |
-| ---------------------------- | :-----------------------: | :-------------------: |
-| `PIMILOR_LAZYLIBRARIAN_PATH` | Path to application files |   `./lazylibrarian`   |
-| `PIMILOR_LAZYLIBRARIAN_PORT` |      Port for web UI      |        `5299`         |
-| `PGID`                       |         Group ID          |        `1000`         |
-| `PUID`                       |          User ID          |        `1000`         |
-| `TZ`                         |         Timezone          | `America/Los_Angeles` |
+| Variable               |        Description        |        Default        |
+| ---------------------- | :-----------------------: | :-------------------: |
+| `PIMILOR_READARR_PATH` | Path to application files |      `./readarr`      |
+| `PIMILOR_READARR_PORT` |      Port for web UI      |        `8787`         |
+| `PGID`                 |         Group ID          |        `1000`         |
+| `PUID`                 |          User ID          |        `1000`         |
+| `TZ`                   |         Timezone          | `America/Los_Angeles` |
+
+---
+
+### Mylar3
+
+PVR for comic books.
+[Container image via linuxserver/docker-mylar3](https://github.com/linuxserver/docker-mylar3)
+
+| Variable              |        Description        |        Default        |
+| --------------------- | :-----------------------: | :-------------------: |
+| `PIMILOR_MYLAR3_PATH` | Path to application files |      `./mylar3`       |
+| `PIMILOR_MYLAR3_PORT` |      Port for web UI      |        `8090`         |
+| `PGID`                |         Group ID          |        `1000`         |
+| `PUID`                |          User ID          |        `1000`         |
+| `TZ`                  |         Timezone          | `America/Los_Angeles` |
 
 ---
 

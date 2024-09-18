@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  # Homarr (https://homarr.dev)
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: lochuil-homarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${LOCHUIL_HOMARR_PORT:-7575}:7575
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LOCHUIL_HOMARR_PATH:-./homarr}/configs:/app/data/configs
+      - ${LOCHUIL_HOMARR_PATH:-./homarr}/icons:/app/public/icons
+      - ${LOCHUIL_HOMARR_PATH:-./homarr}/data:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]
+
+  # Homarr (https://homarr.dev)
+  homarr_admin:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: lochuil-homarr-admin
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${LOCHUIL_HOMARR_ADMIN_PORT:-7575}:7575
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LOCHUIL_HOMARR_ADMIN_PATH:-./homarr}/configs:/app/data/configs
+      - ${LOCHUIL_HOMARR_ADMIN_PATH:-./homarr}/icons:/app/public/icons
+      - ${LOCHUIL_HOMARR_ADMIN_PATH:-./homarr}/data:/data
+    deploy:
+      placement:
+        constraints: [node.labels.lochuil == true]

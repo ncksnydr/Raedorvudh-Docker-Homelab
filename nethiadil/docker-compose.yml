@@ -56,52 +56,24 @@ services:
       placement:
         constraints: [node.labels.nethiadil == true]
 
-  ersatztv:
-    image: jasongdove/ersatztv:develop-arm64
-    container_name: nethiadil-ersatztv
+  # Beets (https://beets.io/)
+  beets:
+    image: lscr.io/linuxserver/beets:latest
+    container_name: nethiadil-beets
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - ${NETHIADIL_ERSATZTV_PORT:-8409}:8409
+      - ${NETHIADIL_BEETS_PORT:-8337}:8337
     restart: unless-stopped
     volumes:
-      - ${NETHIADIL_ERSATZTV_PATH:-./ersatztv}:/root/.local/share/ersatztv
-      - plex-media:/media/shared:ro
+      - ${NETHIADIL_BEETS_PATH:-./beets}:/config
+      - thinmbahad-music-library:/music
+      - thinmbahad-music:/downloads
     deploy:
       placement:
-        constraints: [node.labels.nethiadil == true]
-
-  # # Navidrome (https://www.navidrome.org)
-  # navidrome:
-  #   image: deluan/navidrome:latest
-  #   container_name: nethiadil-navidrome
-  #   environment:
-  #     # ND_BASEURL: ${NETHIADIL_NAVIDROME_URL:-navidrome.example.com}
-  #     ND_ENABLEDOWNLOADS: "FALSE"
-  #     ND_ENABLEFAVOURITES: "TRUE"
-  #     ND_ENABLEGRAVATAR: "TRUE"
-  #     ND_ENABLETRANSCODINGCONFIG: "TRUE"
-  #     ND_LOGLEVEL: info
-  #     ND_MAXSIDEBARPLAYLISTS: 60
-  #     ND_REVERSEPROXYWHITELIST: ${NETWORK_RANGE:-192.168.0.0/16}
-  #     ND_SCANSCHEDULE: 1h
-  #     ND_SESSIONTIMEOUT: 729h
-  #     ND_UIWELCOMEMESSAGE: ${NETHIADIL_NAVIDROME_WELCOME:-Hello World}
-  #     PGID: ${PGID}
-  #     PUID: ${PUID}
-  #     TZ: ${TZ}
-  #   ports:
-  #     - ${NETHIADIL_NAVIDROME_PORT:-}:4533
-  #   restart: unless-stopped
-  #   user: ${PUID}:${PGID} # should be owner of volumes
-  #   volumes:
-  #     - ${NETHIADIL_NAVIDROME_PATH:-./navidrome}:/data
-  #     - thinmbahad-music:/music:ro
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.nethiadil_music == true]
+        constraints: [node.labels.nethiadil_music == true]
 
 volumes:
   plex-media:
@@ -115,4 +87,10 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/music
+      device: :${THINMBAHAD_PATH}/media/music/unprocessed
+  thinmbahad-music-library:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/media/music/library

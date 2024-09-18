@@ -49,11 +49,11 @@ services:
         constraints: [node.labels.pimilor == true]
       resources:
         limits:
-          cpus: '4.00'
-          memory: 10G
+          cpus: '8.00'
+          memory: 15G
         reservations:
-          cpus: '2.00'
-          memory: 8G
+          cpus: '6.00'
+          memory: 9G
 
   # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
   sonarr:
@@ -156,60 +156,64 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
 
-  # LazyLibrarian (https://github.com/linuxserver/docker-lazylibrarian)
-<<<<<<< HEAD
-  # lazylibrarian:
-  #   image: lscr.io/linuxserver/lazylibrarian:latest
-  #   container_name: pimilor-lazylibrarian
-  #   environment:
-  #     PUID: ${PUID:-1000}
-  #     PGID: ${PGID:-1000}
-  #     TZ: ${TZ:-America/Los_Angeles}
-  #   ports:
-  #     - ${PIMILOR_LAZYLIBRARIAN_PORT:-5299}:5299
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ${PIMILOR_LAZYLIBRARIAN_PATH:-./lazylibrarian}:/config
-  #     - cofbilion-blackhole:/downloads
-  #     - thinmbahad-books:/books 
-  #   deploy:
-  #     placement:
-  #       constraints: [node.labels.pimilor == true]
-
+  # Bazarr (https://github.com/linuxserver/docker-bazarr)
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: pimilor-bazarr
-=======
-  lazylibrarian:
-    image: lscr.io/linuxserver/lazylibrarian:latest
-    container_name: pimilor-lazylibrarian
->>>>>>> 5ecb04c408bc4fd5ca576e1f7a34744883592420
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
     ports:
-<<<<<<< HEAD
       - ${PIMILOR_BAZARR_PORT:-6767}:6767
     restart: unless-stopped
     volumes:
       - ${PIMILOR_BAZARR_PATH:-./bazarr}:/config
       - thinmbahad-movies:/movies #optional
       - thinmbahad-tv:/tv #optional
-=======
-      - ${PIMILOR_LAZYLIBRARIAN_PORT:-5299}:5299
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_LAZYLIBRARIAN_PATH:-./lazylibrarian}:/config
-      - cofbilion-blackhole:/downloads
-      - thinmbahad-books:/books 
->>>>>>> 5ecb04c408bc4fd5ca576e1f7a34744883592420
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
 
-  # YTDL (https://github.com/Tzahi12345/YoutubeDL-Material)
-
+  # Readarr (https://github.com/Readarr/Readarr)
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: pimilor-readarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_READARR_PORT:-8787}:8787
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_READARR_PATH:-./readarr}:/config
+      - thinmbahad-audiobooks:/books/audiobooks
+      - thinmbahad-ebooks:/books/ebooks
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Mylar3 (https://github.com/Readarr/Readarr)
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: pimilor-mylar3
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_MYLAR3_PORT:-8090}:8090
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_MYLAR3_PATH:-./mylar3}:/config
+      - thinmbahad-comics:/comics
+      - cofbilion-blackhole:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+    
 volumes:
   cofbilion:
       driver: local
@@ -247,3 +251,21 @@ volumes:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
         device: :${THINMBAHAD_PATH}/media/books
+  thinmbahad-ebooks:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/ebooks
+  thinmbahad-audiobooks:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/audiobooks
+  thinmbahad-comics:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: addr=${NFS_IP},${NFS_OPTIONS}
+        device: :${THINMBAHAD_PATH}/media/books/comics

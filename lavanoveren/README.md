@@ -13,18 +13,17 @@
 Minecraft server.  
 [Container image via itzg/minecraft-server](https://github.com/itzg/docker-minecraft-server)
 
-| Variable                               |        Description         |     Default      |
-| -------------------------------------- | :------------------------: | :--------------: |
-| `LAVANOVEREN_MINECRAFT_CURSEFORGE_API` | API key for CurseForge.com |   `1234567890`   |
-| `LAVANOVEREN_MINECRAFT_LEVEL_NAME`     |       Name of level        |     `Level`      |
-| `LAVANOVEREN_MINECRAFT_MOTD`           |     Message of the day     | `Oh hello there` |
-| `LAVANOVEREN_MINECRAFT_PATH`           | Path to application files  |  `./minecraft`   |
-| `LAVANOVEREN_MINECRAFT_PORT`           |   Port for server access   |     `25565`      |
-| `LAVANOVEREN_MINECRAFT_SERVER_NAME`    |       Name of server       |     `Server`     |
-
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable                               |        Description         |        Default        |
+| -------------------------------------- | :------------------------: | :-------------------: |
+| `LAVANOVEREN_MINECRAFT_CURSEFORGE_API` | API key for CurseForge.com |     `1234567890`      |
+| `LAVANOVEREN_MINECRAFT_LEVEL_NAME`     |       Name of level        |        `Level`        |
+| `LAVANOVEREN_MINECRAFT_MOTD`           |     Message of the day     |   `Oh hello there`    |
+| `LAVANOVEREN_MINECRAFT_PATH`           | Path to application files  |     `./minecraft`     |
+| `LAVANOVEREN_MINECRAFT_PORT`           |   Port for server access   |        `25565`        |
+| `LAVANOVEREN_MINECRAFT_SERVER_NAME`    |       Name of server       |       `Server`        |
+| `PGID`                                 |          Group ID          |        `1000`         |
+| `PUID`                                 |          User ID           |        `1000`         |
+| `TZ`                                   |          Timezone          | `America/Los_Angeles` |
 
 ---
 
@@ -46,21 +45,6 @@ Virtual tabletop for Dungeons & Dragons–type shennanigans.
 | `TZ`                              |          Timezone           | `America/Los_Angeles` |
 
 ---
-
-### EmulatorJS
-
-Web-based games emulator.  
-[Container image via linuxserver/docker-emulatorjs](https://github.com/linuxserver/docker-emulatorjs)
-
-| Variable                           |         Description         |        Default        |
-| ---------------------------------- | :-------------------------: | :-------------------: |
-| `LAVANOVEREN_EMULATORJS_PATH`      |  Path to application files  |    `./emulatorjs`     |
-| `LAVANOVEREN_EMULATORJS_PORT_ROM`  |     Name of the server      |        `3000`         |
-| `LAVANOVEREN_EMULATORJS_PORT_UI`   | Username for FoundryVTT.com |         `80`          |
-| `LAVANOVEREN_EMULATORJS_PORT_PEER` | Password for FoundryVTT.com |        `4001`         |
-| `PGID`                             |          Group ID           |        `1000`         |
-| `PUID`                             |           User ID           |        `1000`         |
-| `TZ`                               |          Timezone           | `America/Los_Angeles` |
 
 ## Sindarin
 

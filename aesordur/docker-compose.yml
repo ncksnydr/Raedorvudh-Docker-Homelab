@@ -4,7 +4,6 @@ services:
     image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1
     container_name: aesordur-mealie
     environment:
-      # TODO Add custom colors (https://nightly.mealie.io/documentation/getting-started/installation/backend-config/#themeing)
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}

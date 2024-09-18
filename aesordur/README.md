@@ -6,6 +6,11 @@
 
 </div>
 
+## TODO
+
+- Add custom colors
+  - See [themeing](https://nightly.mealie.io/documentation/getting-started/installation/backend-config/#themeing).
+
 ## Applications in the stack
 
 ### Mealie
@@ -13,13 +18,13 @@
 Recipe manager and meal planner.  
 [Container image via hay-kot/mealie](https://github.com/hay-kot/mealie)
 
-| Variable | Description | Default |
-|-----------|:----------:|:----------:|
-| `AESORDUR_MEALIE_PATH` | Path to applications files | `./mealie` |
-| `AESORDUR_MEALIE_PORT` | Port for web UI | `80` |
-| `PGID` | Group ID | `1000` |
-| `PUID` | User ID | `1000` |
-| `TZ` | Timezone | `America/Los_Angeles` |
+| Variable               |        Description         |        Default        |
+| ---------------------- | :------------------------: | :-------------------: |
+| `AESORDUR_MEALIE_PATH` | Path to applications files |      `./mealie`       |
+| `AESORDUR_MEALIE_PORT` |      Port for web UI       |         `80`          |
+| `PGID`                 |          Group ID          |        `1000`         |
+| `PUID`                 |          User ID           |        `1000`         |
+| `TZ`                   |          Timezone          | `America/Los_Angeles` |
 
 ## Sindarin
 
@@ -36,11 +41,11 @@ _eye-es-AR-door_
 
 ### Etymology
 
-| Root word | Definition |
-|-----------|:----------:|
-| [aes](https://www.elfdict.com/wt/129803)       | cooked food        |
-| [-or](https://www.elfdict.com/wt/518972)       | doer of (x)       |
-| [hîr](https://www.elfdict.com/wt/13665)       | master, lord      |
+| Root word                                |  Definition  |
+| ---------------------------------------- | :----------: |
+| [aes](https://www.elfdict.com/wt/129803) | cooked food  |
+| [-or](https://www.elfdict.com/wt/518972) | doer of (x)  |
+| [hîr](https://www.elfdict.com/wt/13665)  | master, lord |
 
 </div>
 
