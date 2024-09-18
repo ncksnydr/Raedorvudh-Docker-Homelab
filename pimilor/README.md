@@ -131,21 +131,6 @@ PVR for books.
 
 ---
 
-### Mylar3
-
-PVR for comic books.
-[Container image via linuxserver/docker-mylar3](https://github.com/linuxserver/docker-mylar3)
-
-| Variable              |        Description        |        Default        |
-| --------------------- | :-----------------------: | :-------------------: |
-| `PIMILOR_MYLAR3_PATH` | Path to application files |      `./mylar3`       |
-| `PIMILOR_MYLAR3_PORT` |      Port for web UI      |        `8090`         |
-| `PGID`                |         Group ID          |        `1000`         |
-| `PUID`                |          User ID          |        `1000`         |
-| `TZ`                  |         Timezone          | `America/Los_Angeles` |
-
----
-
 ## Sindarin
 
 <div style="width:49%; margin-right:1%; float:left;">
