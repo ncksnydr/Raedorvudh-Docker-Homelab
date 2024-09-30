@@ -11,7 +11,7 @@
 ### MySQL/MariaDB
 
 Relational database powered by MySQL.  
-[Container image via yobasystems/alpine-mariadb](https://github.com/yobasystems/alpine-mariadb)
+[Container image via yobasystems/alpine-mariadb](https://github.com/yobasystems/alpine-**mariadb**)
 
 | Variable             |        Description        |        Default        |
 | -------------------- | :-----------------------: | :-------------------: |
@@ -66,6 +66,39 @@ Administration and development platform for PostgreSQL.
 | ----------------------------- | :-------------------------: | :-------------------: |
 | `GOISTOR_POSTGRES_ADMIN_PATH` |  Path to application files  |  `./postgres-admin`   |
 | `GOISTOR_POSTGRES_ADMIN_PORT` |       Port for web UI       |         `80`          |
+| `PGID`                        |          Group ID           |        `1000`         |
+| `PUID`                        |           User ID           |        `1000`         |
+| `ROOT_EMAIL`                  | Email address for root user |  `admin@example.com`  |
+| `ROOT_PASSWORD`               |   Password for root user    |      `changeMe`       |
+| `TZ`                          |          Timezone           | `America/Los_Angeles` |
+
+---
+
+### Redis
+
+World’s fastest data platform for caching, vector search, and NoSQL databases.
+[Container image via docker/redis](https://hub.docker.com/_/redis/)
+
+| Variable             |        Description        |        Default        |
+| -------------------- | :-----------------------: | :-------------------: |
+| `GOISTOR_REDIS_PATH` | Path to application files |       `./redis`       |
+| `PGID`               |         Group ID          |        `1000`         |
+| `PUID`               |          User ID          |        `1000`         |
+| `REDIS_PORT`         |   Port for application    |        `6379`         |
+| `TZ`                 |         Timezone          | `America/Los_Angeles` |
+
+---
+
+### Minio
+
+Object storage.
+[Container image via bitnami/minio](https://hub.docker.com/r/bitnami/minio)
+
+| Variable                      |         Description         |        Default        |
+| ----------------------------- | :-------------------------: | :-------------------: |
+| `GOISTOR_MINIO_BUCKET`        | Name of the default bucket  |       `bucket`        |
+| `MINIO_PORT_SSL`              |   Secure port for web UI    |        `9001`         |
+| `MINIO_PORT`                  |       Port for web UI       |        `9000`         |
 | `PGID`                        |          Group ID           |        `1000`         |
 | `PUID`                        |           User ID           |        `1000`         |
 | `ROOT_EMAIL`                  | Email address for root user |  `admin@example.com`  |
