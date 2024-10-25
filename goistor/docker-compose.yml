@@ -44,7 +44,7 @@ services:
 
   # Postgres (https://hub.docker.com/_/postgres)
   postgres:
-    image: postgres:latest
+    image: postgres:16.4
     container_name: goistor-postgres
     environment:
       PUID: ${PUID:-1000}
@@ -98,14 +98,43 @@ services:
     networks:
       - gulhir
     ports:
-      - ${GOISTOR_REDIS_PORT:-6379}:6379
+      - ${REDIS_PORT:-6379}:6379
     restart: always
     volumes:
       - ${GOISTOR_REDIS_PATH:-./redis}:/data
     deploy:
       placement:
         constraints: [node.labels.goistor == true]
+  
+  # Minio (https://min.io)
+  minio:
+    image: docker.io/bitnami/minio:latest
+    container_name: goistor-minio
+    environment:
+      MINIO_ROOT_USER: ${GOISTOR_MINIO_USERNAME:-root}
+      MINIO_ROOT_PASSWORD: ${GOISTOR_MINIO_PASSWORD:-changeMe}
+      MINIO_DEFAULT_BUCKETS: ${GOISTOR_MINIO_BUCKET:-gulhir}
+    networks:
+      - gulhir
+    ports:
+      - ${MINIO_PORT:-9000}:9000
+      - ${MINIO_PORT_SSL:-9001}:9001
+    restart: always
+    volumes:
+      - thinmbahad-storage:/data
+    deploy:
+      placement:
+        constraints: [node.labels.goistor == true]
+    
 
 networks:
   gulhir:
     external: true
+
+volumes:
+  thinmbahad-storage:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/storage
