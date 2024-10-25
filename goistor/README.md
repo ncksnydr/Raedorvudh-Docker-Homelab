@@ -94,16 +94,16 @@ World’s fastest data platform for caching, vector search, and NoSQL databases.
 Object storage.
 [Container image via bitnami/minio](https://hub.docker.com/r/bitnami/minio)
 
-| Variable                      |         Description         |        Default        |
-| ----------------------------- | :-------------------------: | :-------------------: |
-| `GOISTOR_MINIO_BUCKET`        | Name of the default bucket  |       `bucket`        |
-| `MINIO_PORT_SSL`              |   Secure port for web UI    |        `9001`         |
-| `MINIO_PORT`                  |       Port for web UI       |        `9000`         |
-| `PGID`                        |          Group ID           |        `1000`         |
-| `PUID`                        |           User ID           |        `1000`         |
-| `ROOT_EMAIL`                  | Email address for root user |  `admin@example.com`  |
-| `ROOT_PASSWORD`               |   Password for root user    |      `changeMe`       |
-| `TZ`                          |          Timezone           | `America/Los_Angeles` |
+| Variable                 |        Description         |        Default        |
+| ------------------------ | :------------------------: | :-------------------: |
+| `GOISTOR_MINIO_BUCKET`   | Name of the default bucket |       `bucket`        |
+| `GOISTOR_MINIO_PASSWORD` |  Username for web access   |      `changeMe`       |
+| `GOISTOR_MINIO_USERNAME` |  Password for web access   |        `root`         |
+| `MINIO_PORT_SSL`         |   Secure port for web UI   |        `9001`         |
+| `MINIO_PORT`             |      Port for web UI       |        `9000`         |
+| `PGID`                   |          Group ID          |        `1000`         |
+| `PUID`                   |          User ID           |        `1000`         |
+| `TZ`                     |          Timezone          | `America/Los_Angeles` |
 
 ---
 
