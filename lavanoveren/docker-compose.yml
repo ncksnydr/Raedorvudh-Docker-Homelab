@@ -1,35 +1,25 @@
 version: "3.9"
 services:
-  # Minecraft (https://github.com/itzg/docker-minecraft-server)
-  # CurseForce Modpacks (https://legacy.curseforge.com/minecraft/modpacks)
-  minecraft:
-    image: itzg/minecraft-server:latest
-    container_name: lavanoveren-minecraft
+  # Crafty (https://craftycontrol.com)
+  crafty:
+    image: registry.gitlab.com/crafty-controller/crafty-4:latest
+    container_name: lavanoveren-crafty
     environment:
-      ALLOW_CHEATS: "TRUE"
-      DIFFICULTY: normal
-      DISABLE_HEALTHCHECK: "TRUE"
-      EULA: "TRUE"
-      GAMEMODE: SURVIVAL
-      GENERATE_STRUCTURES: "TRUE"
-      GID: ${PGID:-1000}
-      LEVEL_NAME: ${LAVANOVEREN_MINECRAFT_LEVEL_NAME:-Level}
-      MAX_PLAYERS: 100
-      MEMORY: 8G
-      MOTD: ${LAVANOVEREN_MINECRAFT_MOTD:-Oh hello there}
-      PGID: ${PGID:-1000}
-      PUID: ${PUID:-1000}
-      SERVER_NAME: ${LAVANOVEREN_MINECRAFT_SERVER_NAME:-Server}
-      TYPE: PAPER
-      TZ: ${TZ:-America/Los_Angeles}
-      UID: ${PUID:-1000}
+        PUID: ${PUID:-1000}
+        PGID: ${PGID:-1000}
+        TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - ${LAVANOVEREN_MINECRAFT_PORT:-25565}:25565
-    stdin_open: true
-    tty: true
+        - ${LAVANOVEREN_CRAFTY_PORT_UI:-8443}:8443
+        - ${LAVANOVEREN_CRAFTY_PORT_SOCKET:-8123}:8123
+        - ${LAVANOVEREN_CRAFTY_PORT_BEDROCK:-19132}:19132/udp
+        - ${LAVANOVEREN_CRAFTY_PORT_JAVA_RANGE:-25500-25600}:25500-25600
+    restart: always
     volumes:
-      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/app:/data
-      - ${LAVANOVEREN_MINECRAFT_PATH:-./minecraft}/mods:/mods:ro
+        - ${LAVANOVEREN_CRAFTY_PATH:-./crafty}/backups:/crafty/backups
+        - ${LAVANOVEREN_CRAFTY_PATH:-./crafty}/logs:/crafty/logs
+        - ${LAVANOVEREN_CRAFTY_PATH:-./crafty}/servers:/crafty/servers
+        - ${LAVANOVEREN_CRAFTY_PATH:-./crafty}/config:/crafty/app/config
+        - ${LAVANOVEREN_CRAFTY_PATH:-./crafty}/import:/crafty/import
     deploy:
       placement:
         constraints: [node.labels.lavanoveren_minecraft == true]
@@ -54,3 +44,42 @@ services:
     deploy:
       placement:
         constraints: [node.labels.lavanoveren == true]
+
+  # Gaseous (https://github.com/gaseous-project/gaseous-server)
+  gaseous:
+    image: gaseousgames/gaseousserver:latest
+    container_name: lavanoveren-gaseous
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      dbhost: mysql
+      dbuser: ${ROOT_USERNAME:-root}
+      dbpass: ${ROOT_PASSWORD:-changeMe}
+      igdbclientid: ${LAVANOVEREN_GASEOUS_CLIENT_ID:-changeMe}
+      igdbclientsecret: ${LAVANOVEREN_GASEOUS_CLIENT_SECRET:-changeMe}
+    networks:
+      - gulhir
+    ports:
+      - ${LAVANOVEREN_GASEOUS_PORT:-80}:80
+    restart: unless-stopped
+    volumes:
+      - ${LAVANOVEREN_GASEOUS_PATH:-./gaseous}:/root/.gaseous-server
+      - thinmbahad-roms:/root/roms
+    depends_on:
+      - mysql
+    deploy:
+      placement:
+        constraints: [node.labels.lavanoveren == true]
+
+networks:
+  gulhir:
+    external: true
+
+volumes:
+  thinmbahad-roms:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/93.Games/93.01.ROMs
