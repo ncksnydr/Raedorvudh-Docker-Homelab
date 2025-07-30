@@ -70,7 +70,6 @@ services:
     volumes:
       - ${NETHIADIL_BEETS_PATH:-./beets}:/config
       - thinmbahad-music-library:/music
-      - thinmbahad-music:/downloads
     deploy:
       placement:
         constraints: [node.labels.nethiadil_music == true]
@@ -81,16 +80,10 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media
-  thinmbahad-music:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/music/unprocessed
+      device: :${THINMBAHAD_PATH}
   thinmbahad-music-library:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/music/library
+      device: :${THINMBAHAD_PATH}/91.Audio/91.01.Music
