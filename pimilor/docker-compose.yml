@@ -156,26 +156,43 @@ services:
       placement:
         constraints: [node.labels.pimilor == true]
 
-  # Bazarr (https://github.com/linuxserver/docker-bazarr)
-  bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
-    container_name: pimilor-bazarr
+  # Huntarr (https://awesome-docker-compose.com/apps/arr/huntarr)
+  huntarr:
+    image: huntarr/huntarr:latest
+    container_name: pimilor-huntarr
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
     ports:
-      - ${PIMILOR_BAZARR_PORT:-6767}:6767
+      - ${PIMILOR_HUNTARR_PORT:-9705}:9705
     restart: unless-stopped
-    volumes:
-      - ${PIMILOR_BAZARR_PATH:-./bazarr}:/config
-      - thinmbahad-movies:/movies #optional
-      - thinmbahad-tv:/tv #optional
+    volumes: 
+      - ${PIMILOR_HUNTARR_PATH:-./huntarr}:/config
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
-
-  # Readarr (https://github.com/Readarr/Readarr)
+  
+  # Mylar3 (https://github.com/mylar3/mylar3)
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: pimilor-mylar3
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_MYLAR3_PORT:-8090}:8090
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_MYLAR3_PATH:-./mylar3}:/config
+      - thinmbahad-comics:/comics
+      - cofbilion:/downloads
+    deploy:
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Readarr (https://readarr.com)
   readarr:
     image: lscr.io/linuxserver/readarr:develop
     container_name: pimilor-readarr
@@ -188,9 +205,8 @@ services:
     restart: unless-stopped
     volumes:
       - ${PIMILOR_READARR_PATH:-./readarr}:/config
-      - thinmbahad-audiobooks:/books/audiobooks
-      - thinmbahad-ebooks:/books/ebooks
-      - cofbilion-blackhole:/downloads
+      - thinmbahad-ebooks:/books
+      - cofbilion:/downloads
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
@@ -213,40 +229,40 @@ volumes:
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/tv
+        device: :${THINMBAHAD_PATH}/96.Video/96.05.TV
   thinmbahad-movies:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/movies
+        device: :${THINMBAHAD_PATH}/96.Video/96.04.Movies
   thinmbahad-music:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/music
+        device: :${THINMBAHAD_PATH}/91.Audio/91.01.Music
   thinmbahad-books:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books
+        device: :${THINMBAHAD_PATH}/92.Books
   thinmbahad-ebooks:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/ebooks
+        device: :${THINMBAHAD_PATH}/92.Books/92.04.eBooks
   thinmbahad-audiobooks:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/audiobooks
+        device: :${THINMBAHAD_PATH}/92.Books/92.01.Audiobooks
   thinmbahad-comics:
       driver: local
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/comics
+        device: :${THINMBAHAD_PATH}/92.Books/92.02.Comics
