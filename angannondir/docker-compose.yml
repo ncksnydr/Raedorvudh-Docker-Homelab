@@ -11,7 +11,7 @@ services:
       DB_MYSQL_HOST: "mysql"
       DB_MYSQL_NAME: ${ANGANNONDIR_NPM_DATABASE:-npm}
       DB_MYSQL_PASSWORD: ${ROOT_PASSWORD:-npm}
-      DB_MYSQL_PORT: 3306
+      DB_MYSQL_PORT: ${MYSQL_PORT:-3306}
       DB_MYSQL_USER: ${ROOT_USERNAME:-npm}
       DISABLE_IPV6: "TRUE"
     networks:
@@ -30,39 +30,41 @@ services:
       placement:
         constraints: [node.labels.angannondir == true]
 
+
   # Cloudflare (https://github.com/favonia/cloudflare-ddns)
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: angannondir-cloudflare
-    user: "${PUID:-1000}:${PGID:-1000}"
     cap_drop:
       - all
     environment:
       CF_API_TOKEN: ${ANGANNONDIR_CLOUDFLARE_TOKEN:-changeMe}
       DOMAINS: ${DOMAINS:-changeMe.biz}
+      IP6_PROVIDER: "none"
       PROXIED: "TRUE"
       TZ: ${TZ:-America/Los_Angeles}
-      IP6_PROVIDER: "none"
     network_mode: host
     read_only: true
     restart: always
     security_opt:
       - no-new-privileges:true
+    user: "${PUID:-1000}:${PGID:-1000}"
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
+
 
   # DuckDNS (https://github.com/linuxserver/docker-duckdns)
   duckdns:
     image: lscr.io/linuxserver/duckdns:latest
     container_name: angannondir-duckdns
     environment:
+      LOG_FILE: "FALSE"
       PGID: ${PGID:-1000}
       PUID: ${PUID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
       SUBDOMAINS: ${ANGANNONDIR_DUCKDNS_SUBDOMAIN:-changeMe.biz}
       TOKEN: ${ANGANNONDIR_DUCKDNS_TOKEN:-changeMe}
-      LOG_FILE: "FALSE"
+      TZ: ${TZ:-America/Los_Angeles}
     restart: unless-stopped
     volumes:
       - ${ANGANNONDIR_DUCKDNS_PATH:-./duckdns}:/config
