@@ -191,25 +191,6 @@ services:
     deploy:
       placement:
         constraints: [node.labels.pimilor == true]
-  
-  # Readarr (https://readarr.com)
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: pimilor-readarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${PIMILOR_READARR_PORT:-8787}:8787
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_READARR_PATH:-./readarr}:/config
-      - thinmbahad-ebooks:/books
-      - cofbilion:/downloads
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
     
 volumes:
   cofbilion:
