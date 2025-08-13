@@ -1,6 +1,5 @@
 version: "3.9"
 services:
-
   # Firefox (https://docs.linuxserver.io/images/docker-firefox)
   firefox:
     image: lscr.io/linuxserver/firefox:latest
@@ -20,6 +19,272 @@ services:
       - ${PIMILOR_FIREFOX_PATH:-./firefox}:/config
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Firefox
+        - homepage.instance.admin.description=Browser behind VPN
+        - homepage.instance.admin.icon=firefox.svg
+        - homepage.instance.admin.href=${PIMILOR_FIREFOX_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=firefox-vpn
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Huntarr (https://awesome-docker-compose.com/apps/arr/huntarr)
+  huntarr:
+    image: huntarr/huntarr:latest
+    container_name: pimilor-huntarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_HUNTARR_PORT:-9705}:9705
+    restart: unless-stopped
+    volumes: 
+      - ${PIMILOR_HUNTARR_PATH:-./huntarr}:/config
+    depends_on:
+      - transmission
+      - prowlarr
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Huntarr
+        - homepage.instance.admin.description=Missing media manager
+        - homepage.instance.admin.icon=huntarr.png
+        - homepage.instance.admin.href=${PIMILOR_HUNTARR_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=huntarr
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Lidarr (https://github.com/linuxserver/docker-lidarr)
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: pimilor-lidarr
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+    ports:
+      - ${PIMILOR_LIDARR_PORT:-8686}:8686
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_LIDARR_PATH:-./lidarr}:/config
+      - thinmbahad-music:/music
+      - cofbilion:/downloads
+    depends_on:
+      - transmission
+      - prowlarr
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Lidarr
+        - homepage.instance.admin.description=Book collection manager
+        - homepage.instance.admin.icon=lidarr.svg
+        - homepage.instance.admin.href=${PIMILOR_LIDARR_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=lidarr
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_LIDARR_PORT:-8686}
+        - homepage.instance.admin.widgets[0].key=${API_LIDARR:-changeMe}
+        - homepage.instance.admin.widgets[0].fields=["wanted", "queued", "artists"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=lidarr
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Mylar3 (https://github.com/mylar3/mylar3)
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: pimilor-mylar3
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_MYLAR3_PORT:-8090}:8090
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_MYLAR3_PATH:-./mylar3}:/config
+      - thinmbahad-comics:/comics
+      - cofbilion:/downloads
+    depends_on:
+      - transmission
+      - prowlarr
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Mylar3
+        - homepage.instance.admin.description=Comic book collection manager
+        - homepage.instance.admin.icon=mylar3.png
+        - homepage.instance.admin.href=${PIMILOR_MYLAR3_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=mylar3
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_MYLAR3_PORT:-8090}
+        - homepage.instance.admin.widgets[0].key=${API_MYLAR3:-changeMe}
+        - homepage.instance.admin.widgets[0].fields=["series", "issues", "wanted"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=mylar3
+      placement:
+        constraints: [node.labels.pimilor == true]
+  
+  # Overseerr (https://docs.linuxserver.io/images/docker-overseerr)
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: nethiadil-overseerr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      LOG_LEVEL: debug
+    logging:
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_OVERSEERR_PORT:-5055}:5055
+    volumes:
+      - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/config
+    restart: unless-stopped
+    depends_on:
+      - transmission
+      - sonarr
+      - radarr
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Overseerr
+        - homepage.instance.admin.description=Media request management
+        - homepage.instance.public.group=Media
+        - homepage.instance.public.description=Request TV shows and movies
+        - homepage.instance.public.name=Plex request
+        - homepage.icon=overseerr.svg
+        - homepage.href=${PIMILOR_OVERSEERR_URL:-http://localhost}
+        - homepage.widgets[0].type=overseerr
+        - homepage.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_OVERSEERR_PORT:-5055}
+        - homepage.widgets[0].key=${API_OVERSEERR:-changeMe}
+        - homepage.widgets[0].fields=["approved", "available", "processing"]
+        - homepage.widgets[1].type=uptimekuma
+        - homepage.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.widgets[1].fields=["uptime", "incident"]
+        - homepage.widgets[1].slug=overseerr
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Prowlarr (https://github.com/linuxserver/docker-prowlarr)
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: pimilor-prowlarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${PIMILOR_PROWLARR_PORT:-9696}:9696
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_PROWLARR_PATH:-./prowlarr}:/config
+    depends_on:
+      - transmission
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Prowlarr
+        - homepage.instance.admin.description=Torrent indexer manager
+        - homepage.instance.admin.icon=prowlarr.svg
+        - homepage.instance.admin.href=${PIMILOR_PROWLARR_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=prowlarr
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_PROWLARR_PORT:-9696}
+        - homepage.instance.admin.widgets[0].key=${API_PROWLARR:-changeMe}
+        - homepage.instance.admin.widgets[0].fields=["numberOfGrabs", "numberOfQueries", "numberOfFailGrabs", "numberOfFailQueries"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=prowlarr
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+  # Radarr (https://docs.linuxserver.io/images/docker-radarr)
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: pimilor-radarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    logging:
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_RADARR_PORT:-7878}:7878
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_RADARR_PATH:-./radarr}:/config
+      - thinmbahad-movies:/movies 
+      - cofbilion:/downloads
+    depends_on:
+      - transmission
+      - prowlarr
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Radarr
+        - homepage.instance.admin.description=Movie collection manager
+        - homepage.instance.admin.icon=radarr.svg
+        - homepage.instance.admin.href=${PIMILOR_RADARR_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=radarr
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_RADARR_PORT:-7878}
+        - homepage.instance.admin.widgets[0].key=${API_RADARR:-changeMe}
+        - homepage.instance.admin.widgets[0].fields=["wanted", "queued", "series"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=radarr
+      placement:
+        constraints: [node.labels.pimilor == true]
+
+
+  # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: pimilor-sonarr
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    logging:
+      options:
+        max-size: 10m
+    ports:
+      - ${PIMILOR_SONARR_PORT:-8989}:8989
+    restart: unless-stopped
+    volumes:
+      - ${PIMILOR_SONARR_PATH:-./sonarr}:/config
+      - thinmbahad-tv:/tv
+      - cofbilion:/downloads
+    depends_on:
+      - transmission
+      - prowlarr
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Sonarr
+        - homepage.instance.admin.description=TV show collection manager
+        - homepage.instance.admin.icon=sonarr.svg
+        - homepage.instance.admin.href=${PIMILOR_SONARR_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=sonarr
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_SONARR_PORT:-8989}
+        - homepage.instance.admin.widgets[0].key=${API_SONARR:-changeMe}
+        - homepage.instance.admin.widgets[0].fields=["wanted", "queued", "series"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=sonarr
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -45,6 +310,20 @@ services:
       - ${PIMILOR_TRANSMISSION_PATH:-./transmission}:/config
       - cofbilion:/downloads
     deploy:
+      labels:
+        - homepage.instance.admin.group=Pímilor
+        - homepage.instance.admin.name=Transmission
+        - homepage.instance.admin.description=BitTorrent client
+        - homepage.instance.admin.icon=transmission.svg
+        - homepage.instance.admin.href=${PIMILOR_TRANSMISSION_URLL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=transmission
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_TRANSMISSION_PORT_UI:-9091}
+        - homepage.instance.admin.widgets[0].rpcUrl=/transmission/
+        - homepage.instance.admin.widgets[0].fields=["leech", "download", "seed", "upload"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=transmission
       placement:
         constraints: [node.labels.pimilor == true]
       resources:
@@ -55,143 +334,9 @@ services:
           cpus: '6.00'
           memory: 9G
 
-  # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
-  sonarr:
-    image: lscr.io/linuxserver/sonarr
-    container_name: pimilor-sonarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    logging:
-      options:
-        max-size: 10m
-    ports:
-      - ${PIMILOR_SONARR_PORT:-8989}:8989
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_SONARR_PATH:-./sonarr}:/config
-      - thinmbahad-tv:/tv
-      - cofbilion:/downloads
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
 
-  # Radarr (https://docs.linuxserver.io/images/docker-radarr)
-  radarr:
-    image: lscr.io/linuxserver/radarr:latest
-    container_name: pimilor-radarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    logging:
-      options:
-        max-size: 10m
-    ports:
-      - ${PIMILOR_RADARR_PORT:-7878}:7878
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_RADARR_PATH:-./radarr}:/config
-      - thinmbahad-movies:/movies 
-      - cofbilion:/downloads
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
 
-  # Overseerr (https://docs.linuxserver.io/images/docker-overseerr)
-  overseerr:
-    image: lscr.io/linuxserver/overseerr:latest
-    container_name: nethiadil-overseerr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-      LOG_LEVEL: debug
-    logging:
-      options:
-        max-size: 10m
-    ports:
-      - ${PIMILOR_OVERSEERR_PORT:-5055}:5055
-    volumes:
-      - ${PIMILOR_OVERSEERR_PATH:-./overseerr}:/config
-    restart: unless-stopped
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-  
-  # Lidarr (https://github.com/linuxserver/docker-lidarr)
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
-    container_name: pimilor-lidarr
-    environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-    ports:
-      - ${PIMILOR_LIDARR_PORT:-8686}:8686
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_LIDARR_PATH:-./lidarr}:/config
-      - thinmbahad-music:/music #optional
-      - cofbilion:/downloads #optional
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
 
-  # Prowlarr (https://github.com/linuxserver/docker-prowlarr)
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
-    container_name: pimilor-prowlarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${PIMILOR_PROWLARR_PORT:-9696}:9696
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_PROWLARR_PATH:-./prowlarr}:/config
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-
-  # Huntarr (https://awesome-docker-compose.com/apps/arr/huntarr)
-  huntarr:
-    image: huntarr/huntarr:latest
-    container_name: pimilor-huntarr
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${PIMILOR_HUNTARR_PORT:-9705}:9705
-    restart: unless-stopped
-    volumes: 
-      - ${PIMILOR_HUNTARR_PATH:-./huntarr}:/config
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-  
-  # Mylar3 (https://github.com/mylar3/mylar3)
-  mylar3:
-    image: lscr.io/linuxserver/mylar3:latest
-    container_name: pimilor-mylar3
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${PIMILOR_MYLAR3_PORT:-8090}:8090
-    restart: unless-stopped
-    volumes:
-      - ${PIMILOR_MYLAR3_PATH:-./mylar3}:/config
-      - thinmbahad-comics:/comics
-      - cofbilion:/downloads
-    deploy:
-      placement:
-        constraints: [node.labels.pimilor == true]
-    
 volumes:
   cofbilion:
       driver: local

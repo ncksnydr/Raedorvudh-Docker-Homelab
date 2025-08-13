@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1
+    image: ghcr.io/mealie-recipes/mealie:latest
     container_name: aesordur-mealie
     environment:
       PUID: ${PUID:-1000}
@@ -26,5 +26,21 @@ services:
     volumes:
       - ${AESORDUR_MEALIE_PATH:-./mealie}:/app/data
     deploy:
+      labels:
+        - homepage.description=Recipies and meal planning
+        - homepage.href=${AESORDUR_MEALIE_URL:-https://mealie.example.com}
+        - homepage.icon=mealie.svg
+        - homepage.instance.admin.group=Aesordúr
+        - homepage.instance.admin.name=Mealie
+        - homepage.instance.public.group=Xanadu
+        - homepage.instance.public.name=Cookbook
+        - homepage.widgets[0].type=mealie
+        - homepage.widgets[0].url=${RAEDORVUDH_IP:-http://mealie}:${AESORDUR_MEALIE_PORT:-9000}
+        - homepage.widgets[0].key=${API_MEALIE:-changeMe}
+        - homepage.widgets[0].fields=["recipes"]
+        - homepage.widgets[1].type=uptimekuma
+        - homepage.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.widgets[1].slug=mealie
+        - homepage.widgets[1].fields=["uptime", "incident"]
       placement:
         constraints: [node.labels.aesordur == true]

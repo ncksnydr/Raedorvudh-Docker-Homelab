@@ -19,9 +19,17 @@ services:
     volumes:
       - ${GOISTOR_MYSQL_PATH:-./mysql}:/var/lib/mysql
     deploy:
+      labels:
+        - homepage.instance.admin.description=MySQL/MariaDB database
+        - homepage.instance.admin.icon=mysql.svg
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=MySQL
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=mysql
       placement:
         constraints: [node.labels.goistor == true]
-
 
   # PHPMyAdmin (https://github.com/phpmyadmin/docker)
   phpmyadmin:
@@ -45,6 +53,16 @@ services:
     depends_on:
       - mysql
     deploy:
+      labels:
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=PHPMyAdmin
+        - homepage.instance.admin.description=MySQL/MariaDB database management
+        - homepage.instance.admin.icon=phpmyadmin.svg
+        - homepage.instance.admin.href=${GOISTOR_PHPMYADMIN_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=phpmyadmin
       placement:
         constraints: [node.labels.goistor == true]
 
@@ -68,9 +86,18 @@ services:
     depends_on:
       - postgres
     deploy:
+      labels:
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=PG Admin
+        - homepage.instance.admin.description=MySQL/MariaDB database management
+        - homepage.instance.admin.icon=pgadmin.svg
+        - homepage.instance.admin.href=${GOISTOR_POSTGRES_ADMIN_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=pgadmin
       placement:
         constraints: [node.labels.goistor == true]
-
 
   # Postgres (https://hub.docker.com/_/postgres)
   postgres:
@@ -91,9 +118,17 @@ services:
     volumes:
       - ${GOISTOR_POSTGRES_PATH:-./postgres}:/var/lib/postgresql/data/
     deploy:
+      labels:
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=PostgreSQL
+        - homepage.instance.admin.description=PostgreSQL database
+        - homepage.instance.admin.icon=postgresql.svg
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=postgresql
       placement:
         constraints: [node.labels.goistor == true]
-
 
   # Redis (https://github.com/docker-library/redis)
   redis:
@@ -110,6 +145,31 @@ services:
     restart: always
     volumes:
       - ${GOISTOR_REDIS_PATH:-./redis}:/data
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=Redis
+        - homepage.instance.admin.description=Redis memory cache
+        - homepage.instance.admin.icon=redis.svg
+        - homepage.instance.admin.widgets[0].type=uptimekuma
+        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[0].slug=redis
+      placement:
+        constraints: [node.labels.goistor == true]
+
+  uptimekuma:
+    image: louislam/uptime-kuma:1
+    container_name: goistor-uptimekuma
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    ports:
+      - ${UPTIME_KUMA_PORT:-3001}:3001
+    restart: unless-stopped
+    volumes:
+      - ${GOISTOR_UPTIMEKUMA_PATH:-./uptimekuma}:/app/data
     deploy:
       placement:
         constraints: [node.labels.goistor == true]

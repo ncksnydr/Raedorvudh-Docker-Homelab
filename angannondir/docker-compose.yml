@@ -27,6 +27,21 @@ services:
     depends_on:
       - mysql
     deploy:
+      labels:
+        - homepage.instance.admin.description=Reverse proxy manager
+        - homepage.instance.admin.href=${ANGANNONDIR_NPM_URL:-http://localhost}
+        - homepage.instance.admin.icon=nginx-proxy-manager.svg
+        - homepage.instance.admin.group=Angannondír
+        - homepage.instance.admin.name=NGINX Proxy Manager
+        - homepage.instance.admin.widgets[0].type=npm
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${ANGANNONDIR_NPM_PORT_ADMIN:-81}
+        - homepage.instance.admin.widgets[0].username=${ANGANNONDIR_NPM_USERNAME:-changeMe}
+        - homepage.instance.admin.widgets[0].password=${ANGANNONDIR_NPM_PASSWORD:-changeMe}
+        - homepage.instance.admin.widgets[0].fields=["enabled", "disabled", "total"]
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=nginx-proxy-manager
       placement:
         constraints: [node.labels.angannondir == true]
 
@@ -71,7 +86,7 @@ services:
     deploy:
       placement:
         constraints: [node.labels.angannondir == true]
-
+  
 networks:
   gulhir:
     external: true

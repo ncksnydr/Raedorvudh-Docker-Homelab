@@ -19,6 +19,22 @@ services:
       - plex-media:/media
       - /etc/localtime:/etc/localtime:ro
     deploy:
+      labels:
+        - homepage.instance.admin.group=Nethiadil
+        - homepage.instance.admin.name=Plex Media Server
+        - homepage.instance.public.group=Media
+        - homepage.instance.public.name=Nickflix
+        - homepage.description=Streaming media server
+        - homepage.icon=plex.svg
+        - homepage.href=${NETHIADIL_PLEX_URL:-http://localhost}
+        - homepage.widgets[0].type=plex
+        - homepage.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${NETHIADIL_PLEX_PORT:-32400}
+        - homepage.widgets[0].key=${API_PLEX:-changeMe}
+        - homepage.widgets[0].fields=["movies", "tv", "albums"]
+        - homepage.widgets[1].type=uptimekuma
+        - homepage.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.widgets[1].fields=["uptime", "incident"]
+        - homepage.widgets[1].slug=plex
       placement:
         constraints: [node.labels.nethiadil_plex == true]
 
@@ -36,13 +52,29 @@ services:
     volumes:
       - ${NETHIADIL_TAUTULLI_PATH:-./tautulli}:/config
     deploy:
+      labels:
+        - homepage.instance.admin.group=Nethiadil
+        - homepage.instance.admin.name=Tautilli
+        - homepage.instance.admin.description=Plex statistics
+        - homepage.instance.admin.icon=tautulli.svg
+        - homepage.instance.admin.href=${NETHIADIL_TAUTULLI_URL:-http://localhost}
+        - homepage.instance.admin.widgets[0].type=tautulli
+        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${NETHIADIL_TAUTULLI_PORT:-8181}
+        - homepage.instance.admin.widgets[0].key=${API_TAUTULLI:-changeMe}
+        - homepage.instance.admin.widgets[0].enableUser=true
+        - homepage.instance.admin.widgets[0].showEpisodeNumbers=true
+        - homepage.instance.admin.widgets[0].expandOneStreamToTwoRows=true
+        - homepage.instance.admin.widgets[1].type=uptimekuma
+        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
+        - homepage.instance.admin.widgets[1].slug=tautulli
       placement:
         constraints: [node.labels.nethiadil == true]
 
   # Plex Meta Manager (https://docs.linuxserver.io/images/docker-plex-meta-manager)
   plex-meta-manager:
     image: lscr.io/linuxserver/plex-meta-manager:latest
-    container_name: nethiadil-metadata
+    container_name: nethiadil-plex-metadata
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
@@ -51,8 +83,43 @@ services:
       PMM_TIME: ${NETHIADIL_PMM_UPDATE_TIME:-00:00}
     restart: unless-stopped
     volumes:
-      - ${NETHIADIL_PMM_PATH:-./plex-meta-manager}:/config:rw
+      - ${NETHIADIL_PMM_PATH:-./plex-meta-manager}/app:/config:rw
     deploy:
+      placement:
+        constraints: [node.labels.nethiadil == true]
+  
+  # Plex Meta Manager (https://docs.linuxserver.io/images/docker-plex-meta-manager)
+  plex-meta-manager-editor:
+    image: lscr.io/linuxserver/vscodium:latest
+    container_name: nethiadil-plex-metadata-editor
+    cap_add:
+      - IPC_LOCK
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      PASSWORD: ${NETHIADIL_PMM_PASSWORD:-changeMe}
+      TITLE: Plex Meta Manager Editor
+    ports:
+      - ${NETHIADIL_PMM_PORT:-3000}:3000
+      - ${NETHIADIL_PMM_PORT_SSL:-3001}:3001
+    restart: unless-stopped
+    shm_size: "1gb"
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ${NETHIADIL_PMM_PATH:-./plex-meta-manager}:/config
+    deploy:
+      labels:
+          - homepage.instance.admin.group=Nethiadil
+          - homepage.instance.admin.name=Plex Meta Manager
+          - homepage.instance.admin.description=Metadata management for Plex Media Server
+          - homepage.instance.admin.icon=/icons/plex-meta-manager.png
+          - homepage.instance.admin.href=${NETHIADIL_PMM_URL:-http://localhost}
+          - homepage.instance.admin.widgets[0].type=uptimekuma
+          - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+          - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+          - homepage.instance.admin.widgets[0].slug=plex-meta-manager
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -71,6 +138,16 @@ services:
       - ${NETHIADIL_BEETS_PATH:-./beets}:/config
       - thinmbahad-music-library:/music
     deploy:
+      labels:
+          - homepage.instance.admin.group=Nethiadil
+          - homepage.instance.admin.name=Beets
+          - homepage.instance.admin.description=Music library management
+          - homepage.instance.admin.icon=beets.svg
+          - homepage.instance.admin.href=${NETHIADIL_BEETS_URL:-http://localhost}
+          - homepage.instance.admin.widgets[0].type=uptimekuma
+          - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
+          - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
+          - homepage.instance.admin.widgets[0].slug=beets
       placement:
         constraints: [node.labels.nethiadil_music == true]
 
