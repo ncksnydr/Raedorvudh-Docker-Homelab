@@ -19,8 +19,6 @@ services:
       - ${LOCHUIL_HOMEPAGE_PATH:-./homepage}/icons:/app/public/icons
       - ${LOCHUIL_HOMEPAGE_PATH:-./homepage}/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - dockerproxy
     deploy:
       placement:
         constraints: [node.labels.lochuil == true]
@@ -44,12 +42,20 @@ services:
       - ${LOCHUIL_HOMEPAGE_ADMIN_PATH:-./homepage}/icons:/app/public/icons
       - ${LOCHUIL_HOMEPAGE_ADMIN_PATH:-./homepage}/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - dockerproxy
     deploy:
       placement:
         constraints: [node.labels.lochuil == true]
+  
+
 
 networks:
   gulhir:
     external: true
+
+volumes:
+  thinmbahad-photos-public:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/94.Photos/94.01.Public

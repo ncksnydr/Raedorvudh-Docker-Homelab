@@ -1,104 +1,49 @@
 version: "3.9"
 services:
-
-  # PhotoPrism (https://www.photoprism.app)
-  photoprism:
-    image: photoprism/photoprism:preview-arm64
-    container_name: bavronalad-photoprism-app
-    devices:
-      - /dev/video11:/dev/video11
-    environment:
-      PHOTOPRISM_ADMIN_PASSWORD: ${BAVRONALAD_PHOTOPRISM_PASSWORD}
-      PHOTOPRISM_ADMIN_USER: ${BAVRONALAD_PHOTOPRISM_USERNAME}
-      PHOTOPRISM_AUTH_MODE: password
-      PHOTOPRISM_DATABASE_DRIVER: mysql
-      PHOTOPRISM_DATABASE_NAME: ${BAVRONALAD_PHOTOPRISM_DATABASE}
-      PHOTOPRISM_DATABASE_PASSWORD: ${ROOT_PASSWORD}
-      PHOTOPRISM_DATABASE_SERVER: photoprism-db:3306
-      PHOTOPRISM_DATABASE_USER: ${ROOT_USERNAME}
-      PHOTOPRISM_DEBUG: "TRUE"
-      PHOTOPRISM_DETECT_NSFW: "FALSE"
-      PHOTOPRISM_DISABLE_CHOWN: "FALSE"
-      PHOTOPRISM_DISABLE_CLASSIFICATION: "FALSE"
-      PHOTOPRISM_DISABLE_FACES: "FALSE"
-      PHOTOPRISM_DISABLE_FFMPEG: "FALSE"
-      PHOTOPRISM_DISABLE_HEIFCONVERT: "FALSE"
-      PHOTOPRISM_DISABLE_RAW: "TRUE"
-      PHOTOPRISM_DISABLE_SETTINGS: "FALSE"
-      PHOTOPRISM_DISABLE_TENSORFLOW: "FALSE"
-      PHOTOPRISM_DISABLE_WEBDAV: "FALSE"
-      PHOTOPRISM_EXPERIMENTAL: "TRUE"
-      PHOTOPRISM_FFMPEG_ENCODER: "raspberry"
-      PHOTOPRISM_GID: ${PGID}
-      PHOTOPRISM_HTTP_COMPRESSION: gzip
-      PHOTOPRISM_INIT: "tensorflow"
-      PHOTOPRISM_JPEG_QUALITY: 90
-      PHOTOPRISM_JPEG_SIZE: 30000
-      PHOTOPRISM_LOG_LEVEL: debug
-      PHOTOPRISM_ORIGINALS_LIMIT: -1
-      PHOTOPRISM_RAW_PRESETS: "FALSE"
-      PHOTOPRISM_READONLY: "FALSE"
-      PHOTOPRISM_RESOLUTION_LIMIT: -1
-      PHOTOPRISM_SESSION_MAXAGE: -1
-      PHOTOPRISM_SESSION_TIMEOUT: -1
-      PHOTOPRISM_SITE_URL: ${BAVRONALAD_PHOTOPRISM_URL}
-      PHOTOPRISM_THUMB_FILTER: "blackman"
-      PHOTOPRISM_THUMB_SIZE: 7680
-      PHOTOPRISM_TRACE: "TRUE"
-      PHOTOPRISM_UID: ${PUID}
-      PHOTOPRISM_UPLOAD_NSFW: "TRUE"
-      PHOTOPRISM_WORKERS: 2
-      TF_CPP_MIN_LOG_LEVEL: 0
-    ports:
-      - ${BAVRONALAD_PHOTOPRISM_PORT}:2342
-    restart: unless-stopped
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
-    volumes:
-      - photoprism-media:/photoprism/originals
-      - photoprism-media-import:/photoprism/import
-      - ${BAVRONALAD_PHOTOPRISM_PATH}:/photoprism/storage
-    working_dir: "/photoprism"
-    depends_on:
-      - photoprism-db
-    deploy:
-      placement:
-        constraints: [node.labels.bavronalad == true]
-
-  # PhotoPrism (DB)
-  photoprism-db:
-    image: yobasystems/alpine-mariadb:latest
-    container_name: bavronalad-photoprism-db
+  photoview:
+    image: photoview/photoview:latest
+    container_name: bavronalad-photoview
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-changeMe}
-      MYSQL_DATABASE: ${BAVRONALAD_PHOTOPRISM_DATABASE:-npm}
-      MYSQL_USER: ${ROOT_USERNAME:-root}
-      MYSQL_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      MAPBOX_TOKEN: ${API_MAPBOX:-changeMe}
+      PHOTOVIEW_DATABASE_DRIVER: postgres
+      PHOTOVIEW_MEDIA_CACHE: ${BAVRONALAD_PHOTOVIEW_PATH:-./photoview}/cache
+      PHOTOVIEW_POSTGRES_URL: postgresql://${ROOT_USERNAME:-changeMe}:${ROOT_PASSWORD:-changeMe}@${RAEDORVUDH_IP:-127.0.0.1}:${POSTGRES_PORT:-5432}/${BAVRONALAD_PHOTOVIEW_DATABASE_NAME:-photoview}
+      PHOTOVIEW_SERVE_UI: 1
+      PHOTOVIEW_UI_PATH: ${BAVRONALAD_PHOTOVIEW_PATH:-./photoview}/app
     networks:
       - gulhir
-    restart: always
+    ports:
+      - ${BAVRONALAD_PHOTOVIEW_PORT:-80}:80
+    restart: unless-stopped
+    security_opt:
+      - apparmor:unconfined
+      - seccomp:unconfined
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro 
+      - thinmbahad-photos-public:/photos:ro
+    depends_on:
+      - postgresql
     deploy:
+      labels:
+        - homepage.instance.admin.group=Bavronalad
+        - homepage.instance.admin.name=Photoview
+        - homepage.instance.admin.description=Photo management and sharing
+        - homepage.instance.admin.icon=photoview.svg
       placement:
-        constraints: [node.labels.goistor == true]
-
+        constraints: [node.hostname == ] 
+        
 networks:
   gulhir:
     external: true
 
 volumes:
-  photoprism-media:
+  thinmbahad-photos-public:
     driver: local
     driver_opts:
       type: nfs
       o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/photos/gallery
-  photoprism-media-import:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${NFS_IP},${NFS_OPTIONS}
-      device: :${THINMBAHAD_PATH}/media/photos/import
+      device: :${THINMBAHAD_PATH}/94.Photos/94.01.Public

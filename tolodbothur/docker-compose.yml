@@ -1,6 +1,5 @@
 version: '3.9'
 services:
-
   # Manyfold (https://manyfold.app)
   manyfold:
     image: lscr.io/linuxserver/manyfold:latest
@@ -30,30 +29,15 @@ services:
       - ${TOLODBOTHUR_MANYFOLD_PATH:-./manyfold}:/config
       - thinmbahad-models:/libraries
     deploy:
+      labels:
+        - homepage.instance.admin.group=Tolodbothur
+        - homepage.instance.admin.name=Manyfold
+        - homepage.instance.admin.description=3D model manager
+        - homepage.instance.admin.icon=sh-manyfold
+        - homepage.instance.admin.href=${TOLODBOTHUR_MANYFOLD_URL:-http://localhost}
       placement:
         constraints: [node.labels.tolodbothur == true]
-
-  # OctoPrint (https://octoprint.org)
-  octoprint:
-    image: octoprint/octoprint
-    container_name: tolodbothur-octoprint
-    devices:
-      - /dev/ttyACM0:/dev/ttyACM0
-      - /dev/video0:/dev/video0
-    environment:
-      ENABLE_MJPG_STREAMER: "true"
-      PGID: ${PGID:-1000}
-      PUID: ${PUID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${TOLODBOTHUR_OCTOPRINT_PORT:-80}:80
-    restart: unless-stopped
-    volumes:
-      - ${TOLODBOTHUR_OCTOPRINT_PATH:-./octoprint}:/octoprint
-    deploy:
-      placement:
-        constraints: [node.labels.tolodbothur == true]
-
+  
 networks:
   gulhir:
     external: true
@@ -64,4 +48,4 @@ volumes:
       driver_opts:
         type: nfs
         o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/3d
+        device: :${THINMBAHAD_PATH}/95.Storage/95.02.manyfold

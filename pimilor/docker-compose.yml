@@ -25,10 +25,6 @@ services:
         - homepage.instance.admin.description=Browser behind VPN
         - homepage.instance.admin.icon=firefox.svg
         - homepage.instance.admin.href=${PIMILOR_FIREFOX_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=firefox-vpn
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -43,7 +39,7 @@ services:
     ports:
       - ${PIMILOR_HUNTARR_PORT:-9705}:9705
     restart: unless-stopped
-    volumes: 
+    volumes:
       - ${PIMILOR_HUNTARR_PATH:-./huntarr}:/config
     depends_on:
       - transmission
@@ -55,13 +51,9 @@ services:
         - homepage.instance.admin.description=Missing media manager
         - homepage.instance.admin.icon=huntarr.png
         - homepage.instance.admin.href=${PIMILOR_HUNTARR_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=huntarr
       placement:
         constraints: [node.labels.pimilor == true]
-  
+
   # Lidarr (https://github.com/linuxserver/docker-lidarr)
   lidarr:
     image: lscr.io/linuxserver/lidarr:latest
@@ -87,14 +79,10 @@ services:
         - homepage.instance.admin.description=Book collection manager
         - homepage.instance.admin.icon=lidarr.svg
         - homepage.instance.admin.href=${PIMILOR_LIDARR_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=lidarr
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_LIDARR_PORT:-8686}
-        - homepage.instance.admin.widgets[0].key=${API_LIDARR:-changeMe}
-        - homepage.instance.admin.widgets[0].fields=["wanted", "queued", "artists"]
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=lidarr
+        - homepage.instance.admin.widget.type=lidarr
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_LIDARR_PORT:-8686}
+        - homepage.instance.admin.widget.key=${API_LIDARR:-changeMe}
+        - homepage.instance.admin.widget.fields=["wanted", "queued", "artists"]
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -121,19 +109,15 @@ services:
         - homepage.instance.admin.group=Pímilor
         - homepage.instance.admin.name=Mylar3
         - homepage.instance.admin.description=Comic book collection manager
-        - homepage.instance.admin.icon=mylar3.png
+        - homepage.instance.admin.icon=sh-mylar3
         - homepage.instance.admin.href=${PIMILOR_MYLAR3_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=mylar3
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_MYLAR3_PORT:-8090}
-        - homepage.instance.admin.widgets[0].key=${API_MYLAR3:-changeMe}
-        - homepage.instance.admin.widgets[0].fields=["series", "issues", "wanted"]
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=mylar3
+        - homepage.instance.admin.widget.type=mylar
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_MYLAR3_PORT:-8090}
+        - homepage.instance.admin.widget.key=${API_MYLAR3:-changeMe}
+        - homepage.instance.admin.widget.fields=["series", "issues", "wanted"]
       placement:
         constraints: [node.labels.pimilor == true]
-  
+
   # Overseerr (https://docs.linuxserver.io/images/docker-overseerr)
   overseerr:
     image: lscr.io/linuxserver/overseerr:latest
@@ -162,17 +146,13 @@ services:
         - homepage.instance.admin.description=Media request management
         - homepage.instance.public.group=Media
         - homepage.instance.public.description=Request TV shows and movies
-        - homepage.instance.public.name=Plex request
+        - homepage.instance.public.name=Plex Requests
         - homepage.icon=overseerr.svg
         - homepage.href=${PIMILOR_OVERSEERR_URL:-http://localhost}
-        - homepage.widgets[0].type=overseerr
-        - homepage.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_OVERSEERR_PORT:-5055}
-        - homepage.widgets[0].key=${API_OVERSEERR:-changeMe}
-        - homepage.widgets[0].fields=["approved", "available", "processing"]
-        - homepage.widgets[1].type=uptimekuma
-        - homepage.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.widgets[1].fields=["uptime", "incident"]
-        - homepage.widgets[1].slug=overseerr
+        - homepage.widget.type=overseerr
+        - homepage.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_OVERSEERR_PORT:-5055}
+        - homepage.widget.key=${API_OVERSEERR:-changeMe}
+        - homepage.widget.fields=["approved", "available", "processing"]
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -198,14 +178,10 @@ services:
         - homepage.instance.admin.description=Torrent indexer manager
         - homepage.instance.admin.icon=prowlarr.svg
         - homepage.instance.admin.href=${PIMILOR_PROWLARR_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=prowlarr
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_PROWLARR_PORT:-9696}
-        - homepage.instance.admin.widgets[0].key=${API_PROWLARR:-changeMe}
-        - homepage.instance.admin.widgets[0].fields=["numberOfGrabs", "numberOfQueries", "numberOfFailGrabs", "numberOfFailQueries"]
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=prowlarr
+        - homepage.instance.admin.widget.type=prowlarr
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_PROWLARR_PORT:-9696}
+        - homepage.instance.admin.widget.key=${API_PROWLARR:-changeMe}
+        - homepage.instance.admin.widget.fields=["numberOfGrabs", "numberOfQueries", "numberOfFailGrabs", "numberOfFailQueries"]
       placement:
         constraints: [node.labels.pimilor == true]
 
@@ -225,7 +201,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${PIMILOR_RADARR_PATH:-./radarr}:/config
-      - thinmbahad-movies:/movies 
+      - thinmbahad-movies:/movies
       - cofbilion:/downloads
     depends_on:
       - transmission
@@ -237,17 +213,12 @@ services:
         - homepage.instance.admin.description=Movie collection manager
         - homepage.instance.admin.icon=radarr.svg
         - homepage.instance.admin.href=${PIMILOR_RADARR_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=radarr
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_RADARR_PORT:-7878}
-        - homepage.instance.admin.widgets[0].key=${API_RADARR:-changeMe}
-        - homepage.instance.admin.widgets[0].fields=["wanted", "queued", "series"]
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=radarr
+        - homepage.instance.admin.widget.type=radarr
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_RADARR_PORT:-7878}
+        - homepage.instance.admin.widget.key=${API_RADARR:-changeMe}
+        - homepage.instance.admin.widget.fields=["wanted", "queued", "series"]
       placement:
         constraints: [node.labels.pimilor == true]
-
 
   # Sonarr (https://docs.linuxserver.io/images/docker-sonarr)
   sonarr:
@@ -277,18 +248,14 @@ services:
         - homepage.instance.admin.description=TV show collection manager
         - homepage.instance.admin.icon=sonarr.svg
         - homepage.instance.admin.href=${PIMILOR_SONARR_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=sonarr
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_SONARR_PORT:-8989}
-        - homepage.instance.admin.widgets[0].key=${API_SONARR:-changeMe}
-        - homepage.instance.admin.widgets[0].fields=["wanted", "queued", "series"]
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=sonarr
+        - homepage.instance.admin.widget.type=sonarr
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_SONARR_PORT:-8989}
+        - homepage.instance.admin.widget.key=${API_SONARR:-changeMe}
+        - homepage.instance.admin.widget.fields=["wanted", "queued", "series"]
       placement:
         constraints: [node.labels.pimilor == true]
 
-  # Transmission (https://docs.linuxserver.io/images/docker-transmission)
+    # Transmission (https://docs.linuxserver.io/images/docker-transmission)
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: pimilor-transmission
@@ -310,85 +277,68 @@ services:
       - ${PIMILOR_TRANSMISSION_PATH:-./transmission}:/config
       - cofbilion:/downloads
     deploy:
-      labels:
-        - homepage.instance.admin.group=Pímilor
-        - homepage.instance.admin.name=Transmission
-        - homepage.instance.admin.description=BitTorrent client
-        - homepage.instance.admin.icon=transmission.svg
-        - homepage.instance.admin.href=${PIMILOR_TRANSMISSION_URLL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=transmission
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${PIMILOR_TRANSMISSION_PORT_UI:-9091}
-        - homepage.instance.admin.widgets[0].rpcUrl=/transmission/
-        - homepage.instance.admin.widgets[0].fields=["leech", "download", "seed", "upload"]
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=transmission
       placement:
         constraints: [node.labels.pimilor == true]
       resources:
         limits:
-          cpus: '8.00'
+          cpus: "8.00"
           memory: 15G
         reservations:
-          cpus: '6.00'
+          cpus: "6.00"
           memory: 9G
-
-
-
 
 volumes:
   cofbilion:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}
   cofbilion-blackhole:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${COFBILION_PATH}/blackhole
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${COFBILION_PATH}/blackhole
   thinmbahad-tv:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/96.Video/96.05.TV
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/96.Video/96.05.TV
   thinmbahad-movies:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/96.Video/96.04.Movies
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/96.Video/96.04.Movies
   thinmbahad-music:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/91.Audio/91.01.Music
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/91.Audio/91.01.Music
   thinmbahad-books:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/92.Books
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books
   thinmbahad-ebooks:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/92.Books/92.04.eBooks
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books/92.04.eBooks
   thinmbahad-audiobooks:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/92.Books/92.01.Audiobooks
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books/92.01.Audiobooks
   thinmbahad-comics:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/92.Books/92.02.Comics
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books/92.02.Comics

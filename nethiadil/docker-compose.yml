@@ -27,14 +27,10 @@ services:
         - homepage.description=Streaming media server
         - homepage.icon=plex.svg
         - homepage.href=${NETHIADIL_PLEX_URL:-http://localhost}
-        - homepage.widgets[0].type=plex
-        - homepage.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${NETHIADIL_PLEX_PORT:-32400}
-        - homepage.widgets[0].key=${API_PLEX:-changeMe}
-        - homepage.widgets[0].fields=["movies", "tv", "albums"]
-        - homepage.widgets[1].type=uptimekuma
-        - homepage.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.widgets[1].fields=["uptime", "incident"]
-        - homepage.widgets[1].slug=plex
+        - homepage.widget.type=plex
+        - homepage.widget.url=${RAEDORVUDH_IP:-http://localhost}:${NETHIADIL_PLEX_PORT:-32400}
+        - homepage.widget.key=${API_PLEX:-changeMe}
+        - homepage.widget.fields=["movies", "tv", "albums"]
       placement:
         constraints: [node.labels.nethiadil_plex == true]
 
@@ -58,16 +54,12 @@ services:
         - homepage.instance.admin.description=Plex statistics
         - homepage.instance.admin.icon=tautulli.svg
         - homepage.instance.admin.href=${NETHIADIL_TAUTULLI_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=tautulli
-        - homepage.instance.admin.widgets[0].url=${RAEDORVUDH_IP:-http://localhost}:${NETHIADIL_TAUTULLI_PORT:-8181}
-        - homepage.instance.admin.widgets[0].key=${API_TAUTULLI:-changeMe}
-        - homepage.instance.admin.widgets[0].enableUser=true
-        - homepage.instance.admin.widgets[0].showEpisodeNumbers=true
-        - homepage.instance.admin.widgets[0].expandOneStreamToTwoRows=true
-        - homepage.instance.admin.widgets[1].type=uptimekuma
-        - homepage.instance.admin.widgets[1].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[1].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[1].slug=tautulli
+        - homepage.instance.admin.widget.type=tautulli
+        - homepage.instance.admin.widget.url=${RAEDORVUDH_IP:-http://localhost}:${NETHIADIL_TAUTULLI_PORT:-8181}
+        - homepage.instance.admin.widget.key=${API_TAUTULLI:-changeMe}
+        - homepage.instance.admin.widget.enableUser=true
+        - homepage.instance.admin.widget.showEpisodeNumbers=true
+        - homepage.instance.admin.widget.expandOneStreamToTwoRows=true
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -116,10 +108,6 @@ services:
           - homepage.instance.admin.description=Metadata management for Plex Media Server
           - homepage.instance.admin.icon=/icons/plex-meta-manager.png
           - homepage.instance.admin.href=${NETHIADIL_PMM_URL:-http://localhost}
-          - homepage.instance.admin.widgets[0].type=uptimekuma
-          - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-          - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-          - homepage.instance.admin.widgets[0].slug=plex-meta-manager
       placement:
         constraints: [node.labels.nethiadil == true]
 
@@ -142,12 +130,8 @@ services:
           - homepage.instance.admin.group=Nethiadil
           - homepage.instance.admin.name=Beets
           - homepage.instance.admin.description=Music library management
-          - homepage.instance.admin.icon=beets.svg
+          - homepage.instance.admin.icon=sh-beets
           - homepage.instance.admin.href=${NETHIADIL_BEETS_URL:-http://localhost}
-          - homepage.instance.admin.widgets[0].type=uptimekuma
-          - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-          - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-          - homepage.instance.admin.widgets[0].slug=beets
       placement:
         constraints: [node.labels.nethiadil_music == true]
 

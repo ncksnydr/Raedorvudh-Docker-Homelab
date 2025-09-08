@@ -1,27 +1,34 @@
 version: "3.9"
 services:
-
-  # Kavita (https://www.kavitareader.com/)
-  kavita:
-    image: lscr.io/linuxserver/kavita:latest
-    container_name: perfadaben-kavita
+  # Audiobookshelf (https://www.audiobookshelf.org/)
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: perfadaben-audiobookshelf
     environment:
-      PGID: ${PGID:-1000}
       PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
       TZ: ${TZ:-America/New_York}
     ports:
-      - ${PERFADABEN_KAVITA_PORT:-5000}:5000
+      - ${PERFADABEN_AUDIOBOOKSHELF_PORT:-80}:80
     restart: unless-stopped
     volumes:
-      - ${PERFADABEN_KAVITA_PATH:-./kavita}:/config
-      - thinmbahad-books:/data/books
-      - thinmbahad-comics:/data/comics
-      - thinmbahad-magazines:/data/magazines
-      - thinmbahad-rpgs:/data/rpgs
+      - thinmbahad-audiobooks:/audiobooks
+      - ${PERFADABEN_AUDIOBOOKSHELF_PATH:-./audiobookshelf}/config:/config
+      - ${PERFADABEN_AUDIOBOOKSHELF_PATH:-./audiobookshelf}/metadata:/metadata
     deploy:
+      labels:
+        - homepage.instance.admin.group=Perfadaben
+        - homepage.instance.admin.name=Audiobookshelf
+        - homepage.instance.admin.description=Audiobook player
+        - homepage.instance.admin.icon=audiobookshelf.svg
+        - homepage.instance.admin.href=${PERFADABEN_AUDIOBOOKSHELF_URL:-http://localhost}
+        - homepage.instance.admin.widget.type=audiobookshelf
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PERFADABEN_AUDIOBOOKSHELF_PORT:-80}
+        - homepage.instance.admin.widget.key=${API_AUDIOBOOKSHELF:-changeMe}
+        - homepage.instance.admin.widget.fields=["books", "booksDuration"]
       placement:
-        constraints: [node.labels.perfadaben == true]
-  
+        constraints: [node.hostname == budhlefnui]
+
   # Calibre (https://calibre-ebook.com/)
   calibre:
     image: lscr.io/linuxserver/calibre:latest
@@ -32,6 +39,7 @@ services:
       TZ: ${TZ:-America/New_York}
       CUSTOM_USER: ${PERFADABEN_CALIBRE_USERNAME:-admin}
       PASSWORD: ${PERFADABEN_CALIBRE_PASSWORD:-changeMe}
+      TITLE: "Calibre"
     ports:
       - ${PERFADABEN_CALIBRE_PORT:-8080}:8080
       - ${PERFADABEN_CALIBRE_PORT_SSL:-8181}:8181
@@ -40,11 +48,15 @@ services:
     security_opt:
       - seccomp:unconfined
     volumes:
-      - thinmbahad-books-root:/config
+      - thinmbahad-books:/config
     deploy:
-      placement:
-        constraints: [node.labels.perfadaben == true]
-  
+      labels:
+        - homepage.instance.admin.group=Perfadaben
+        - homepage.instance.admin.name=Calibre
+        - homepage.instance.admin.description=Audiobook and eBook management
+        - homepage.instance.admin.icon=calibre.svg
+        - homepage.instance.admin.href=${PERFADABEN_CALIBRE_URL:-http://localhost}
+
   # Calibre (https://calibre-ebook.com/)
   calibre-web:
     image: lscr.io/linuxserver/calibre-web:latest
@@ -58,51 +70,42 @@ services:
     restart: unless-stopped
     volumes:
       - ${PERFADABEN_CALIBRE_WEB_PATH:-./calibre-web}:/config
-      - thinmbahad-calibre-library:/books
+      - thinmbahad-books:/books
     deploy:
+      labels:
+        - homepage.instance.admin.group=Perfadaben
+        - homepage.instance.admin.name=Calibre Web
+        - homepage.instance.admin.description=eBook reader
+        - homepage.instance.admin.icon=calibre-web.svg
+        - homepage.instance.admin.href=${PERFADABEN_CALIBRE_WEB_URL:-http://localhost}
+        - homepage.instance.admin.widget.type=calibreweb
+        - homepage.instance.admin.widget.url=http://${RAEDORVUDH_IP:-http://localhost}:${PERFADABEN_CALIBRE_WEB_PORT:-80}
+        - homepage.instance.admin.widget.fields=["books", "authors", "categories", "series"]
       placement:
-        constraints: [node.labels.perfadaben == true]
+        constraints: [node.hostname == budhlefnui]
 
 volumes:
-  thinmbahad-books-root:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books
-  thinmbahad-calibre-library:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/__calibre
   thinmbahad-books:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/ebooks
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books
+  thinmbahad-ebooks:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books/92.04.eBooks
+  thinmbahad-audiobooks:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books/92.01.Audiobooks
   thinmbahad-comics:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/comics
-  thinmbahad-cookbooks:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/cookbooks
-  thinmbahad-magazines:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/magazines
-  thinmbahad-rpgs:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/media/books/rpgs
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/92.Books/92.02.Comics

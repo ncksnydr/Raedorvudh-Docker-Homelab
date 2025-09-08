@@ -1,5 +1,33 @@
 version: "3.9"
 services:
+  # Min.io (https://github.com/minio/minio)
+  minio:
+    image: quay.io/minio/minio
+    container_name: goistor-minio
+    command: server /data --console-address ":9001"
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      MINIO_ROOT_USER: ${GOISTOR_MINIO_USER:-changeMe}
+      MINIO_ROOT_PASSWORD: ${GOISTOR_MINIO_PASSWORD:-changeMe}
+    ports:
+      - ${GOISTOR_MINIO_PORT_API:-9000}:9000
+      - ${GOISTOR_MINIO_PORT_CONSOLE:-9001}:9001
+    volumes:
+      - thinmbahad_storage:/data
+    deploy:
+      labels:
+        - homepage.description=File storage server
+        - homepage.href=${GOISTOR_MINIO_URL:-http://localhost}
+        - homepage.icon=minio.svg
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=Minio
+        - homepage.instance.public.group=Organization
+        - homepage.instance.public.name=Cloud Storage
+      placement:
+        constraints: [node.hostname == raedorvudh]
+
   # MySQL/MariaDB (https://github.com/yobasystems/alpine-mariadb)
   mysql:
     image: yobasystems/alpine-mariadb:latest
@@ -24,10 +52,6 @@ services:
         - homepage.instance.admin.icon=mysql.svg
         - homepage.instance.admin.group=Goistor
         - homepage.instance.admin.name=MySQL
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=mysql
       placement:
         constraints: [node.labels.goistor == true]
 
@@ -59,10 +83,6 @@ services:
         - homepage.instance.admin.description=MySQL/MariaDB database management
         - homepage.instance.admin.icon=phpmyadmin.svg
         - homepage.instance.admin.href=${GOISTOR_PHPMYADMIN_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=phpmyadmin
       placement:
         constraints: [node.labels.goistor == true]
 
@@ -92,10 +112,6 @@ services:
         - homepage.instance.admin.description=MySQL/MariaDB database management
         - homepage.instance.admin.icon=pgadmin.svg
         - homepage.instance.admin.href=${GOISTOR_POSTGRES_ADMIN_URL:-http://localhost}
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=pgadmin
       placement:
         constraints: [node.labels.goistor == true]
 
@@ -123,10 +139,6 @@ services:
         - homepage.instance.admin.name=PostgreSQL
         - homepage.instance.admin.description=PostgreSQL database
         - homepage.instance.admin.icon=postgresql.svg
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=postgresql
       placement:
         constraints: [node.labels.goistor == true]
 
@@ -151,29 +163,17 @@ services:
         - homepage.instance.admin.name=Redis
         - homepage.instance.admin.description=Redis memory cache
         - homepage.instance.admin.icon=redis.svg
-        - homepage.instance.admin.widgets[0].type=uptimekuma
-        - homepage.instance.admin.widgets[0].url=${UPTIME_KUMA_URL:-http://localhost:3000}
-        - homepage.instance.admin.widgets[0].fields=["uptime", "incident"]
-        - homepage.instance.admin.widgets[0].slug=redis
       placement:
         constraints: [node.labels.goistor == true]
 
-  uptimekuma:
-    image: louislam/uptime-kuma:1
-    container_name: goistor-uptimekuma
-    environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
-      TZ: ${TZ:-America/Los_Angeles}
-    ports:
-      - ${UPTIME_KUMA_PORT:-3001}:3001
-    restart: unless-stopped
-    volumes:
-      - ${GOISTOR_UPTIMEKUMA_PATH:-./uptimekuma}:/app/data
-    deploy:
-      placement:
-        constraints: [node.labels.goistor == true]
-  
 networks:
   gulhir:
     external: true
+
+volumes:
+  thinmbahad_storage:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/95.Storage
