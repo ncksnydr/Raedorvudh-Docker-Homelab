@@ -166,6 +166,32 @@ services:
       placement:
         constraints: [node.labels.goistor == true]
 
+  # Redis Insight (https://github.com/docker-library/redis)
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: goistor-redis-insight
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+    networks:
+      - gulhir
+    ports:
+      - ${GOISTOR_REDIS_INSIGHT_PORT:-5540}:5540
+    restart: unless-stopped
+    volumes:
+      - ${GOISTOR_REDIS_INSIGHT_PATH:-./redis-insight}:/data
+    depends_on:
+      - redis
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Goistor
+        - homepage.instance.admin.name=Redis Insight
+        - homepage.instance.admin.description=Redis GUI
+        - homepage.instance.admin.icon=redis.svg
+      placement:
+        constraints: [node.hostname == raedorvudh]
+
 networks:
   gulhir:
     external: true
