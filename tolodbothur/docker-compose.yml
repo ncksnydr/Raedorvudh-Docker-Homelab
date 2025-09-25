@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 services:
   # Manyfold (https://manyfold.app)
   manyfold:
-    image: lscr.io/linuxserver/manyfold:latest
+    image: ghcr.io/manyfold3d/manyfold:latest
     container_name: tolodbothur-manyfold
     cap_add:
       - CHOWN
@@ -15,19 +15,25 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}/${REDIS_DB_MANYFOLD:-0}
       SECRET_KEY_BASE: ${TOLODBOTHUR_MANYFOLD_SECRET:-changeMe}
-      DATABASE_URL: postgresql://${ROOT_USERNAME:-changeMe}:${ROOT_PASSWORD:-changeMe}@${RAEDORVUDH_IP:-127.0.0.1}:${POSTGRES_PORT:-5432}/${TOLODBOTHUR_MANYFOLD_DATABASE_NAME:-manyfold}
+      DATABASE_ADAPTER: postgresql
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${POSGRES_PORT:-5432}
+      DATABASE_USER: ${ROOT_USERNAME:-changeMe}
+      DATABASE_PASSWORD: ${ROOT_PASSWORD:-changeMe}
+      DATABASE_NAME: ${TOLODBOTHUR_MANYFOLD_DATABASE_NAME:-manyfold}
     networks:
       - gulhir
     ports:
       - ${TOLODBOTHUR_MANYFOLD_PORT:-3214}:3214
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
     volumes:
       - ${TOLODBOTHUR_MANYFOLD_PATH:-./manyfold}:/config
       - thinmbahad-models:/libraries
+    depends_on:
+      - redis
+      - postgres
     deploy:
       labels:
         - homepage.instance.admin.group=Tolodbothur
@@ -36,16 +42,16 @@ services:
         - homepage.instance.admin.icon=sh-manyfold
         - homepage.instance.admin.href=${TOLODBOTHUR_MANYFOLD_URL:-http://localhost}
       placement:
-        constraints: [node.labels.tolodbothur == true]
-  
+        constraints: [node.hostname == budhdun]
+
 networks:
   gulhir:
     external: true
 
 volumes:
   thinmbahad-models:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: addr=${NFS_IP},${NFS_OPTIONS}
-        device: :${THINMBAHAD_PATH}/95.Storage/95.02.manyfold
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=${NFS_IP},${NFS_OPTIONS}
+      device: :${THINMBAHAD_PATH}/95.Storage/95.02.manyfold
