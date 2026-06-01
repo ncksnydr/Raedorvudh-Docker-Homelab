@@ -72,7 +72,6 @@ services:
   # Plex (https://docs.linuxserver.io/images/docker-plex)
   plex:
     image: lscr.io/linuxserver/plex:latest
-    container_name: nethiadil-plex
     environment:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
@@ -92,7 +91,7 @@ services:
       - plex_claim_token
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${BASE_PATH:-.}/nethiadil/plex:/config
+      - ${BASE_PATH:-.}/plex:/config
       - thinmbahad-media:/media
     deploy:
       labels:
@@ -136,7 +135,6 @@ services:
   # Tautilli (https://docs.linuxserver.io/images/docker-tautulli)
   tautulli:
     image: lscr.io/linuxserver/tautulli:latest
-    container_name: nethiadil-plex-stats
     environment:
       PUID: ${NAS_PUID:-1000}
       PGID: ${NAS_PGID:-1000}
@@ -164,6 +162,96 @@ services:
       placement:
         constraints:
           - node.hostname == amonvedui
+
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-America/Los_Angeles}
+      auth: "false"
+      cronPluginUpdate: ""
+      ffmpegVersion: 7
+      inContainer: "true"
+      internalNode: "true"
+      maxLogSizeMB: 10
+      nodeName: NETHIADIL_TDARR_SERVER
+      NVIDIA_DRIVER_CAPABILITIES: all
+      NVIDIA_VISIBLE_DEVICES: all
+      openBrowser: "true"
+      serverIP: 0.0.0.0
+      serverPort: 8266
+      UMASK_SET: 002
+      webUIPort: 8265
+    ports:
+      - 22211:8265
+      - 22212:8266
+    volumes:
+      - ${BASE_PATH:-.}/tdarr/cache:/app/temp
+      - ${BASE_PATH:-.}/tdarr/config:/app/configs
+      - ${BASE_PATH:-.}/tdarr/logs:/app/logs
+      - ${BASE_PATH:-.}/tdarr/server:/app/server
+      - thinmbahad-movies:/media/movies
+      - thinmbahad-tv:/media/tv
+    deploy:
+      labels:
+        - homepage.instance.admin.group=Nethiadil
+        - homepage.instance.admin.name=Tdarr (Server)
+        - homepage.instance.admin.description=Media server video transcoding
+        - homepage.instance.admin.icon=tdarr.svg
+        - homepage.instance.admin.href=${TDARR_URL:-http://localhost}
+        # - homepage.instance.admin.widget.type=tdarr
+        # - homepage.instance.admin.widget.url=${MANAGER_IP:-http://localhost}:22211
+        # - homepage.instance.admin.widget.key=${HOMEPAGE_TDARR_API_KEY}
+      placement:
+        constraints:
+          - node.hostname == budganthui
+
+  # tdarr-node:
+  #   image: ghcr.io/haveagitgat/tdarr_node:latest
+  #   devices:
+  #     - /dev/dri:/dev/dri
+  #   environment:
+  #     PUID: ${PUID:-1000}
+  #     PGID: ${PGID:-1000}
+  #     TZ: ${TZ:-America/Los_Angeles}
+  #     apiKey: ""
+  #     cronPluginUpdate: ""
+  #     ffmpegVersion: 7
+  #     healthcheckcpuWorkers: 1
+  #     healthcheckgpuWorkers: 1
+  #     inContainer: "true"
+  #     maxLogSizeMB: 10
+  #     nodeName: MyExternalNode
+  #     nodeType: mapped
+  #     NVIDIA_DRIVER_CAPABILITIES: all
+  #     NVIDIA_VISIBLE_DEVICES: all
+  #     pollInterval: 2000
+  #     priority: -1
+  #     serverIP: 0.0.0.0
+  #     serverPort: 8266
+  #     startPaused: "false"
+  #     transcodecpuWorkers: 2
+  #     transcodegpuWorkers: 1
+  #     UMASK_SET: 002
+  #   network_mode: service:tdarr
+  #   volumes:
+  #     - ${BASE_PATH:-.}/tdarr/cache:/app/temp
+  #     - ${BASE_PATH:-.}/tdarr/config:/app/configs
+  #     - ${BASE_PATH:-.}/tdarr/logs:/app/logs
+  #     - thinmbahad-movies:/media/movies
+  #     - thinmbahad-tv:/media/tv
+  #   deploy:
+  #     labels:
+  #       - homepage.instance.admin.group=Nethiadil
+  #       - homepage.instance.admin.name=Tdarr (Node)
+  #       - homepage.instance.admin.description=Media server video transcoding
+  #       - homepage.instance.admin.icon=tdarr.svg
+  #     placement:
+  #       constraints:
+  #         - node.hostname == budganthui
 
 configs:
   beets-config:
