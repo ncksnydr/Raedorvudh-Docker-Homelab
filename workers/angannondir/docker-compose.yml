@@ -5,80 +5,6 @@
 #   Services related to access and authentication.
 # --------------------------------------------------------------------------
 services:
-  # Authentik (https://goauthentik.io/)
-  authentik-server:
-    image: ghcr.io/goauthentik/server:2025.8.4
-    command: server
-    environment:
-      AUTHENTIK_POSTGRESQL__HOST: postgres
-      AUTHENTIK_POSTGRESQL__NAME: file:///run/secrets/authentik_database
-      AUTHENTIK_POSTGRESQL__PASSWORD: file:////run/secrets/root_password
-      AUTHENTIK_POSTGRESQL__USER: file:////run/secrets/root_username
-      AUTHENTIK_REDIS__HOST: redis
-      AUTHENTIK_SECRET_KEY: file:////run/secrets/authentik_secret_key
-    networks:
-      - gulhir
-    ports:
-      - 50120:9000
-      - 50121:9443
-    secrets:
-      - authentik_database
-      - authentik_secret_key
-      - root_password
-      - root_username
-    volumes:
-      - gogiwnadh-storage-authentik-media:/media
-      - gogiwnadh-storage-authentik-templates:/templates
-    depends_on:
-      - postgres
-      - redis
-    deploy:
-      labels:
-        - homepage.instance.admin.group=Angannondír
-        - homepage.instance.admin.name=Authentik
-        - homepage.instance.admin.description=Single sign-on and identity provider (server)
-        - homepage.instance.admin.icon=authentik.svg
-        - homepage.instance.admin.href=${AUTHENTIK_URL:-http://localhost}
-      placement:
-        constraints:
-          - node.labels.pi4 == true
-
-  authentik-worker:
-    image: ghcr.io/goauthentik/server:2025.8.4
-    command: worker
-    environment:
-      AUTHENTIK_POSTGRESQL__HOST: postgres
-      AUTHENTIK_POSTGRESQL__NAME: file:///run/secrets/authentik_database
-      AUTHENTIK_POSTGRESQL__PASSWORD: file:////run/secrets/root_password
-      AUTHENTIK_POSTGRESQL__USER: file:////run/secrets/root_username
-      AUTHENTIK_REDIS__HOST: redis
-      AUTHENTIK_SECRET_KEY: file:////run/secrets/authentik_secret_key
-    networks:
-      - gulhir
-    secrets:
-      - authentik_database
-      - authentik_secret_key
-      - root_password
-      - root_username
-    user: root
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - gogiwnadh-storage-authentik-media:/media
-      - gogiwnadh-storage-authentik-templates:/templates
-      - gogiwnadh-storage-authentik-certs:/certs
-    depends_on:
-      - postgres
-      - redis
-    deploy:
-      labels:
-        - homepage.instance.admin.group=Angannondír
-        - homepage.instance.admin.name=Authentik
-        - homepage.instance.admin.description=Single sign-on and identity provider (worker)
-        - homepage.instance.admin.icon=authentik.svg
-      placement:
-        constraints:
-          - node.labels.pi4 == true
-
   # Cloudflare (https://github.com/favonia/cloudflare-ddns)
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
@@ -174,45 +100,36 @@ services:
         constraints:
           - node.role == manager
 
-  pihole:
-    image: pihole/pihole:latest
+  # Tailscale (https://tailscale.com)
+  tailscale:
+    image: tailscale/tailscale:latest
+    hostname: enedos-gateway
     cap_add:
-      - SYS_TIME
+      - NET_ADMIN
     environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
       TZ: ${TZ:-America/Los_Angeles}
-      WEBPASSWORD_FILE: /run/secrets/pihole_password
-      FTLCONF_dns_listeningMode: "all"
-      FTLCONF_LOCAL_IPV4: "10.0.1.45"
-      PIHOLE_DNS_: "1.1.1.1"
-      HOMEPAGE_FILE_PIHOLE_API_KEY: /run/secrets/pihole_api
+      TS_AUTHKEY: file:/run/secrets/tailscale_authkey
+      TS_ROUTES: ${NETWORK_RANGE:-10.0.1.0/24}
+      TS_EXTRA_ARGS: --advertise-exit-node --hostname=enedos-gateway
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "false"
+      TS_ACCEPT_DNS: "false"
+    devices:
+      - /dev/net/tun:/dev/net/tun
     network_mode: host
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 39238:80/tcp
-      - 39239:443/tcp
     secrets:
-      - pihole_api
-      - pihole_password
+      - tailscale_authkey
     volumes:
-      - ${BASE_PATH:-.}/pihole:/etc/pihole
+      - ${BASE_PATH:-.}/tailscale:/var/lib/tailscale
     deploy:
       labels:
         - homepage.instance.admin.group=Angannondír
-        - homepage.instance.admin.name=Pihol
-        - homepage.instance.admin.description=DNS sinkhole and ad blocker
-        - homepage.instance.admin.href=${PIHOLE_URL:-http://localhost}
-        - homepage.instance.admin.icon=pihole.svg
-        - homepage.instance.admin.widget.type=pihole
-        - homepage.instance.admin.widget.url=${MANAGER_IP:-http://localhost}:81
-        - homepage.instance.admin.widget.version=6
-        - homepage.instance.admin.widget.key=${HOMEPAGE_FILE_PIHOLE_API_KEY}
-        - homepage.instance.admin.widget.fields=["queries", "blocked", "blocked_percent", "gravity"]
+        - homepage.instance.admin.name=Tailscale
+        - homepage.instance.admin.description=Subnet router and exit node for remote LAN access
+        - homepage.instance.admin.icon=tailscale.svg
       placement:
         constraints:
-          - node.labels.honeypot == true
+          - node.role == manager
 
 networks:
   gulhir:
@@ -229,15 +146,13 @@ secrets:
     external: true
   nginx_proxy_manager_password:
     external: true
-  pihole_api:
-    external: true
-  pihole_password:
-    external: true
   root_email:
     external: true
   root_password:
     external: true
   root_username:
+    external: true
+  tailscale_authkey:
     external: true
 
 volumes:
